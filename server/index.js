@@ -13,7 +13,7 @@ const User = require('./models/User');
 const app = express();
 app.use(cors({
   origin: [
-    "https://pafum-d-elite.vercel.app", // Your Live Vercel Site
+    "https://pafum-d-elite.vercel.app/", // Your Live Vercel Site
     "http://localhost:5173"             // Your Local Computer
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
