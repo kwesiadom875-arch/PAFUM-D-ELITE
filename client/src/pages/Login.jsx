@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 
@@ -14,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // Call the Login Route
-      const res = await axios.post('http://127.0.0.1:5000/api/auth/login', formData);
+      const res = await axios.post(`${API_URL}/api/auth/login`, formData);
       
       // Pass User AND Token to Context
       login(res.data.user, res.data.token);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import './ScentFinder.css';
 
 const ScentFinder = () => {
@@ -13,7 +14,7 @@ const ScentFinder = () => {
     setResponse(null); // Clear previous answer
 
     try {
-      const res = await axios.post('http://127.0.0.1:5000/api/josie', { userMessage: input });
+      const res = await axios.post(`${API_URL}/api/josie`, { userMessage: input });
       setResponse(res.data.reply);
     } catch (err) {
       setResponse("I'm having trouble connecting to the ether right now.");

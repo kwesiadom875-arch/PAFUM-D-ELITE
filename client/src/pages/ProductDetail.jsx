@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import API_URL from '../config';
 import { CartContext } from '../context/CartContext';
 import LuxuryNegotiator from '../components/LuxuryNegotiator';
 import { FaGlobe, FaThermometerHalf, FaClock, FaStar, FaMars, FaFlask, FaTag } from 'react-icons/fa';
@@ -84,11 +85,11 @@ const ProductDetail = () => {
   const [finalPrice, setFinalPrice] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://127.0.0.1:5000/api/products/${id}`).then(res => {
+    axios.get(`${API_URL}/api/products/${id}`).then(res => {
       setProduct(res.data);
       setFinalPrice(res.data.price);
     });
-    axios.get('http://127.0.0.1:5000/api/products').then(res => {
+    axios.get(`${API_URL}/api/products`).then(res => {
       const others = res.data.filter(p => p.id !== parseInt(id) && p._id !== id);
       setRelated(others.slice(0, 4));
     });

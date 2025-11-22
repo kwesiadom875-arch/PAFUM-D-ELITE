@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Signup = () => {
@@ -12,7 +13,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       // Call the Register Endpoint
-      await axios.post('http://127.0.0.1:5000/api/auth/register', formData);
+      await axios.post(`${API_URL}/api/auth/register`, formData);
       alert("Registration Successful! Please Login.");
       navigate('/login'); // Send them to login page
     } catch (error) {

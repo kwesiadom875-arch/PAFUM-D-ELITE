@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import './Admin.css';
 
 const Admin = () => {
@@ -17,7 +18,7 @@ const Admin = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/products');
+      const res = await axios.get(`${API_URL}/api/products`);
       setProducts(res.data);
     } catch (err) { console.error(err); }
   };
@@ -32,7 +33,7 @@ const Admin = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://127.0.0.1:5000/api/scrape', { url: scrapeUrl });
+      const res = await axios.post(`${API_URL}/api/scrape`, { url: scrapeUrl });
       const data = res.data;
 
       // Populate the form with scraped data
@@ -55,7 +56,7 @@ const Admin = () => {
     e.preventDefault();
     try {
       const newProduct = { ...form, id: Math.floor(Math.random() * 100000) };
-      await axios.post('http://127.0.0.1:5000/api/products', newProduct);
+      await axios.post(`${API_URL}/api/products`, newProduct);
       alert("Product Added Successfully!");
       setForm({ name: '', price: '', category: '', description: '', image: '', notes: '' });
       setScrapeUrl('');
@@ -67,7 +68,7 @@ const Admin = () => {
 
   const handleDelete = async (id) => {
     if(!window.confirm("Delete this item?")) return;
-    await axios.delete(`http://127.0.0.1:5000/api/products/${id}`);
+    await axios.delete(`/api/products/${id}`);
     fetchProducts();
   };
 

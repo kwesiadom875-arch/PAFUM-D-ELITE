@@ -16,7 +16,7 @@ app.use(express.json());
 
 // --- CONFIGURATION ---
 // 1. AI Config (Groq)
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "gsk_YOUR_KEY_HERE" }); 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // 2. Auth Config
 const JWT_SECRET = process.env.JWT_SECRET || "parfum_delite_secret_key_123";

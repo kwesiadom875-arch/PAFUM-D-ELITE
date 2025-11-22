@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { FaHeart } from 'react-icons/fa'; // Import Heart Icon
@@ -15,7 +16,7 @@ const Shop = () => {
   const categories = ["All", "Floral", "Woody", "Fresh", "Spicy"];
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:5000/api/products')
+    axios.get(`${API_URL}/api/products`)
       .then(res => {
         setProducts(res.data);
         setFilteredProducts(res.data);
