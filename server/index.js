@@ -11,12 +11,21 @@ const Product = require('./models/Product');
 const User = require('./models/User');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://pafum-d-elite.vercel.app", // Your Live Vercel Site
+    "http://localhost:5173"             // Your Local Computer
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // --- CONFIGURATION ---
 // 1. AI Config (Groq)
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ 
+  apiKey: process.env.GROQ_API_KEY 
+});
 
 // 2. Auth Config
 const JWT_SECRET = process.env.JWT_SECRET || "parfum_delite_secret_key_123";
