@@ -1,0 +1,15 @@
+.admin-page { margin-top: 40px; }
+.admin-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+@media(min-width: 768px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
+
+.form-section input, .form-section textarea {
+  width: 100%; background: rgba(255,255,255,0.1); border: 1px solid #333; 
+  color: white; padding: 10px; margin-bottom: 10px;
+}
+
+.admin-item {
+  display: flex; align-items: center; gap: 15px; padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.admin-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.delete-btn { background: #ff4d4d; border: none; color: white; padding: 5px 10px; cursor: pointer; margin-left: auto; }

@@ -1,0 +1,24 @@
+.profile-page { margin-top: 40px; }
+.profile-wrapper { display: flex; flex-direction: column; align-items: center; gap: 40px; }
+
+.loyalty-card {
+  width: 100%; max-width: 400px; height: 220px;
+  border-radius: 15px; padding: 25px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: white;
+  font-family: 'Times New Roman', serif;
+}
+
+/* Platinum Gradient */
+.card-platinum {
+  background: linear-gradient(135deg, #333333, #8E8E8E);
+  border: 1px solid #C0C0C0;
+}
+
+.card-top { display: flex; justify-content: space-between; text-transform: uppercase; font-size: 0.8rem; }
+.card-mid h3 { font-size: 1.8rem; margin: 0; letter-spacing: 1px; }
+.card-bot { text-align: right; font-weight: bold; }
+
+.benefits h3 { color: #C5A059; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.benefits ul { list-style: none; padding: 0; }
+.benefits li { padding: 10px 0; color: #B0B0B0; }

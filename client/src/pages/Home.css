@@ -1,0 +1,104 @@
+/* General Spacing */
+.home-container { padding-bottom: 100px; }
+.section-title { font-size: 2.5rem; margin-bottom: 40px; font-family: 'Playfair Display', serif; }
+.text-center { text-align: center; }
+.gold-text { color: #C5A059; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
+
+/* --- HERO SECTION --- */
+.hero-section {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 40px;
+}
+
+.hero-text { max-width: 500px; }
+.hero-text h2 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-family: 'Playfair Display', serif; }
+.hero-sub { color: #B0B0B0; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.6; }
+
+.hero-visuals { position: relative; width: 500px; height: 500px; }
+.float-bottle { position: absolute; height: 300px; object-fit: contain; transition: 0.5s ease; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+
+/* Floating Animation Positions */
+.float-bottle.left { left: 0; top: 50px; transform: rotate(-10deg); z-index: 1; }
+.float-bottle.center { left: 120px; top: 0; z-index: 2; height: 340px; }
+.float-bottle.right { right: 0; top: 80px; transform: rotate(10deg); z-index: 1; }
+
+.hero-visuals:hover .float-bottle.left { transform: translateX(-20px) rotate(-15deg); }
+.hero-visuals:hover .float-bottle.right { transform: translateX(20px) rotate(15deg); }
+
+/* --- CURATOR SECTION --- */
+.curator-section {
+  margin-top: 100px;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.curator-content { flex: 1; }
+.curator-content h1 { font-size: 3rem; margin: 10px 0 20px 0; }
+.curator-content p { color: #B0B0B0; line-height: 1.8; margin-bottom: 30px; font-size: 1.1rem; }
+.action-row { display: flex; gap: 15px; }
+
+.curator-image { flex: 1; display: flex; justify-content: center; position: relative; }
+/* Add a gold glow behind the curator bottle */
+.curator-image::before {
+  content: ''; position: absolute; width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.2) 0%, transparent 70%);
+  z-index: -1; top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.curator-image img { height: 500px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8)); }
+
+/* --- COLLECTIONS SECTION --- */
+.collections-section { margin-top: 120px; }
+.collections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+.collection-card { padding: 20px; transition: transform 0.3s; }
+.collection-card:hover { transform: translateY(-5px); border-color: #C5A059; }
+
+.img-wrapper { height: 250px; overflow: hidden; margin-bottom: 20px; border-radius: 4px; }
+.img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+.collection-card:hover img { transform: scale(1.05); }
+
+.collection-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+.collection-card p { color: #B0B0B0; font-size: 0.9rem; }
+
+/* --- REVIEWS SECTION --- */
+.reviews-section { margin-top: 120px; }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+
+.review-card { padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+.review-card p { font-style: italic; color: #E0E0E0; margin-bottom: 20px; }
+
+.reviewer { display: flex; align-items: center; gap: 15px; }
+.avatar { width: 40px; height: 40px; background: #333; border-radius: 50%; border: 1px solid #C5A059; }
+.name { display: block; font-weight: bold; color: #C5A059; }
+.role { display: block; font-size: 0.8rem; color: #999; }
+
+/* --- FOOTER CTA --- */
+.footer-cta {
+  margin-top: 120px; text-align: center; padding: 80px 20px;
+  background: linear-gradient(to bottom, transparent, rgba(197, 160, 89, 0.05));
+}
+.footer-cta h2 { margin-bottom: 30px; font-size: 2.5rem; }
+.cta-buttons { display: flex; justify-content: center; gap: 20px; }
+
+/* --- UTILS --- */
+.btn-outline {
+  background: transparent; border: 1px solid #C5A059; color: #C5A059;
+  padding: 12px 24px; cursor: pointer; transition: 0.3s; text-decoration: none;
+}
+.btn-outline:hover { background: #C5A059; color: black; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .hero-section, .curator-section { flex-direction: column; text-align: center; }
+  .collections-grid, .reviews-grid { grid-template-columns: 1fr; }
+  .hero-visuals { width: 100%; height: 350px; margin-top: 40px; }
+  .float-bottle.center { height: 250px; left: 50%; transform: translateX(-50%); }
+  .float-bottle.left { left: 10%; }
+  .float-bottle.right { right: 10%; }
+  .curator-image img { height: 350px; margin-top: 40px; }
+  .action-row { justify-content: center; }
+}

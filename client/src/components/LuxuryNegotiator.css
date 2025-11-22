@@ -1,0 +1,23 @@
+.negotiator-box {
+  margin-top: 20px;
+  border-color: #C5A059;
+}
+.chat-header {
+  display: flex; justify-content: space-between; color: #C5A059; margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;
+}
+.chat-header button { background: none; border: none; color: white; cursor: pointer; }
+
+.chat-window {
+  height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 10px;
+}
+.msg { padding: 8px; border-radius: 4px; font-size: 0.9rem; }
+.msg.ai { background: rgba(255,255,255,0.1); align-self: flex-start; border-left: 2px solid #C5A059; }
+.msg.user { background: rgba(197, 160, 89, 0.3); align-self: flex-end; }
+
+.chat-input { display: flex; gap: 5px; }
+.chat-input input { flex: 1; background: black; border: 1px solid #333; color: white; padding: 5px; }
+.chat-input button { background: #C5A059; border: none; cursor: pointer; font-weight: bold; }
+.success-msg { color: #C5A059; text-align: center; font-weight: bold; }
+.btn-outline { background: transparent; border: 1px solid #C5A059; color: #C5A059; padding: 10px; cursor: pointer; }
