@@ -31,10 +31,14 @@ const groq = new Groq({
 const JWT_SECRET = process.env.JWT_SECRET || "parfum_delite_secret_key_123";
 
 // 3. Database Connection
-mongoose.connect('mongodb://127.0.0.1:27017/parfum_delite')
+// Connect to MongoDB
+// This uses the Cloud Address (from Render Env) if available, 
+// otherwise falls back to Localhost (for your laptop).
+const dbAddress = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/parfum_delite';
+
+mongoose.connect(dbAddress)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Error:', err));
-
 // --- MIDDLEWARE ---
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
