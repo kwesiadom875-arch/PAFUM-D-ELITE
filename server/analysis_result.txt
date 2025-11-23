@@ -1,0 +1,7 @@
+--- ANALYSIS START ---
+Number of .accord-bar elements: 9
+
+Found 'woody' in tag: div
+Classes: accord-bar
+Path: div#app > div.off-canvas-wrapper.grid-container > div.grid-container#main-content > div.grid-x.grid-margin-x > div.small-12.medium-12.large-9.cell > div.grid-x.bg-white.grid-padding-x.grid-padding-y > div.cell.small-12 > div.grid-x.grid-margin-x.grid-margin-y > div.cell.small-6.text-center > div.grid-x > div.cell.accord-box > div
+--- ANALYSIS END ---

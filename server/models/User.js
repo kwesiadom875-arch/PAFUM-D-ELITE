@@ -24,7 +24,14 @@ const userSchema = new mongoose.Schema({
   tier: {
     type: String,
     default: 'Bronze'
-  }
+  },
+  orderHistory: [{
+    productName: String,
+    productImage: String,
+    originalPrice: Number,
+    finalPrice: Number,
+    date: { type: Date, default: Date.now }
+  }]
 });
 
 module.exports = mongoose.model('User', userSchema);
