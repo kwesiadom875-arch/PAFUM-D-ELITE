@@ -17,9 +17,33 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Only scroll when new messages are added, not when typing
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [messages.length]); // Changed to track message count instead of full messages array
+
+  // Auto-close modal when deal is made
+  useEffect(() => {
+    if (dealMade) {
+      const timer = setTimeout(() => {
+        setIsOpen(false);
+        setDealMade(false);
+      }, 3000); // Close after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [dealMade]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleOffer = async () => {
     if (!offer) return;
@@ -62,59 +86,70 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
     }
   };
 
-  if (!isOpen) return (
-    <button className="btn-outline negotiate-trigger" onClick={() => setIsOpen(true)}>
-      Negotiate Price
-    </button>
-  );
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
   return (
-    <div className="negotiator-card">
-      {/* Header */}
-      <div className="chat-header">
-        <div className="header-info">
-          <div className="status-dot"></div>
-          <span>Private Concierge</span>
-        </div>
-        <button className="close-btn" onClick={() => setIsOpen(false)}>×</button>
-      </div>
+    <>
+      <button className="btn-outline negotiate-trigger" onClick={() => setIsOpen(true)}>
+        Negotiate Price
+      </button>
 
-      {/* Chat Window */}
-      <div className="chat-window">
-        {messages.map((m, i) => (
-          <div key={i} className={`msg ${m.sender}`}>
-            {m.text}
-          </div>
-        ))}
-        {isTyping && (
-          <div className="msg ai typing">
-            <span className="dot"></span>
-            <span className="dot"></span>
-            <span className="dot"></span>
-          </div>
-        )}
-        <div ref={chatEndRef} />
-      </div>
+      {/* Modal Overlay */}
+      {isOpen && (
+        <div className="negotiator-overlay" onClick={closeModal}>
+          <div className="negotiator-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="chat-header">
+              <div className="header-info">
+                <div className="status-dot"></div>
+                <span>Private Concierge</span>
+              </div>
+              <button className="close-btn" onClick={closeModal}>×</button>
+            </div>
 
-      {/* Input Area or Deal Certificate */}
-      {!dealMade ? (
-        <div className="chat-input-area">
-          <input
-            type="number"
-            value={offer}
-            onChange={(e) => setOffer(e.target.value)}
-            placeholder="Enter your offer..."
-            onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
-          />
-          <button className="send-btn" onClick={handleOffer}>→</button>
-        </div>
-      ) : (
-        <div className="deal-certificate">
-          <h4>Deal Secured</h4>
-          <p>The price has been updated.</p>
+            {/* Chat Window */}
+            <div className="chat-window">
+              {messages.map((m, i) => (
+                <div key={i} className={`msg ${m.sender}`}>
+                  {m.text}
+                </div>
+              ))}
+              {isTyping && (
+                <div className="msg ai typing">
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Input Area or Deal Certificate */}
+            {!dealMade ? (
+              <div className="chat-input-area">
+                <input
+                  type="number"
+                  value={offer}
+                  onChange={(e) => setOffer(e.target.value)}
+                  placeholder="Enter your offer..."
+                  onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
+                />
+                <button className="send-btn" onClick={handleOffer}>→</button>
+              </div>
+            ) : (
+              <div className="deal-certificate">
+                <div className="certificate-icon">✓</div>
+                <h4>Deal Secured</h4>
+                <p>The price has been updated.</p>
+                <p className="closing-message">Closing in 3 seconds...</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

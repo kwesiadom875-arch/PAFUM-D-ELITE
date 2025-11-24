@@ -80,7 +80,7 @@
 
 .input-group {
     position: relative;
-    width: 100%;
+    width: 90%;
 }
 
 .input-icon {
@@ -94,8 +94,8 @@
 }
 
 .input-group input {
-    width: 100%;
-    padding: 14px 45px 14px 45px; /* Left padding for icon, Right for toggle */
+    width: 85%;
+    padding: 14px 45px 14px 45px;
     background: var(--input-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;

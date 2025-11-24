@@ -2,20 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const jwt =require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const cheerio = require('cheerio');
 const Groq = require("groq-sdk");
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
-const crypto = require('crypto');
-const argon2 = require('argon2');
-const rateLimit = require('express-rate-limit');
 
 const Product = require('./models/Product');
 const User = require('./models/User');
 const Request = require('./models/Request');
-const { sendVerificationEmail } = require('./services/emailService');
-const { hashPassword, verifyPassword } = require('./utils/security');
 
 const app = express();
 app.use(cors({
@@ -53,125 +49,29 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-const authLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 10, // Limit each IP to 10 requests per windowMs
-	standardHeaders: true,
-	legacyHeaders: false, 
-  message: "Too many login/register attempts. Please try again after 15 minutes."
-});
-
 // --- ROUTES ---
 
 // 1. AUTH
-// Secure registration with email verification
-app.post('/api/auth/register', authLimiter, async (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(200).json({ 
-        message: "If this email is valid, a verification link has been sent to your inbox." 
-      });
-    }
-
-    const hashedPassword = await hashPassword(password);
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const tokenExpiry = Date.now() + 3600000; // 1 hour
-
-    const newUser = new User({ 
-      username, 
-      email, 
-      password: hashedPassword,
-      verificationToken,
-      verificationTokenExpiry: tokenExpiry
-    });
-    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
-    
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, verificationToken);
-    } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-      // Don't reveal email sending failure to user
-    }
-    
-    // Generic success message (anti-enumeration)
-    res.status(200).json({ 
-      message: "If this email is valid, a verification link has been sent to your inbox." 
-    });
-    
-  } catch (e) {
-    console.error('Registration error:', e);
-    // Generic error (don't leak system information)
-    res.status(200).json({ 
-      message: "If this email is valid, a verification link has been sent to your inbox." 
-    });
-  }
+    res.json({ message: "User registered successfully" });
+  } catch (e) { res.status(500).json({ error: "Email exists or error" }); }
 });
 
-// Email verification endpoint
-app.get('/api/auth/verify-email', async (req, res) => {
-  try {
-    const { token } = req.query;
-    
-    const user = await User.findOne({
-      verificationToken: token,
-      verificationTokenExpiry: { $gt: Date.now() }
-    });
-    
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired verification link" });
-    }
-    
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpiry = undefined;
-    await user.save();
-    
-    res.json({ message: "Email verified successfully! You can now sign in." });
-    
-  } catch (e) {
-    console.error('Verification error:', e);
-    res.status(500).json({ message: "Verification failed" });
-  }
-});
-
-// Login with email verification check and Argon2
-app.post('/api/auth/login', authLimiter, async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
     const user = await User.findOne({ email });
-    
-    // Check user exists and password is correct (using Argon2)
-    if (!user || !(await verifyPassword(user.password, password))) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    
-    // Check if email is verified
-    if (!user.isVerified) {
-      return res.status(403).json({ 
-        message: "Please verify your email before signing in. Check your inbox for the verification link." 
-      });
-    }
-    
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ 
-      token, 
-      user: { 
-        username: user.username, 
-        email: user.email,
-        tier: user.tier,
-        spending: user.spending
-      } 
-    });
-  } catch (e) { 
-    console.error('Login error:', e);
-    res.status(500).json({ error: "Login failed" }); 
-  }
+    res.json({ token, user: { username: user.username, email: user.email } });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.get('/api/user/profile', verifyToken, async (req, res) => {
@@ -246,78 +146,95 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // 3. AI: JOSIE
 app.post('/api/josie', async (req, res) => {
-  const { userMessage } = req.body;
+  const { userMessage, history } = req.body;
+  const products = await Product.find();
 
   try {
-    // A. Get Inventory Context (So AI knows what you actually sell)
-    const products = await Product.find();
-    const inventoryContext = products.map(p => 
-      `ID:${p.id}, Name:${p.name}, Price: GH₵${p.price}, Category:${p.category}, Notes:${p.notes}, Desc:${p.description.substring(0, 100)}...`
-    ).join('\n');
+    const inventory = products.map(p => `${p.name} (${p.category})`).join('\n');
 
-    // B. The "Generative UI" System Prompt
-    const systemPrompt = `
-      You are Josie, the Senior Scent Sommelier for Parfum D'Elite.
-      
-      CRITICAL: You must return valid JSON only. No markdown.
-      Your response must have a "type" and "data".
-      
-      Supported Types:
-      1. "text": Standard chat response.
-      2. "product_card": Recommend a specific product. Data must include "productId" and "reason".
-      3. "comparison": Compare 2 products. Data must include "productIds" (array of ints) and "analysis".
-
-      Inventory:
-      ${inventoryContext}
-
-      If the user asks for a recommendation, prefer sending a "product_card".
-      If they ask "A vs B", send a "comparison".
-    `;
+    const messages = [
+      {
+        role: "system",
+        content: `You are Josie, a luxury perfume sommelier.
+        
+        Current Inventory:
+        ${inventory}
+        
+        --- LOGIC ---
+        1. IF Greeting: Reply politely.
+        2. IF Recommendation Needed:
+           - Recommend ONE perfume. 
+           - DO NOT recommend the same perfume twice in a row. Look at the history!
+           - If the user asks for "another", give a DIFFERENT option.
+           
+        --- FORMATTING ---
+        - No Markdown. Use Emojis for stats.
+        - REQUIRED STATS: ⏳ Longevity, 🌬️ Sillage, 💬 Community.
+        - IF NOT IN INVENTORY: Must end with "We currently don't have that in stock but you can make a request."
+        `
+      },
+      ...(history || []),
+      { role: "user", content: userMessage }
+    ];
 
     const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
+      messages: messages,
       model: "llama-3.3-70b-versatile",
-      // This forces the AI to be a coder, not a chatterbox
-      response_format: { type: "json_object" } 
+      max_tokens: 250
     });
 
-    // Parse the JSON string back into an object
-    const aiResponse = JSON.parse(completion.choices[0].message.content);
-    res.json(aiResponse);
-
+    res.json({ reply: completion.choices[0]?.message?.content });
   } catch (error) {
     console.error("AI Error:", error);
-    // Fallback if AI fails
-    res.json({ 
-      type: "text", 
-      data: { message: "I am sensing some interference. Could you repeat that?" } 
-    });
+    res.json({ reply: "I am having trouble accessing the archives. Please try again." });
   }
-
 });
-// 4. AI: NEGOTIATOR
+
+// 4. AI: NEGOTIATOR (STRICT VERSION - 15% MAX DISCOUNT)
 app.post('/api/negotiate', async (req, res) => {
   const { product, userOffer, history } = req.body;
   const price = product.price;
   const offer = parseFloat(userOffer);
   const ratio = offer / price;
 
+  // STRICT NEGOTIATION RULES
+  const MAX_DISCOUNT = 0.15; // 15% maximum discount
+  const minAcceptablePrice = price * (1 - MAX_DISCOUNT); // 85% of original price
+  const negotiationRounds = (history || []).filter(msg => msg.role === 'user').length;
+
   let systemInstruction = "";
   let status = "negotiating";
+  let counter = 0;
 
-  if (ratio < 0.5) {
-    systemInstruction = `The user offered ${offer} for a ${price} item (too low). You are insulted but polite. Reject it firmly. Do not counter.`;
+  // REJECT: Offer is below minimum acceptable (85% of price)
+  if (offer < minAcceptablePrice) {
+    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. This is ${((1 - ratio) * 100).toFixed(0)}% off, which is far below our 15% maximum discount policy. Our absolute minimum is GH₵${minAcceptablePrice.toFixed(0)}. Politely but firmly reject this offer. Inform them our maximum discount is 15%, making the lowest possible price GH₵${minAcceptablePrice.toFixed(0)}.`;
     status = "rejected";
-  } else if (ratio < 0.8) {
-    const counter = Math.floor((offer + (price * 0.85)) / 2);
-    systemInstruction = `The user offered ${offer} for a ${price} item. It's decent but we want more. Counter offer with ${counter}. Be persuasive.`;
-    status = "counter";
-  } else {
-    systemInstruction = `The user offered ${offer} for a ${price} item. This is acceptable. Accept the deal warmly. Use the word "ACCEPTED" in your response.`;
+  }
+  // ACCEPT: Offer is at or above 85% of price (within 15% discount)
+  else if (offer >= minAcceptablePrice) {
+    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. This is within our acceptable range (15% maximum discount). Accept the deal graciously and warmly. Use the word "ACCEPTED" clearly in your response.`;
     status = "accepted";
+  }
+  // COUNTER: This shouldn't happen often since we reject below 85%, but as a safeguard
+  else {
+    // Be very strict with counters - stay close to original price
+    if (negotiationRounds === 0) {
+      // First offer: Counter with 97% of original (only 3% off)
+      counter = Math.floor(price * 0.97);
+    } else if (negotiationRounds === 1) {
+      // Second round: Counter with 93% (7% off)
+      counter = Math.floor(price * 0.93);
+    } else if (negotiationRounds === 2) {
+      // Third round: Counter with 90% (10% off)
+      counter = Math.floor(price * 0.90);
+    } else {
+      // Final rounds: Go down to minimum (85%)
+      counter = Math.ceil(minAcceptablePrice);
+    }
+    
+    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. Counter with GH₵${counter}. Be firm but professional. Emphasize the exceptional quality and value of this luxury item. This is round ${negotiationRounds + 1} of negotiation.`;
+    status = "counter";
   }
 
   try {
@@ -401,6 +318,7 @@ app.post('/api/scrape', async (req, res) => {
     });
     const notes = notesList.join(', ');
     
+    // Enhanced perfumer extraction - try multiple selectors
     let perfumer = "Master Perfumer";
     const perfumerSelectors = [
       'div[itemprop="brand"] a',
@@ -418,6 +336,7 @@ app.post('/api/scrape', async (req, res) => {
       }
     }
 
+    // AI Description Shortening
     if (description && description.length > 200) {
       try {
         const aiResponse = await groq.chat.completions.create({
@@ -434,6 +353,7 @@ app.post('/api/scrape', async (req, res) => {
         description = aiResponse.choices[0]?.message?.content || description;
       } catch (aiError) {
         console.error("AI description shortening failed:", aiError);
+        // Fallback: just truncate
         description = description.substring(0, 200) + '...';
       }
     }
