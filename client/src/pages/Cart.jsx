@@ -3,6 +3,8 @@ import { CartContext } from '../context/CartContext';
 import { PaystackButton } from 'react-paystack';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
+import axios from 'axios';
+import API_URL from '../config';
 import './Cart.css';
 
 const Cart = () => {
@@ -11,20 +13,41 @@ const Cart = () => {
   const totalAmount = getCartTotal();
 
   // PAYSTACK CONFIGURATION
-  // This is a TEST Key. It simulates payment without using real money.
-  const publicKey = "pk_test_5c7f8d0eb20bc1ad8db4fd63a881a53a85539b94"; 
+  const publicKey = "pk_test_5c7f8d0eb20bc1ad8db4fd63a881a53a85539b94";
 
   const componentProps = {
-    email: "user@example.com", // In a real app, we'd get this from the Login
-    amount: totalAmount * 100, // Paystack counts in pesewas (multiply by 100)
+    email: "user@example.com",
+    amount: totalAmount * 100,
     currency: "GHS",
     metadata: { name: "Guest Shopper", phone: "0240000000" },
     publicKey,
     text: "Checkout Now",
-    onSuccess: () => {
-      alert("Payment Successful! Welcome to the Elite Circle.");
-      clearCart();
-      navigate('/');
+    onSuccess: async (reference) => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          await axios.post(`${API_URL}/api/user/purchase`, {
+            items: cart.map(item => ({
+              productId: item.id,
+              productName: item.name,
+              productImage: item.image,
+              originalPrice: item.originalPrice || item.price,
+              finalPrice: item.price,
+              negotiated: item.negotiated || false
+            }))
+          }, {
+            headers: { Authorization: token }
+          });
+        }
+        alert("Payment Successful! Your profile has been updated.");
+        clearCart();
+        navigate('/profile');
+      } catch (error) {
+        console.error('Error recording purchase:', error);
+        alert("Payment successful but couldn't update profile.");
+        clearCart();
+        navigate('/');
+      }
     },
     onClose: () => alert("Transaction cancelled"),
   };
@@ -41,7 +64,7 @@ const Cart = () => {
   return (
     <div className="container cart-page">
       <h2 className="section-title">Your Selection</h2>
-      
+
       <div className="cart-grid">
         {/* LEFT: ITEMS */}
         <div className="cart-items">
@@ -76,7 +99,7 @@ const Cart = () => {
             <span>Total</span>
             <span style={{ color: '#C5A059' }}>GH₵{totalAmount}</span>
           </div>
-          
+
           {/* THE PAYSTACK BUTTON */}
           <div className="paystack-wrapper">
             <PaystackButton className="btn-primary" {...componentProps} />

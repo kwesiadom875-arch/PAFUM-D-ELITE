@@ -79,6 +79,38 @@ app.get('/api/user/profile', verifyToken, async (req, res) => {
   res.json(user);
 });
 
+// Record Purchase
+app.post('/api/user/purchase', verifyToken, async (req, res) => {
+  try {
+    const { items } = req.body;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    items.forEach(item => {
+      user.orderHistory.push({
+        productId: item.productId,
+        productName: item.productName,
+        productImage: item.productImage,
+        originalPrice: item.originalPrice,
+        finalPrice: item.finalPrice,
+        negotiated: item.negotiated || false,
+        date: new Date()
+      });
+    });
+    const purchaseTotal = items.reduce((sum, item) => sum + item.finalPrice, 0);
+    user.spending += purchaseTotal;
+    if (user.spending >= 15000) { user.tier = 'Elite Diamond'; }
+    else if (user.spending >= 10001) { user.tier = 'Diamond'; }
+    else if (user.spending >= 7001) { user.tier = 'Platinum'; }
+    else if (user.spending >= 3001) { user.tier = 'Gold'; }
+    else { user.tier = 'Bronze'; }
+    await user.save();
+    const updatedUser = await User.findById(req.userId).select('-password');
+    res.json({ message: "Purchase recorded successfully", user: updatedUser });
+  } catch (error) {
+    console.error('Purchase recording error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 // 2. PRODUCTS
 app.get('/api/products', async (req, res) => {
   const products = await Product.find();
@@ -238,9 +270,7 @@ app.post('/api/scrape', async (req, res) => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     
-    // Set User Agent to avoid bot detection
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     
     const content = await page.content();
@@ -248,7 +278,7 @@ app.post('/api/scrape', async (req, res) => {
 
     const name = $('h1[itemprop="name"]').text().replace(/for women and men/i, '').trim();
     const image = $('img[itemprop="image"]').attr('src');
-    const description = $('div[itemprop="description"]').text().trim();
+    let description = $('div[itemprop="description"]').text().trim();
     const rating = $('span[itemprop="ratingValue"]').text().trim();
     
     let gender = "Unisex";
@@ -262,7 +292,45 @@ app.post('/api/scrape', async (req, res) => {
     });
     const notes = notesList.join(', ');
     
-    const perfumer = $('.perfumer-avatar').next('a').text().trim() || "Master Perfumer";
+    // Enhanced perfumer extraction - try multiple selectors
+    let perfumer = "Master Perfumer";
+    const perfumerSelectors = [
+      'div[itemprop="brand"] a',
+      '.perfumer-avatar + a',
+      'a[href*="/noses/"]',
+      'div:contains("Perfumer:") + a',
+      'p:contains("Nose:") a'
+    ];
+    
+    for (const selector of perfumerSelectors) {
+      const found = $(selector).first().text().trim();
+      if (found && found.length > 0 && found !== "Master Perfumer") {
+        perfumer = found;
+        break;
+      }
+    }
+
+    // AI Description Shortening
+    if (description && description.length > 200) {
+      try {
+        const aiResponse = await groq.chat.completions.create({
+          messages: [{
+            role: "system",
+            content: "You are a luxury perfume copywriter. Shorten perfume descriptions to 2-3 elegant sentences (max 150 words). Remove unnecessary details, keep only the essence, mood, and key notes. Be poetic but concise."
+          }, {
+            role: "user",
+            content: `Shorten this perfume description:\n\n${description}`
+          }],
+          model: "llama-3.3-70b-versatile",
+          max_tokens: 200
+        });
+        description = aiResponse.choices[0]?.message?.content || description;
+      } catch (aiError) {
+        console.error("AI description shortening failed:", aiError);
+        // Fallback: just truncate
+        description = description.substring(0, 200) + '...';
+      }
+    }
 
     const data = { name, image, description, notes, perfumer, rating, gender };
 

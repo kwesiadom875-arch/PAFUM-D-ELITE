@@ -1,18 +1,19 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-export const CartContext = createContext();
+import { CartContext } from './CartContextType';
+export { CartContext };
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   // On initial load, check for a token in localStorage to keep the user logged in.
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (token) {
       // Set the auth token for all future axios requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
@@ -34,7 +35,7 @@ export const CartProvider = ({ children }) => {
     setUser(null);
     setCart([]); // Clear cart on logout
   };
-  
+
   // --- Cart Logic ---
   const addToCart = (product, negotiatedPrice = null) => {
     const finalPrice = negotiatedPrice || product.price;
@@ -54,7 +55,7 @@ export const CartProvider = ({ children }) => {
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
-    <CartContext.Provider value={{ 
+    <CartContext.Provider value={{
       cart, addToCart, removeFromCart, clearCart, getCartTotal,
       user, login, logout
     }}>

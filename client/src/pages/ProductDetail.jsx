@@ -18,8 +18,15 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [finalPrice, setFinalPrice] = useState(null);
+  const [negotiatorKey, setNegotiatorKey] = useState(0); // Force negotiator to reset
 
   useEffect(() => {
+    // Scroll to top when product changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Reset negotiator by changing key
+    setNegotiatorKey(prev => prev + 1);
+
     axios.get(`${API_URL}/api/products/${id}`).then(res => {
       setProduct(res.data);
       setFinalPrice(res.data.price);
@@ -43,6 +50,7 @@ const ProductDetail = () => {
 
       {/* HERO SECTION */}
       <ProductHero
+        key={negotiatorKey}
         product={product}
         finalPrice={finalPrice}
         addToCart={addToCart}

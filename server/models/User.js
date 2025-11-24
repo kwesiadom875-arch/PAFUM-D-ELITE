@@ -26,12 +26,18 @@ const userSchema = new mongoose.Schema({
     default: 'Bronze'
   },
   orderHistory: [{
+    productId: String,
     productName: String,
     productImage: String,
     originalPrice: Number,
     finalPrice: Number,
+    negotiated: { type: Boolean, default: false },
     date: { type: Date, default: Date.now }
-  }]
+  }],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

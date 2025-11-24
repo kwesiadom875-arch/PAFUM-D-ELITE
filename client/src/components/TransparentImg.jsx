@@ -1,15 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const TransparentImg = ({ src, alt, className, style, ...props }) => {
     const [processedSrc, setProcessedSrc] = useState(null);
-    const canvasRef = useRef(null);
 
     const isExternal = src && src.startsWith('http');
 
     useEffect(() => {
         // If it's a local file, we don't need to process it
         if (!isExternal) {
-            setProcessedSrc(src);
             return;
         }
 

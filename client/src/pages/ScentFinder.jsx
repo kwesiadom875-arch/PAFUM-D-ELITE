@@ -7,12 +7,12 @@ const ScentFinder = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRequestBtn, setShowRequestBtn] = useState(false);
-  
+
   // 1. Change: Store a history of messages
   const [messages, setMessages] = useState([
-    { 
-      sender: 'ai', 
-      text: "Welcome to the private salon. Tell me about the occasion, the mood, or a memory you wish to evoke, and I shall find your scent." 
+    {
+      sender: 'ai',
+      text: "Welcome to the private salon. Tell me about the occasion, the mood, or a memory you wish to evoke, and I shall find your scent."
     }
   ]);
 
@@ -47,11 +47,11 @@ const ScentFinder = () => {
         content: m.text
       }));
 
-      const res = await axios.post(`${API_URL}/api/josie`, { 
+      const res = await axios.post(`${API_URL}/api/josie`, {
         userMessage: userMsg,
-        history: contextHistory 
+        history: contextHistory
       });
-      
+
       const reply = res.data.reply;
 
       setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
@@ -60,7 +60,7 @@ const ScentFinder = () => {
       if (reply.includes("currently don't have that in stock")) {
         setShowRequestBtn(true);
       }
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, { sender: 'ai', text: "I seem to have lost my connection to the archives." }]);
     }
     setLoading(false);
@@ -74,7 +74,7 @@ const ScentFinder = () => {
   return (
     <div className="finder-page container">
       <div className="chat-window glass-card">
-        
+
         {/* HEADER */}
         <div className="chat-header">
           <h2>Ask Josie</h2>
@@ -100,7 +100,7 @@ const ScentFinder = () => {
               </div>
             </div>
           )}
-          
+
           {/* Invisible element to scroll to */}
           <div ref={chatEndRef} />
         </div>
@@ -115,9 +115,9 @@ const ScentFinder = () => {
 
         {/* INPUT AREA */}
         <div className="input-area">
-          <input 
-            type="text" 
-            placeholder="Describe your vibe..." 
+          <input
+            type="text"
+            placeholder="Describe your vibe..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && askJosie()}
