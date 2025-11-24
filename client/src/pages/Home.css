@@ -52,9 +52,9 @@
 
 /* --- COLLECTIONS SECTION --- */
 .collections-section { margin-top: 120px; }
-.collections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.collections-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 
-.collection-card { padding: 20px; transition: transform 0.3s; }
+.collection-card { padding: 20px; transition: transform 0.3s; text-decoration: none; display: block; color: inherit; }
 .collection-card:hover { transform: translateY(-5px); border-color: #C5A059; }
 
 .img-wrapper { height: 250px; overflow: hidden; margin-bottom: 20px; border-radius: 4px; }

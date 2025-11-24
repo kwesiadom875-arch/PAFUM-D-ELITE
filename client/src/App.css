@@ -1,13 +1,13 @@
 :root {
-  --bg-black: #050505;
+  --bg-white: #FFFFFF;
   --gold: #C5A059;
-  --text-white: #FFFFFF;
-  --glass: rgba(255, 255, 255, 0.05);
+  --text-dark: #1a1a1a;
+  --glass: rgba(0, 0, 0, 0.03);
 }
 
 body {
-  background-color: var(--bg-black);
-  color: var(--text-white);
+  background-color: var(--bg-white);
+  color: var(--text-dark);
   font-family: 'Helvetica Neue', sans-serif; /* Simple clean font for now */
   margin: 0;
   min-height: 100vh;

@@ -20,7 +20,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/auth?mode=signin');
     if (isMenuOpen) toggleMenu();
   };
 
@@ -50,8 +50,8 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login">Sign In</Link>
-                <Link to="/signup" className="nav-btn">Sign Up</Link>
+                <Link to="/auth?mode=signin">Sign In</Link>
+                <Link to="/auth?mode=signup" className="nav-btn">Sign Up</Link>
               </>
             )}
           </div>
@@ -79,8 +79,8 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" onClick={toggleMenu}>Sign In</Link>
-              <Link to="/signup" onClick={toggleMenu} className="nav-btn mobile-btn">Sign Up</Link>
+              <Link to="/auth?mode=signin" onClick={toggleMenu}>Sign In</Link>
+              <Link to="/auth?mode=signup" onClick={toggleMenu} className="nav-btn mobile-btn">Sign Up</Link>
             </>
           )}
         </div>

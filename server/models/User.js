@@ -34,6 +34,24 @@ const userSchema = new mongoose.Schema({
     negotiated: { type: Boolean, default: false },
     date: { type: Date, default: Date.now }
   }],
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: {
+    type: String,
+    sparse: true  // Allows multiple null values
+  },
+  verificationTokenExpiry: {
+    type: Date
+  },
+  passwordResetToken: {
+    type: String,
+    sparse: true
+  },
+  passwordResetExpiry: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now

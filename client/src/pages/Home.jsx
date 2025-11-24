@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import TransparentImg from '../components/TransparentImg';
+import { CartContext } from '../context/CartContext';
 import './Home.css';
 
 const Home = () => {
+  const { user } = useContext(CartContext);
+
   return (
     <div className="home-container">
 
@@ -46,26 +49,36 @@ const Home = () => {
         </div>
       </section>
 
-      {/* --- SECTION 3: COLLECTIONS (Two Cards) --- */}
+      {/* --- SECTION 3: COLLECTIONS --- */}
       <section className="collections-section container">
         <h2 className="section-title text-center">Explore Our Collections</h2>
         <div className="collections-grid">
 
-          <div className="collection-card glass-card">
-            <div className="img-wrapper">
-              <img src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=800&auto=format&fit=crop" alt="Designer" />
-            </div>
-            <h3>Designer Fragrances</h3>
-            <p>Iconic scents from the world's top fashion houses.</p>
-          </div>
-
-          <div className="collection-card glass-card">
+          <Link to="/shop" className="collection-card glass-card">
             <div className="img-wrapper">
               <img src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=800&auto=format&fit=crop" alt="Niche" />
             </div>
-            <h3>Niche Perfumes</h3>
+            <h3>Niche</h3>
             <p>Rare, artisanal creations for the true connoisseur.</p>
-          </div>
+          </Link>
+
+          <Link to="/shop" className="collection-card glass-card">
+            <div className="img-wrapper">
+              <img src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=800&auto=format&fit=crop" alt="Luxury" />
+            </div>
+            <h3>Luxury</h3>
+            <p>Iconic scents from the world's top fashion houses.</p>
+          </Link>
+
+          {user?.tier === 'Elite Diamond' && (
+            <Link to="/shop" className="collection-card glass-card">
+              <div className="img-wrapper">
+                <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop" alt="Ultra Niche" />
+              </div>
+              <h3>Ultra Niche</h3>
+              <p>Exclusive masterpieces reserved for our elite members.</p>
+            </Link>
+          )}
 
         </div>
       </section>
