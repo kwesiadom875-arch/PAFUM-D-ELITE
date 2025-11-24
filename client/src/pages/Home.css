@@ -14,11 +14,11 @@
 }
 
 .hero-text { max-width: 500px; }
-.hero-text h2 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-family: 'Playfair Display', serif; }
-.hero-sub { color: #B0B0B0; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.6; }
+.hero-text h2 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-family: 'Playfair Display', serif; color: #1a1a1a; }
+.hero-sub { color: #666; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.6; }
 
 .hero-visuals { position: relative; width: 500px; height: 500px; }
-.float-bottle { position: absolute; height: 300px; object-fit: contain; transition: 0.5s ease; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+.float-bottle { position: absolute; height: 300px; object-fit: contain; transition: 0.5s ease; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
 
 /* Floating Animation Positions */
 .float-bottle.left { left: 0; top: 50px; transform: rotate(-10deg); z-index: 1; }
@@ -37,18 +37,18 @@
 }
 
 .curator-content { flex: 1; }
-.curator-content h1 { font-size: 3rem; margin: 10px 0 20px 0; }
-.curator-content p { color: #B0B0B0; line-height: 1.8; margin-bottom: 30px; font-size: 1.1rem; }
+.curator-content h1 { font-size: 3rem; margin: 10px 0 20px 0; color: #1a1a1a; }
+.curator-content p { color: #666; line-height: 1.8; margin-bottom: 30px; font-size: 1.1rem; }
 .action-row { display: flex; gap: 15px; }
 
 .curator-image { flex: 1; display: flex; justify-content: center; position: relative; }
 /* Add a gold glow behind the curator bottle */
 .curator-image::before {
   content: ''; position: absolute; width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(197, 160, 89, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, transparent 70%);
   z-index: -1; top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
-.curator-image img { height: 500px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8)); }
+.curator-image img { height: 500px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1)); }
 
 /* --- COLLECTIONS SECTION --- */
 .collections-section { margin-top: 120px; }
@@ -61,35 +61,35 @@
 .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
 .collection-card:hover img { transform: scale(1.05); }
 
-.collection-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
-.collection-card p { color: #B0B0B0; font-size: 0.9rem; }
+.collection-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: #1a1a1a; }
+.collection-card p { color: #666; font-size: 0.9rem; }
 
 /* --- REVIEWS SECTION --- */
 .reviews-section { margin-top: 120px; }
 .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 
 .review-card { padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
-.review-card p { font-style: italic; color: #E0E0E0; margin-bottom: 20px; }
+.review-card p { font-style: italic; color: #333; margin-bottom: 20px; }
 
 .reviewer { display: flex; align-items: center; gap: 15px; }
-.avatar { width: 40px; height: 40px; background: #333; border-radius: 50%; border: 1px solid #C5A059; }
+.avatar { width: 40px; height: 40px; background: #f0f0f0; border-radius: 50%; border: 1px solid #C5A059; }
 .name { display: block; font-weight: bold; color: #C5A059; }
-.role { display: block; font-size: 0.8rem; color: #999; }
+.role { display: block; font-size: 0.8rem; color: #666; }
 
 /* --- FOOTER CTA --- */
 .footer-cta {
   margin-top: 120px; text-align: center; padding: 80px 20px;
-  background: linear-gradient(to bottom, transparent, rgba(197, 160, 89, 0.05));
+  background: linear-gradient(to bottom, transparent, rgba(197, 160, 89, 0.08));
 }
-.footer-cta h2 { margin-bottom: 30px; font-size: 2.5rem; }
+.footer-cta h2 { margin-bottom: 30px; font-size: 2.5rem; color: #1a1a1a; }
 .cta-buttons { display: flex; justify-content: center; gap: 20px; }
 
 /* --- UTILS --- */
 .btn-outline {
-  background: transparent; border: 1px solid #C5A059; color: #C5A059;
+  background: transparent; border: 2px solid #C5A059; color: #C5A059;
   padding: 12px 24px; cursor: pointer; transition: 0.3s; text-decoration: none;
 }
-.btn-outline:hover { background: #C5A059; color: black; }
+.btn-outline:hover { background: #C5A059; color: #fff; }
 
 /* Mobile */
 @media (max-width: 900px) {

@@ -11,7 +11,7 @@
   font-family: 'Inter', sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
   color: #999; cursor: pointer; transition: 0.3s; padding-bottom: 5px;
 }
-.filter-btn:hover, .filter-btn.active { color: black; border-bottom: 1px solid black; }
+.filter-btn:hover, .filter-btn.active { color: #1a1a1a; border-bottom: 1px solid #1a1a1a; }
 
 /* --- GRID --- */
 .product-grid {
@@ -27,24 +27,23 @@
   cursor: pointer;
 }
 
-/* 1. Image Frame (The Grey Box) */
+/* 1. Image Frame */
 .image-frame {
   position: relative;
-  background-color: #F5F5F7; /* Apple/High-end Grey */
-  height: 420px; /* Tall & Elegant */
+  background-color: #FFFFFF;
+  height: 420px;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; /* Crucial for the slide effect */
+  overflow: hidden;
   margin-bottom: 20px;
+  border: 1px solid #E5E5E5;
 }
 
 .image-frame img {
   height: 280px;
   width: auto;
   object-fit: contain;
-  /* This makes white backgrounds transparent-ish on grey */
-  mix-blend-mode: multiply; 
   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -67,13 +66,13 @@
 }
 .wishlist-btn:hover { color: #ff4d4d; transform: scale(1.1); }
 
-/* 3. The Slide-Up Button (The "Pop" Factor) */
+/* 3. The Slide-Up Button */
 .action-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  transform: translateY(100%); /* Hidden below */
+  transform: translateY(100%);
   transition: transform 0.4s ease;
 }
 
