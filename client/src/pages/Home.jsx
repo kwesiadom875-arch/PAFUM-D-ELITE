@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import TransparentImg from '../components/TransparentImg';
 import './Home.css';
 
 const Home = () => {
   return (
     <div className="home-container">
-      
+
       {/* --- SECTION 1: HERO (Floating Bottles) --- */}
       <section className="hero-section container">
         <div className="hero-text">
@@ -18,9 +19,9 @@ const Home = () => {
 
         <div className="hero-visuals fade-in delay-3">
           {/* We use the bottles from the image logic */}
-          <img src="https://fimgs.net/mdimg/perfume/375x500.4608.jpg" alt="1 Million" className="float-bottle left" />
-          <img src="https://fimgs.net/mdimg/perfume/375x500.31009.jpg" alt="Sauvage" className="float-bottle center" />
-          <img src="https://fimgs.net/mdimg/perfume/375x500.46040.jpg" alt="Gentleman" className="float-bottle right" />
+          <TransparentImg src="/images/1-million.png" alt="1 Million" className="float-bottle left" />
+          <TransparentImg src="/images/sauvage.png" alt="Sauvage" className="float-bottle center" />
+          <TransparentImg src="/images/gentleman.png" alt="Gentleman" className="float-bottle right" />
         </div>
       </section>
 
@@ -30,8 +31,8 @@ const Home = () => {
           <h3 className="gold-text">The Curator's Notes</h3>
           <h1>Penhaligon's Halfeti</h1>
           <p>
-            This is the ultimate woody and spicy fragrance, inspired by the opulent goods traded in Turkey. 
-            Halfeti is a dark, mysterious, and captivating scent. It opens with a rich blend of saffron and citrus, 
+            This is the ultimate woody and spicy fragrance, inspired by the opulent goods traded in Turkey.
+            Halfeti is a dark, mysterious, and captivating scent. It opens with a rich blend of saffron and citrus,
             settles into a heart of rose and nutmeg, and dries down into a luxurious base of leather, precious oud, and sandalwood.
           </p>
           <div className="action-row">
@@ -41,7 +42,7 @@ const Home = () => {
         </div>
         <div className="curator-image">
           {/* The big bottle from your reference */}
-          <img src="https://fimgs.net/mdimg/perfume/375x500.31400.jpg" alt="Halfeti" />
+          <TransparentImg src="/images/halfeti.png" alt="Halfeti" />
         </div>
       </section>
 
@@ -49,7 +50,7 @@ const Home = () => {
       <section className="collections-section container">
         <h2 className="section-title text-center">Explore Our Collections</h2>
         <div className="collections-grid">
-          
+
           <div className="collection-card glass-card">
             <div className="img-wrapper">
               <img src="https://images.unsplash.com/photo-1594035910387-fea4779426e9?q=80&w=800&auto=format&fit=crop" alt="Designer" />

@@ -3,7 +3,8 @@ import axios from 'axios';
 import API_URL from '../config';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { FaHeart } from 'react-icons/fa'; // Import Heart Icon
+import { FaHeart } from 'react-icons/fa';
+import TransparentImg from '../components/TransparentImg';
 import './Shop.css';
 
 const Shop = () => {
@@ -36,13 +37,13 @@ const Shop = () => {
 
   return (
     <div className="shop-container container">
-      
+
       {/* HEADER */}
       <div className="shop-header">
         <h1 className="page-title">The Olfactory Archives</h1>
         <div className="filter-bar">
           {categories.map((cat) => (
-            <button 
+            <button
               key={cat}
               className={`filter-btn ${activeFilter === cat ? 'active' : ''}`}
               onClick={() => handleFilter(cat)}
@@ -57,19 +58,19 @@ const Shop = () => {
       <div className="product-grid">
         {filteredProducts.map(product => (
           <div key={product.id || product._id} className="luxury-card">
-            
+
             {/* IMAGE FRAME */}
             <div className="image-frame">
               {/* Badge */}
               {product.price > 2000 && <span className="badge-top">Best Seller</span>}
-              
+
               {/* Wishlist Icon */}
               <button className="wishlist-btn"><FaHeart /></button>
 
               <Link to={`/product/${product.id || product._id}`}>
-                <img src={product.image} alt={product.name} />
+                <TransparentImg src={product.image} alt={product.name} />
               </Link>
-              
+
               {/* SLIDE UP ACTION BAR */}
               <div className="action-overlay">
                 <button onClick={() => addToCart(product)}>

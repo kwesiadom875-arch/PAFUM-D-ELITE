@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const cheerio = require('cheerio');
 const Groq = require("groq-sdk");
 const puppeteer = require('puppeteer');
+const fetch = require('node-fetch');
 
 const Product = require('./models/Product');
 const User = require('./models/User');
@@ -270,6 +271,28 @@ app.post('/api/scrape', async (req, res) => {
   } catch (error) {
     console.error("Scraping Error:", error);
     res.status(500).json({ error: "Failed to scrape data" });
+  }
+});
+
+app.get('/proxy-image', async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.status(400).send('No URL provided');
+  }
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    const contentType = response.headers.get('content-type');
+    if (contentType) {
+      res.setHeader('Content-Type', contentType);
+    }
+    response.body.pipe(res);
+  } catch (error) {
+    console.error('Error proxying image:', error);
+    res.status(500).send('Failed to proxy image');
   }
 });
 
