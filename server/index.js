@@ -146,47 +146,44 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // 3. AI: JOSIE
 app.post('/api/josie', async (req, res) => {
-  const { userMessage, history } = req.body;
-  const products = await Product.find();
+  const { userMessage } = req.body;
 
   try {
-    const inventory = products.map(p => `${p.name} (${p.category})`).join('\n');
+    // 1. Give AI the Inventory Context
+    const products = await Product.find();
+    const inventoryContext = products.map(p => 
+      `ID:${p.id}, Name:${p.name}, Price: GH₵${p.price}, Category:${p.category}, Notes:${p.notes}, Desc:${p.description.substring(0, 100)}...`
+    ).join('\n');
 
-    const messages = [
-      {
-        role: "system",
-        content: `You are Josie, a luxury perfume sommelier.
-        
-        Current Inventory:
-        ${inventory}
-        
-        --- LOGIC ---
-        1. IF Greeting: Reply politely.
-        2. IF Recommendation Needed:
-           - Recommend ONE perfume. 
-           - DO NOT recommend the same perfume twice in a row. Look at the history!
-           - If the user asks for "another", give a DIFFERENT option.
-           
-        --- FORMATTING ---
-        - No Markdown. Use Emojis for stats.
-        - REQUIRED STATS: ⏳ Longevity, 🌬️ Sillage, 💬 Community.
-        - IF NOT IN INVENTORY: Must end with "We currently don't have that in stock but you can make a request."
-        `
-      },
-      ...(history || []),
-      { role: "user", content: userMessage }
-    ];
+    // 2. System Prompt for JSON Output
+    const systemPrompt = `
+      You are Josie, the Senior Scent Sommelier for Parfum D'Elite.
+      CRITICAL: You must return valid JSON only. No markdown.
+      Your response must have a "type" and "data".
+      
+      Supported Types:
+      1. "text": Standard chat response.
+      2. "product_card": Recommend a specific product. Data must include "productId" (int) and "reason".
+      
+      Inventory:
+      ${inventoryContext}
+    `;
 
     const completion = await groq.chat.completions.create({
-      messages: messages,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
+      ],
       model: "llama-3.3-70b-versatile",
-      max_tokens: 250
+      response_format: { type: "json_object" } 
     });
 
-    res.json({ reply: completion.choices[0]?.message?.content });
+    const aiResponse = JSON.parse(completion.choices[0].message.content);
+    res.json(aiResponse);
+
   } catch (error) {
     console.error("AI Error:", error);
-    res.json({ reply: "I am having trouble accessing the archives. Please try again." });
+    res.json({ type: "text", data: { message: "I am sensing interference. Please try again." } });
   }
 });
 
