@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import LuxuryNegotiator from '../LuxuryNegotiator';
+import { FaHeart } from 'react-icons/fa';
+import axios from 'axios';
+import API_URL from '../../config';
 
 import TransparentImg from '../TransparentImg';
 
@@ -26,6 +29,28 @@ const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
         };
 
         addToCart(itemToAdd, finalPrice);
+    };
+
+    const handleAddToWishlist = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Or redirect to login
+                alert('Please log in to add to wishlist');
+                return;
+            }
+            await axios.post(`${API_URL}/api/user/wishlist/add/${product._id}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert('Added to wishlist!');
+        } catch (error) {
+            if (error.response && error.response.status === 400) {
+                alert('Product already in wishlist');
+            } else {
+                console.error('Error adding to wishlist:', error);
+                alert('Could not add to wishlist');
+            }
+        }
     };
 
     // Check if product has stock
@@ -97,6 +122,14 @@ const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
                         disabled={!hasStock}
                     >
                         {hasStock ? 'Add to Cart' : 'Out of Stock'}
+                    </button>
+                    <button
+                        className="btn-icon"
+                        onClick={handleAddToWishlist}
+                        disabled={!hasStock}
+                        title="Add to Wishlist"
+                    >
+                        <FaHeart />
                     </button>
                     {hasStock && <LuxuryNegotiator product={product} onDealAccepted={setFinalPrice} />}
                 </div>

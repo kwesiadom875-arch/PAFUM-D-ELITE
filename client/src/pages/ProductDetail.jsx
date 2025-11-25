@@ -9,14 +9,13 @@ import './ProductDetail.css';
 import ProductHero from '../components/product/ProductHero';
 import ProductBento from '../components/product/ProductBento';
 import ProductAccords from '../components/product/ProductAccords';
-import RelatedProducts from '../components/product/RelatedProducts';
+import RecommendedProducts from '../components/RecommendedProducts';
 import ProductSkeleton from '../components/ProductSkeleton';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
   const [product, setProduct] = useState(null);
-  const [related, setRelated] = useState([]);
   const [finalPrice, setFinalPrice] = useState(null);
   const [negotiatorKey, setNegotiatorKey] = useState(0); // Force negotiator to reset
 
@@ -30,10 +29,6 @@ const ProductDetail = () => {
     axios.get(`${API_URL}/api/products/${id}`).then(res => {
       setProduct(res.data);
       setFinalPrice(res.data.price);
-    });
-    axios.get(`${API_URL}/api/products`).then(res => {
-      const others = res.data.filter(p => p.id !== parseInt(id) && p._id !== id);
-      setRelated(others.slice(0, 4));
     });
   }, [id]);
 
@@ -71,9 +66,9 @@ const ProductDetail = () => {
         notesArray={notesArray}
       />
 
-      {/* RELATED */}
-      <RelatedProducts
-        related={related}
+      {/* RECOMMENDED */}
+      <RecommendedProducts
+        productId={id}
       />
 
     </div>

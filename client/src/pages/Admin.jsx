@@ -3,8 +3,10 @@ import axios from 'axios';
 import API_URL from '../config';
 import './Admin.css';
 
+import Dashboard from '../components/Dashboard';
+
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState('inventory');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [scrapeUrl, setScrapeUrl] = useState('');
@@ -149,6 +151,7 @@ const Admin = () => {
       <div className="admin-header">
         <h2 className="section-title" style={{ color: '#C5A059', marginBottom: '0' }}>Admin Dashboard</h2>
         <div className="admin-tabs">
+          <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
           <button className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
           <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Orders</button>
           <button className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`} onClick={() => setActiveTab('stock')}>Stock</button>
@@ -156,6 +159,8 @@ const Admin = () => {
           <button className={`tab-btn ${activeTab === 'featured' ? 'active' : ''}`} onClick={() => setActiveTab('featured')}>Featured</button>
         </div>
       </div>
+
+      {activeTab === 'dashboard' && <Dashboard />}
 
       {activeTab === 'inventory' && (
         <div className="admin-grid">

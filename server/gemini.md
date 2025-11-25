@@ -107,4 +107,4 @@
    2. Build Dashboard Components: Create components for different charts and data tables (e.g.,
       SalesOverTimeChart, TopProductsTable).
    3. Fetch and Display Data: Have these components call the admin API endpoints and render the data as   
-      visualizations
+      visualizationscd

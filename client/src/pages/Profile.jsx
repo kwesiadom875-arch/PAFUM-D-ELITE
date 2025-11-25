@@ -1,8 +1,13 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import API_URL from '../config';
 import './Profile.css';
 import { FaChip, FaCrown, FaHistory, FaWallet } from 'react-icons/fa'; // Install react-icons if needed
+
+import RecommendedProducts from '../components/RecommendedProducts';
+
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -14,10 +19,10 @@ const Profile = () => {
         const token = localStorage.getItem('token');
         if (!token) return (window.location.href = '/login');
 
-        const res = await axios.get(`${API_URL}/api/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUser(res.data);
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        const userRes = await axios.get(`${API_URL}/api/user/profile`, config);
+        setUser(userRes.data);
       } catch (err) {
         console.error(err);
       }
@@ -106,9 +111,37 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* 5. GAMIFICATION */}
+        <div className="gamification-section">
+          <h3>Your Status</h3>
+          <div className="stats-grid">
+            <div className="stat-box glass-card">
+              <h4>Points</h4>
+              <p>{user.points || 0}</p>
+            </div>
+            <div className="stat-box glass-card">
+              <h4>Badges</h4>
+              <div className="badges-grid">
+                {user.badges && user.badges.length > 0 ? (
+                  user.badges.map((badge, i) => (
+                    <div key={i} className="badge">
+                      {badge.name}
+                    </div>
+                  ))
+                ) : (
+                  <p>No badges yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 4. MY SCENT COLLECTION (History) */}
         <div className="history-section">
-          <h3>My Scent Collection</h3>
+          <div className="history-header">
+            <h3>My Scent Collection</h3>
+            <Link to="/wishlist" className="btn-outline">My Wishlist</Link>
+          </div>
           <div className="history-grid">
             {/* If order history is empty, show placeholder */}
             {(!user.orderHistory || user.orderHistory.length === 0) ? (
@@ -133,6 +166,8 @@ const Profile = () => {
             )}
           </div>
         </div>
+
+        <RecommendedProducts userId={user._id} />
 
       </div>
     </div>

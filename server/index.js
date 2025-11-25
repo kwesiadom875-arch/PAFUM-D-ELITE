@@ -15,8 +15,11 @@ const User = require('./models/User');
 const Request = require('./models/Request');
 const Review = require('./models/Review');
 const ProductAnalytics = require('./models/ProductAnalytics');
-const { extractFragranceNotes, analyzeReviewSentiment, callGroqAI } = require('./services/aiHelpers');
 const { sendAIPersonalizedEmail } = require('./services/emailService');
+const { awardPoints } = require('./services/gamificationService');
+const { extractFragranceNotes, analyzeReviewSentiment, callGroqAI, generatePersonalizedMessage } = require('./services/aiHelpers');
+const Featured = require('./models/Featured');
+const adminAuth = require('./middleware/adminAuth');
 const app = express();
 app.use(cors({
   origin: [
@@ -37,7 +40,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "parfum_delite_secret_key_123";
 const dbAddress = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/parfum_delite';
 
 mongoose.connect(dbAddress)
-  .then(() => console.log('✅ MongoDB Connected'))
+  .then(() => {
+    console.log('✅ MongoDB Connected');
+  })
   .catch(err => console.error('❌ MongoDB Error:', err));
 
 // --- MIDDLEWARE ---
@@ -89,6 +94,177 @@ app.get('/api/user/profile', verifyToken, async (req, res) => {
   res.json(user);
 });
 
+// --- RECOMMENDATIONS ---
+app.get('/api/recommendations/user/:userId', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const orderHistory = user.orderHistory;
+    if (orderHistory.length === 0) {
+      // If no order history, return top 5 rated products
+      const topProducts = await Product.find().sort({ rating: -1 }).limit(5);
+      return res.json(topProducts);
+    }
+
+    const recentCategories = [...new Set(orderHistory.slice(-5).map(item => item.productCategory))];
+    const recentProductIds = orderHistory.map(item => item.productId);
+
+    const recommendedProducts = await Product.find({
+      category: { $in: recentCategories },
+      id: { $nin: recentProductIds } // Exclude already purchased products
+    }).limit(10);
+
+    res.json(recommendedProducts);
+  } catch (error) {
+    console.error('User recommendations error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/recommendations/product/:productId', async (req, res) => {
+  try {
+    const product = await Product.findOne({ id: req.params.productId });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const recommendedProducts = await Product.find({
+      category: product.category,
+      id: { $ne: product.id } // Exclude the product itself
+    }).limit(5);
+
+    res.json(recommendedProducts);
+  } catch (error) {
+    console.error('Product recommendations error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- WISHLIST ---
+app.post('/api/user/wishlist/add/:productId', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const productId = req.params.productId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (user.wishlist.includes(productId)) {
+      return res.status(400).json({ message: "Product already in wishlist" });
+    }
+
+    user.wishlist.push(productId);
+    await user.save();
+
+    res.json(user.wishlist);
+  } catch (error) {
+    console.error('Add to wishlist error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/user/wishlist/remove/:productId', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const productId = req.params.productId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
+    await user.save();
+
+    res.json(user.wishlist);
+  } catch (error) {
+    console.error('Remove from wishlist error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/reviews', verifyToken, async (req, res) => {
+  try {
+    const { productId, rating, reviewText } = req.body;
+    const userId = req.userId;
+
+    const newReview = new Review({
+      userId,
+      productId,
+      rating,
+      reviewText,
+    });
+
+    await newReview.save();
+    await awardPoints(userId, 'review');
+
+    res.status(201).json(newReview);
+  } catch (error) {
+    console.error('Review submission error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- ADMIN ---
+app.get('/api/admin/analytics/summary', verifyToken, adminAuth, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalOrders = await User.aggregate([
+      { $project: { orderCount: { $size: "$orderHistory" } } },
+      { $group: { _id: null, total: { $sum: "$orderCount" } } }
+    ]);
+
+    res.json({
+      totalUsers,
+      totalProducts,
+      totalOrders: totalOrders.length > 0 ? totalOrders[0].total : 0,
+    });
+  } catch (error) {
+    console.error('Admin summary error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/analytics/sales-over-time', verifyToken, adminAuth, async (req, res) => {
+  try {
+    const sales = await User.aggregate([
+      { $unwind: "$orderHistory" },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderHistory.date" } },
+          totalSales: { $sum: "$orderHistory.finalPrice" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+    res.json(sales);
+  } catch (error) {
+    console.error('Sales over time error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/users', verifyToken, adminAuth, async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json(users);
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Record Purchase
 app.post('/api/user/purchase', verifyToken, async (req, res) => {
   try {
@@ -127,11 +303,13 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
     }
 
     // STEP 2: Record purchase in user order history
-    items.forEach(item => {
+    for (const item of items) {
+      const product = await Product.findOne({ id: item.productId });
       user.orderHistory.push({
         productId: item.productId,
         productName: item.productName,
         productImage: item.productImage,
+        productCategory: product.category,
         originalPrice: item.originalPrice,
         finalPrice: item.finalPrice,
         selectedSize: item.selectedSize || null,
@@ -140,7 +318,7 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
         deliveryLocation: deliveryLocation || null,
         date: new Date()
       });
-    });
+    }
 
     // STEP 3: Update spending and tier
     const purchaseTotal = items.reduce((sum, item) => sum + (item.finalPrice * (item.quantity || 1)), 0);
@@ -150,6 +328,7 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
     else if (user.spending >= 7001) { user.tier = 'Platinum'; }
     else if (user.spending >= 3001) { user.tier = 'Gold'; }
     else { user.tier = 'Bronze'; }
+    await awardPoints(req.userId, 'purchase');
     await user.save();
 
     // STEP 4: Decrement stock for each item
@@ -220,7 +399,7 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // 2.5 FEATURED PERFUME
-const Featured = require('./models/Featured');
+// 2.5 FEATURED PERFUME
 
 app.get('/api/featured', async (req, res) => {
   try {
@@ -338,6 +517,57 @@ app.post('/api/josie', async (req, res) => {
         message: "I am currently meditating on the complexities of Oud. Please ask again." 
       } 
     });
+  }
+});
+
+app.post('/api/ai/scent-discovery', async (req, res) => {
+  const { query } = req.body;
+
+  if (!query) {
+    return res.status(400).json({ error: "Query is required" });
+  }
+
+  try {
+    const systemPrompt = `
+      You are an AI scent expert. Your task is to analyze a user's query and extract key fragrance characteristics.
+      Return a JSON object with a single key "keywords" which is an array of strings.
+      The keywords should be single words or short phrases that can be used to search a perfume database.
+      For example, if the user says "I want something that smells like a walk in a pine forest after the rain",
+      you should return {"keywords": ["pine", "earthy", "fresh", "petrichor"]}.
+    `;
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: query }
+      ],
+      model: "llama-3.1-70b-versatile",
+      response_format: { type: "json_object" }
+    });
+
+    const aiResponse = JSON.parse(completion.choices[0]?.message?.content);
+    const keywords = aiResponse.keywords || [];
+
+    if (keywords.length === 0) {
+      return res.json([]);
+    }
+
+    const searchRegex = new RegExp(keywords.join('|'), 'i');
+
+    const products = await Product.find({
+      $or: [
+        { name: searchRegex },
+        { description: searchRegex },
+        { notes: searchRegex },
+        { category: searchRegex }
+      ]
+    }).limit(10);
+
+    res.json(products);
+
+  } catch (error) {
+    console.error("AI Scent Discovery Error:", error);
+    res.status(500).json({ error: "Failed to discover scents" });
   }
 });
 
@@ -665,19 +895,6 @@ Return JSON: {"brand":"Brand","concentration":"Type","origin":"Country","season"
     res.status(500).json({ error: "Failed to batch enrich products" });
   }
 });
-/**
- * NEW AI ENDPOINTS TO ADD TO index.js
- * 
- * ADD THESE IMPORTS AT THE TOP (after existing model imports):
- * const Review = require('./models/Review');
- * const ProductAnalytics = require('./models/ProductAnalytics');
- * const { extractFragranceNotes, analyzeReviewSentiment, callGroqAI, generatePersonalizedMessage } = require('./services/aiHelpers');
- * const { sendAIPersonalizedEmail } = require('./services/emailService');
- * const Featured = require('./models/Featured');  // If not already imported
- * 
- * ADD THESE ENDPOINTS BEFORE app.listen():
- */
-
 // ==============================================
 // PHASE 2: CUSTOMER-FACING AI AGENTS
 // ==============================================

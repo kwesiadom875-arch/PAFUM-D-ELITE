@@ -1,215 +1,113 @@
 .finder-page {
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  min-height: 80vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 85vh;
-  padding: 40px 20px;
-  background-color: #FFFFFF;
+  align-items: flex-start;
 }
 
-/* THE MAIN BOX */
-.chat-window {
+.finder-window {
   width: 100%;
-  max-width: 700px;
-  height: 700px;
-  display: flex;
-  flex-direction: column;
-  background: #FFF;
-  border: 1px solid #E5E5E5;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-  overflow: hidden; /* Keeps everything inside rounded corners if you had them */
-}
-
-/* HEADER */
-.chat-header {
-  padding: 20px;
-  border-bottom: 1px solid #F0F0F0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #FAFAFA;
-}
-
-.chat-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
-  margin: 0;
-  color: #111;
-}
-
-.status-dot {
-  width: 8px; height: 8px;
-  background-color: #C5A059; /* Gold dot */
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.chat-header small {
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  color: #999;
-}
-
-/* MESSAGES AREA */
-.messages-container {
-  flex-grow: 1;
-  padding: 30px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  background-color: #FFFFFF;
-}
-
-/* SCROLLBAR STYLING (Slim) */
-.messages-container::-webkit-scrollbar { width: 6px; }
-.messages-container::-webkit-scrollbar-thumb { background: #EEE; }
-
-/* MESSAGE ROWS */
-.message-row {
-  display: flex;
-  width: 100%;
-}
-
-.message-row.user { justify-content: flex-end; }
-.message-row.ai { justify-content: flex-start; }
-
-/* BUBBLES */
-.message-bubble {
-  max-width: 80%;
-  padding: 15px 20px;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  position: relative;
-}
-
-/* User Bubble: Black, Sharp */
-.user .message-bubble {
-  background-color: #111;
-  color: white;
-  border-radius: 12px 12px 0 12px; /* Editorial shape */
-}
-
-/* AI Bubble: Light Grey, Gold Accent */
-.ai .message-bubble {
-  background-color: #F9F9F9;
-  color: #333;
-  border-left: 3px solid #C5A059;
-  border-radius: 0 12px 12px 12px;
-}
-
-/* TYPING ANIMATION */
-.typing span {
-  animation: blink 1.4s infinite both;
-  font-size: 2rem;
-  line-height: 10px;
-  margin: 0 2px;
-}
-.typing span:nth-child(2) { animation-delay: 0.2s; }
-.typing span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
-
-/* INPUT AREA */
-.input-area {
-  padding: 20px;
-  border-top: 1px solid #F0F0F0;
-  background: #FFF;
-  display: flex;
-  gap: 10px;
-}
-
-.input-area input {
-  flex-grow: 1;
-  padding: 15px;
-  border: 1px solid #DDD;
-  background: #FAFAFA;
-  color: #111;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  outline: none;
-  transition: 0.3s;
-}
-
-.input-area input:focus {
-  border-color: #C5A059;
-  background: #FFF;
-}
-
-.send-btn {
-  background: #C5A059;
-  color: white;
-  border: none;
-  padding: 0 30px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.send-btn:hover { background: #111; }
-
-/* REQUEST ACTION */
-.request-action {
+  max-width: 900px;
+  padding: 40px;
   text-align: center;
-  padding: 10px;
-  background: #FFFBF0; /* Very light gold tint */
-  border-top: 1px solid #F0F0F0;
 }
-.request-action p { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
-.btn-black-small {
-  background: black; color: white; border: none; padding: 8px 20px;
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
-} /* Chat Container */
-.messages-list {
+
+.finder-window h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.scent-finder-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scent-finder-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.scent-finder-input {
   width: 100%;
-  height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  max-width: 500px;
+  padding: 15px 20px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 50px 0 0 50px;
+  outline: none;
+  transition: border-color 0.3s;
 }
 
-/* AI Product Card Style */
-.ai-card {
-  align-self: flex-start;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid #C5A059;
-  border-radius: 10px;
-  padding: 15px;
-  max-width: 80%;
+.scent-finder-input:focus {
+  border-color: #C5A059;
 }
 
-.ai-reason {
-  font-style: italic;
-  color: #ddd;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
+.finder-page .btn-primary {
+  border-radius: 0 50px 50px 0;
+  padding: 15px 30px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.mini-product {
-  display: flex;
-  gap: 15px;
-  background: rgba(0,0,0,0.3);
-  padding: 10px;
-  border-radius: 8px;
+.loading-message,
+.no-results-message {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: #666;
 }
 
-.mini-product img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 4px;
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card {
   background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.mini-info h4 { margin: 0; font-size: 1rem; color: #C5A059; }
-.mini-info span { font-size: 0.9rem; color: white; display: block; margin: 5px 0; }
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+}
 
-.mini-actions { display: flex; gap: 10px; }
-.btn-gold { background: #C5A059; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
-.btn-link { color: #ccc; text-decoration: underline; font-size: 0.8rem; align-self: center; }
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  background-color: #fff;
+  padding: 10px;
+}
+
+.product-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  margin: 1rem 1rem 0.5rem 1rem;
+}
+
+.product-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #C5A059;
+  margin: 0 1rem 1rem 1rem;
+}

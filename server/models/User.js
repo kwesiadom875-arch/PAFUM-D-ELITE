@@ -29,12 +29,31 @@ const userSchema = new mongoose.Schema({
     productId: String,
     productName: String,
     productImage: String,
+    productCategory: String,
     originalPrice: Number,
     finalPrice: Number,
+    selectedSize: String,
+    quantity: Number,
     negotiated: { type: Boolean, default: false },
     date: { type: Date, default: Date.now }
   }],
+  wishlist: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product'
+  }],
+  points: {
+    type: Number,
+    default: 0
+  },
+  badges: [{
+    name: String,
+    date: { type: Date, default: Date.now }
+  }],
   isVerified: {
+    type: Boolean,
+    default: false
+  },
+  isAdmin: {
     type: Boolean,
     default: false
   },
