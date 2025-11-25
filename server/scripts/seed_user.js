@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 const User = require('./models/User');
 
 const dbAddress = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/parfum_delite';
@@ -17,12 +17,12 @@ mongoose.connect(dbAddress)
     const existing = await User.findOne({ email });
     if (existing) {
       console.log('User already exists. Updating password...');
-      existing.password = await bcrypt.hash(password, 10);
+      existing.password = await argon2.hash(password);
       await existing.save();
       console.log('Password updated.');
     } else {
       console.log('Creating new user...');
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await argon2.hash(password);
       const newUser = new User({
         username,
         email,
