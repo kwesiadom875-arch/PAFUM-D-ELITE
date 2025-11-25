@@ -470,24 +470,41 @@ app.get('/api/admin/orders', async (req, res) => {
 app.post('/api/admin/update-stock', async (req, res) => {
   try {
     console.log("Update Stock Request Body:", req.body);
-    const { productId, size, quantity } = req.body;
+    const { productId, size, quantity, price } = req.body;
     
-    let product = await Product.findOne({ id: productId });
+    let product;
+    
+    // 1. Try finding by custom numeric ID
+    if (productId && !isNaN(productId)) {
+      product = await Product.findOne({ id: productId });
+    }
+
+    // 2. If not found, try finding by MongoDB _id
     if (!product && mongoose.Types.ObjectId.isValid(productId)) {
       product = await Product.findById(productId);
     }
 
     if (!product) {
+      console.log("Product not found for ID:", productId);
       return res.status(404).json({ error: "Product not found" });
     }
 
     if (size) {
-      // Update size-specific stock
+      // Update size-specific stock or add new size
       const sizeIndex = product.sizes.findIndex(s => s.size === size);
       if (sizeIndex === -1) {
-        return res.status(404).json({ error: `Size ${size} not found for this product` });
+        // Add new size variant if it doesn't exist
+        product.sizes.push({ 
+          size, 
+          stockQuantity: quantity, 
+          price: price ? parseFloat(price) : product.price // Use provided price or default
+        });
+      } else {
+        product.sizes[sizeIndex].stockQuantity = quantity;
+        if (price) {
+          product.sizes[sizeIndex].price = parseFloat(price);
+        }
       }
-      product.sizes[sizeIndex].stockQuantity = quantity;
     } else {
       // Update main stock
       product.stockQuantity = quantity;

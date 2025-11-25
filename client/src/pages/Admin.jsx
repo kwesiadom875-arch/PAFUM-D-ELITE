@@ -23,7 +23,7 @@ const Admin = () => {
   });
 
   // Stock Update State
-  const [stockUpdate, setStockUpdate] = useState({ productId: '', size: '', quantity: 0 });
+  const [stockUpdate, setStockUpdate] = useState({ productId: '', size: '', quantity: 0, price: '' });
 
   useEffect(() => {
     if (activeTab === 'inventory' || activeTab === 'stock') fetchProducts();
@@ -137,7 +137,7 @@ const Admin = () => {
     try {
       await axios.post(`${API_URL}/api/admin/update-stock`, stockUpdate);
       alert("Stock Updated!");
-      setStockUpdate({ productId: '', size: '', quantity: 0 });
+      setStockUpdate({ productId: '', size: '', quantity: 0, price: '' });
       fetchProducts();
     } catch (error) {
       alert("Failed to update stock.");
@@ -263,7 +263,7 @@ const Admin = () => {
           <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>Stock Management</h3>
           <div className="stock-update-box" style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
             <h4>Update Stock Level</h4>
-            <form onSubmit={handleStockUpdate} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
+            <form onSubmit={handleStockUpdate} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
               <div>
                 <label>Product</label>
                 <select
@@ -284,6 +284,15 @@ const Admin = () => {
                   placeholder="e.g. 50ml"
                   value={stockUpdate.size}
                   onChange={(e) => setStockUpdate({ ...stockUpdate, size: e.target.value })}
+                />
+              </div>
+              <div>
+                <label>Price (Optional)</label>
+                <input
+                  type="number"
+                  placeholder="Override Price"
+                  value={stockUpdate.price || ''}
+                  onChange={(e) => setStockUpdate({ ...stockUpdate, price: e.target.value })}
                 />
               </div>
               <div>
@@ -319,7 +328,7 @@ const Admin = () => {
                       {p.sizes && p.sizes.length > 0 ? (
                         <div style={{ fontSize: '0.8rem' }}>
                           {p.sizes.map(s => (
-                            <div key={s.size}>{s.size}: {s.stockQuantity}</div>
+                            <div key={s.size}>{s.size}: {s.stockQuantity} (GH₵{s.price})</div>
                           ))}
                         </div>
                       ) : '-'}
