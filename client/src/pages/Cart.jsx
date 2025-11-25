@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { PaystackButton } from 'react-paystack';
@@ -21,7 +22,7 @@ const Cart = () => {
     currency: "GHS",
     metadata: { name: "Guest Shopper", phone: "0240000000" },
     publicKey,
-    text: "Checkout Now",
+    text: "Pay Now",
     onSuccess: async (reference) => {
       try {
         const token = localStorage.getItem('token');
@@ -63,46 +64,75 @@ const Cart = () => {
 
   return (
     <div className="container cart-page">
-      <h2 className="section-title">Your Selection</h2>
+      <h2 className="section-title">Secure Checkout</h2>
 
       <div className="cart-grid">
-        {/* LEFT: ITEMS */}
-        <div className="cart-items">
-          {cart.map((item, index) => (
-            <div key={index} className="glass-card cart-item">
-              <img src={item.image} alt={item.name} />
-              <div className="item-details">
-                <h3>{item.name}</h3>
-                <p>{item.category}</p>
-                <p className="price">GH₵{item.price}</p>
-              </div>
-              <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
-                <FaTrash />
-              </button>
+        {/* LEFT: SHIPPING & ITEMS */}
+        <div className="checkout-left">
+
+          {/* 1. SHIPPING FORM */}
+          <div className="glass-card shipping-form">
+            <h3>Shipping Details</h3>
+            <div className="form-row">
+              <input type="text" placeholder="First Name" className="input-field" />
+              <input type="text" placeholder="Last Name" className="input-field" />
             </div>
-          ))}
+            <input type="text" placeholder="Address Line 1" className="input-field full" />
+            <div className="form-row">
+              <input type="text" placeholder="City" className="input-field" />
+              <input type="text" placeholder="Region" className="input-field" />
+            </div>
+            <input type="tel" placeholder="Phone Number" className="input-field full" />
+          </div>
+
+          {/* 2. CART ITEMS */}
+          <div className="cart-items-review">
+            <h3>Your Selection ({cart.length})</h3>
+            {cart.map((item, index) => (
+              <div key={index} className="glass-card cart-item-mini">
+                <img src={item.image} alt={item.name} />
+                <div className="item-details">
+                  <h4>{item.name}</h4>
+                  <p className="price">GH₵{item.price}</p>
+                </div>
+                <button className="remove-btn-mini" onClick={() => removeFromCart(item.id)}>
+                  <FaTrash />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* RIGHT: TOTAL & PAY */}
-        <div className="glass-card cart-summary">
-          <h3>Order Summary</h3>
-          <div className="summary-row">
-            <span>Subtotal</span>
-            <span>GH₵{totalAmount}</span>
-          </div>
-          <div className="summary-row">
-            <span>Shipping</span>
-            <span>Free (Elite Standard)</span>
-          </div>
-          <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '20px 0' }} />
-          <div className="summary-row total">
-            <span>Total</span>
-            <span style={{ color: '#C5A059' }}>GH₵{totalAmount}</span>
-          </div>
+        {/* RIGHT: ORDER SUMMARY */}
+        <div className="checkout-right">
+          <div className="glass-card cart-summary sticky-summary">
+            <h3>Order Summary</h3>
+            <div className="summary-row">
+              <span>Subtotal</span>
+              <span>GH₵{totalAmount}</span>
+            </div>
+            <div className="summary-row">
+              <span>Shipping</span>
+              <span>Free (Elite Standard)</span>
+            </div>
+            <div className="summary-row">
+              <span>Tax</span>
+              <span>GH₵0.00</span>
+            </div>
+            <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '20px 0' }} />
+            <div className="summary-row total">
+              <span>Total</span>
+              <span style={{ color: '#C5A059' }}>GH₵{totalAmount}</span>
+            </div>
 
-          {/* THE PAYSTACK BUTTON */}
-          <div className="paystack-wrapper">
-            <PaystackButton className="btn-primary" {...componentProps} />
+            {/* THE PAYSTACK BUTTON */}
+            <div className="paystack-wrapper">
+              <PaystackButton className="btn-primary full-width" {...componentProps} />
+            </div>
+
+            <p className="secure-note">
+              <span role="img" aria-label="lock">🔒</span> Secure SSL Encryption
+            </p>
           </div>
         </div>
       </div>

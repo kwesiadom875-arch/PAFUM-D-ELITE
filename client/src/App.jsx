@@ -11,8 +11,10 @@ import Cart from './pages/Cart';
 import Admin from './pages/Admin.jsx';
 import Profile from './components/Profile';
 import ScentFinder from './pages/ScentFinder';
-import Auth from './pages/Auth';
+// import Auth from './pages/Auth';
 import VerifyEmail from './pages/VerifyEmail';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function App() {
   return (
@@ -26,8 +28,10 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/find-your-scent" element={<ScentFinder />} />
-        <Route path="/auth" element={<Auth />} />
+        {/* <Route path="/auth" element={<Auth />} /> */}
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </CartProvider>
   );

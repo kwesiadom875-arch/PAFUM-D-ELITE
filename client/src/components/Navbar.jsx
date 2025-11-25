@@ -118,7 +118,7 @@ const Navbar = () => {
               <span>Total:</span>
               <span>GH₵{getCartTotal()}</span>
             </div>
-            <button className="btn-gold full-width" onClick={handleCheckout}>
+            <button className="btn-gold" onClick={handleCheckout}>
               Checkout
             </button>
           </div>

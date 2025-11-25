@@ -16,6 +16,8 @@
 .card-bronze { background: linear-gradient(135deg, #3E2723, #5D4037); border: 1px solid #8D6E63; }
 .card-gold { background: linear-gradient(135deg, #B8860B, #F0E68C); color: black; border: 1px solid #FFD700; }
 .card-platinum { background: linear-gradient(135deg, #222, #444); border: 1px solid #C5A059; }
+.card-diamond { background: linear-gradient(135deg, #b9f2ff, #e0f7fa); color: #006064; border: 1px solid #00bcd4; }
+.card-elite-diamond { background: linear-gradient(135deg, #000000, #1a1a1a); color: #C5A059; border: 1px solid #C5A059; box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); }
 
 .card-top { display: flex; justify-content: space-between; font-family: 'Playfair Display', serif; letter-spacing: 2px; }
 .card-chip img { width: 50px; opacity: 0.8; }

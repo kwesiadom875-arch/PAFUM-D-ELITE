@@ -111,7 +111,6 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // 2. PRODUCTS
 app.get('/api/products', async (req, res) => {
   const products = await Product.find();
@@ -134,104 +133,91 @@ app.post('/api/products', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+// 2.5 FEATURED PERFUME
+const Featured = require('./models/Featured');
+
+app.get('/api/featured', async (req, res) => {
   try {
-    let result = await Product.findOneAndDelete({ id: req.params.id });
-    if (!result && mongoose.Types.ObjectId.isValid(req.params.id)) {
-      result = await Product.findByIdAndDelete(req.params.id);
-    }
-    res.json({ message: "Deleted" });
+    const featured = await Featured.findOne().sort({ _id: -1 });
+    res.json(featured || {});
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/featured', async (req, res) => {
+  try {
+    await Featured.deleteMany({}); 
+    const newFeatured = new Featured(req.body);
+    await newFeatured.save();
+    res.json(newFeatured);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 3. AI: JOSIE
 app.post('/api/josie', async (req, res) => {
-  const { userMessage } = req.body;
+  const { userMessage, history } = req.body;
+  const products = await Product.find();
 
   try {
-    // 1. Give AI the Inventory Context
-    const products = await Product.find();
-    const inventoryContext = products.map(p => 
-      `ID:${p.id}, Name:${p.name}, Price: GH₵${p.price}, Category:${p.category}, Notes:${p.notes}, Desc:${p.description.substring(0, 100)}...`
-    ).join('\n');
+    const inventory = products.map(p => `${p.name} (${p.category})`).join('\n');
 
-    // 2. System Prompt for JSON Output
-    const systemPrompt = `
-      You are Josie, the Senior Scent Sommelier for Parfum D'Elite.
-      CRITICAL: You must return valid JSON only. No markdown.
-      Your response must have a "type" and "data".
-      
-      Supported Types:
-      1. "text": Standard chat response.
-      2. "product_card": Recommend a specific product. Data must include "productId" (int) and "reason".
-      
-      Inventory:
-      ${inventoryContext}
-    `;
+    const messages = [
+      {
+        role: "system",
+        content: `You are Josie, a luxury perfume sommelier.
+        
+        Current Inventory:
+        ${inventory}
+        
+        --- LOGIC ---
+        1. IF Greeting: Reply politely.
+        2. IF Recommendation Needed:
+           - Recommend ONE perfume. 
+           - DO NOT recommend the same perfume twice in a row. Look at the history!
+           - If the user asks for "another", give a DIFFERENT option.
+           
+        --- FORMATTING ---
+        - No Markdown. Use Emojis for stats.
+        - REQUIRED STATS: ⏳ Longevity, 🌬️ Sillage, 💬 Community.
+        - IF NOT IN INVENTORY: Must end with "We currently don't have that in stock but you can make a request."
+        `
+      },
+      ...(history || []),
+      { role: "user", content: userMessage }
+    ];
 
     const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
+      messages: messages,
       model: "llama-3.3-70b-versatile",
-      response_format: { type: "json_object" } 
+      max_tokens: 250
     });
 
-    const aiResponse = JSON.parse(completion.choices[0].message.content);
-    res.json(aiResponse);
-
+    res.json({ reply: completion.choices[0]?.message?.content });
   } catch (error) {
     console.error("AI Error:", error);
-    res.json({ type: "text", data: { message: "I am sensing interference. Please try again." } });
+    res.json({ reply: "I am having trouble accessing the archives. Please try again." });
   }
 });
 
-// 4. AI: NEGOTIATOR (STRICT VERSION - 15% MAX DISCOUNT)
+// 4. AI: NEGOTIATOR
 app.post('/api/negotiate', async (req, res) => {
   const { product, userOffer, history } = req.body;
   const price = product.price;
   const offer = parseFloat(userOffer);
   const ratio = offer / price;
 
-  // STRICT NEGOTIATION RULES
-  const MAX_DISCOUNT = 0.15; // 15% maximum discount
-  const minAcceptablePrice = price * (1 - MAX_DISCOUNT); // 85% of original price
-  const negotiationRounds = (history || []).filter(msg => msg.role === 'user').length;
-
   let systemInstruction = "";
   let status = "negotiating";
-  let counter = 0;
 
-  // REJECT: Offer is below minimum acceptable (85% of price)
-  if (offer < minAcceptablePrice) {
-    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. This is ${((1 - ratio) * 100).toFixed(0)}% off, which is far below our 15% maximum discount policy. Our absolute minimum is GH₵${minAcceptablePrice.toFixed(0)}. Politely but firmly reject this offer. Inform them our maximum discount is 15%, making the lowest possible price GH₵${minAcceptablePrice.toFixed(0)}.`;
+  if (ratio < 0.5) {
+    systemInstruction = `The user offered ${offer} for a ${price} item (too low). You are insulted but polite. Reject it firmly. Do not counter.`;
     status = "rejected";
-  }
-  // ACCEPT: Offer is at or above 85% of price (within 15% discount)
-  else if (offer >= minAcceptablePrice) {
-    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. This is within our acceptable range (15% maximum discount). Accept the deal graciously and warmly. Use the word "ACCEPTED" clearly in your response.`;
-    status = "accepted";
-  }
-  // COUNTER: This shouldn't happen often since we reject below 85%, but as a safeguard
-  else {
-    // Be very strict with counters - stay close to original price
-    if (negotiationRounds === 0) {
-      // First offer: Counter with 97% of original (only 3% off)
-      counter = Math.floor(price * 0.97);
-    } else if (negotiationRounds === 1) {
-      // Second round: Counter with 93% (7% off)
-      counter = Math.floor(price * 0.93);
-    } else if (negotiationRounds === 2) {
-      // Third round: Counter with 90% (10% off)
-      counter = Math.floor(price * 0.90);
-    } else {
-      // Final rounds: Go down to minimum (85%)
-      counter = Math.ceil(minAcceptablePrice);
-    }
-    
-    systemInstruction = `The user offered GH₵${offer} for a GH₵${price} item. Counter with GH₵${counter}. Be firm but professional. Emphasize the exceptional quality and value of this luxury item. This is round ${negotiationRounds + 1} of negotiation.`;
+  } else if (ratio < 0.8) {
+    const counter = Math.floor((offer + (price * 0.85)) / 2);
+    systemInstruction = `The user offered ${offer} for a ${price} item. It's decent but we want more. Counter offer with ${counter}. Be persuasive.`;
     status = "counter";
+  } else {
+    systemInstruction = `The user offered ${offer} for a ${price} item. This is acceptable. Accept the deal warmly. Use the word "ACCEPTED" in your response.`;
+    status = "accepted";
   }
 
   try {
@@ -362,6 +348,38 @@ app.post('/api/scrape', async (req, res) => {
   } catch (error) {
     console.error("Scraping Error:", error);
     res.status(500).json({ error: "Failed to scrape data" });
+  }
+});
+
+// 6. ADMIN: GET ALL ORDERS
+app.get('/api/admin/orders', async (req, res) => {
+  try {
+    // In a real app, you would verify if the requester is an admin here.
+    // For now, we just fetch all users who have orders.
+    const users = await User.find({ 'orderHistory.0': { $exists: true } });
+    
+    let allOrders = [];
+    users.forEach(user => {
+      user.orderHistory.forEach(order => {
+        allOrders.push({
+          orderId: order._id || Math.random().toString(36).substr(2, 9), // Fallback ID
+          username: user.username,
+          email: user.email,
+          productName: order.productName,
+          finalPrice: order.finalPrice,
+          date: order.date,
+          status: 'Paid' // Since they are in history, they are paid
+        });
+      });
+    });
+
+    // Sort by date descending
+    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json(allOrders);
+  } catch (error) {
+    console.error("Admin Orders Error:", error);
+    res.status(500).json({ error: "Failed to fetch orders" });
   }
 });
 

@@ -31,9 +31,11 @@ const Profile = () => {
 
   // --- TIER LOGIC ---
   const tiers = {
-    Bronze: { limit: 1000, next: 'Gold', color: '#cd7f32' },
-    Gold: { limit: 5000, next: 'Platinum', color: '#C5A059' },
-    Platinum: { limit: 100000, next: 'Max', color: '#E5E4E2' }
+    Bronze: { limit: 3000, next: 'Gold', color: '#cd7f32' },
+    Gold: { limit: 7000, next: 'Platinum', color: '#C5A059' },
+    Platinum: { limit: 10000, next: 'Diamond', color: '#E5E4E2' },
+    Diamond: { limit: 15000, next: 'Elite Diamond', color: '#b9f2ff' },
+    'Elite Diamond': { limit: 1000000, next: 'Max', color: '#000000' }
   };
 
   const currentTier = tiers[user.tier] || tiers.Bronze;
@@ -42,23 +44,23 @@ const Profile = () => {
   const toUnlock = nextGoal - user.spending;
 
   // Fake stats for now if DB is empty (replace with user.savedAmount later)
-  const totalSaved = user.savedAmount || 450; 
-  const discountLevel = user.tier === 'Platinum' ? '20%' : user.tier === 'Gold' ? '10%' : '0%';
+  const totalSaved = user.savedAmount || 0;
+  const discountLevel = user.tier === 'Elite Diamond' ? '25%' : user.tier === 'Diamond' ? '20%' : user.tier === 'Platinum' ? '15%' : user.tier === 'Gold' ? '10%' : '0%';
 
   return (
     <div className="container profile-page">
       <h2 className="section-title text-center">The Elite Circle</h2>
-      
+
       <div className="profile-dashboard">
-        
+
         {/* 1. THE DIGITAL BLACK CARD */}
-        <div className={`member-card card-${user.tier.toLowerCase()}`}>
+        <div className={`member-card card-${user.tier.toLowerCase().replace(' ', '-')}`}>
           <div className="card-top">
             <span className="card-brand">PARFUM D'ELITE</span>
             <span className="card-tier">{user.tier} MEMBER</span>
           </div>
           <div className="card-chip">
-             <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/chip.png" alt="chip" />
+            <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/chip.png" alt="chip" />
           </div>
           <div className="card-details">
             <div className="card-holder">
@@ -73,14 +75,14 @@ const Profile = () => {
         </div>
 
         {/* 2. ASCENSION PROGRESS */}
-        {user.tier !== 'Platinum' && (
+        {user.tier !== 'Elite Diamond' && (
           <div className="progress-container glass-card">
             <div className="progress-text">
               <span>Current Spend: <strong>GH₵{user.spending}</strong></span>
               <span>Unlock {currentTier.next}: <strong>GH₵{toUnlock}</strong> left</span>
             </div>
             <div className="progress-track">
-              <div className="progress-fill" style={{width: `${progressPercent}%`}}></div>
+              <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
             </div>
           </div>
         )}
@@ -108,26 +110,27 @@ const Profile = () => {
         <div className="history-section">
           <h3>My Scent Collection</h3>
           <div className="history-grid">
-             {/* If order history is empty, show placeholder */}
-             {(!user.orders || user.orders.length === 0) ? (
-               <p className="no-orders">No perfumes collected yet.</p>
-             ) : (
-               user.orders.map((order, i) => (
-                 <div key={i} className="history-card glass-card">
-                    <div className="history-img">
-                      <img src={order.img} alt="perfume" />
+            {/* If order history is empty, show placeholder */}
+            {(!user.orderHistory || user.orderHistory.length === 0) ? (
+              <p className="no-orders">No perfumes collected yet.</p>
+            ) : (
+              user.orderHistory.map((order, i) => (
+                <div key={i} className="history-card glass-card">
+                  <div className="history-img">
+                    <img src={order.productImage || "https://via.placeholder.com/100"} alt="perfume" />
+                  </div>
+                  <div className="history-info">
+                    <h4>{order.productName}</h4>
+                    <div className="price-row">
+                      <span className="old-price">GH₵{order.originalPrice}</span>
+                      <span className="paid-price">GH₵{order.finalPrice}</span>
                     </div>
-                    <div className="history-info">
-                      <h4>{order.name}</h4>
-                      <div className="price-row">
-                        <span className="old-price">GH₵{order.originalPrice}</span>
-                        <span className="paid-price">GH₵{order.paidPrice}</span>
-                      </div>
-                      <span className="status-badge">Delivered</span>
-                    </div>
-                 </div>
-               ))
-             )}
+                    <span className="status-badge">Delivered</span>
+                    <span className="order-date">{new Date(order.date).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
