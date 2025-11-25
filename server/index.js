@@ -241,32 +241,80 @@ app.post('/api/featured', async (req, res) => {
 // 3. AI: JOSIE
 app.post('/api/josie', async (req, res) => {
   const { userMessage, history } = req.body;
-  const products = await Product.find();
-
+  
   try {
-    const inventory = products.map(p => `${p.name} (${p.category})`).join('\n');
+    // 1. Prepare the Inventory String
+    const products = await Product.find();
+    const inventory = products.map(p => 
+      `[ID: ${p.id}] Name: ${p.name} | Category: ${p.category} | Price: GH₵${p.price} | Notes: ${p.notes} | Desc: ${p.description}`
+    ).join('\n');
+
+    const systemPrompt = `
+      You are **Josie**, the Senior Scent Sommelier and Concierge for **Parfum D'Elite**, a luxury fragrance house in Accra, Ghana.
+      
+      **YOUR GOAL:** To guide users to the perfect scent using your deep knowledge of olfactory notes, the local climate (Accra heat), and their personal "vibe." You do not just chat; you **curate experiences**.
+
+      **YOUR PERSONALITY:**
+      - **Tone:** Sophisticated, witty, knowledgeable, and slightly exclusive (think "Vogue Editor" meets "Best Friend").
+      - **Vocabulary:** Use sensory words (e.g., "opulent," "effervescent," "gourmand," "dry-down").
+      - **Honesty:** If a user suggests a heavy Oud for a beach day in 35°C heat, politely warn them.
+
+      **YOUR INVENTORY:**
+      You have access to the following "Parfum D'Elite" collection:
+      ${inventory}
+
+      **CRITICAL OUTPUT RULES (GENERATIVE UI):**
+      You must **NEVER** return plain text. You must **ALWAYS** return a valid JSON object. 
+      Your response must follow one of these 3 structures based on the user's intent:
+
+      ---
+      
+      **SCENARIO 1: General Chat / Clarification**
+      (Use this when asking follow-up questions or greeting)
+      {
+        "type": "text",
+        "data": {
+          "message": "Your sophisticated, witty response goes here."
+        }
+      }
+
+      **SCENARIO 2: Recommendation (The "Product Card")**
+      (Use this when you have found a specific perfume that matches their request)
+      {
+        "type": "recommendation",
+        "data": {
+          "message": "A brief, persuasive intro about why this is the one.",
+          "product": {
+            "id": 123, // Must match the ID in the Inventory list
+            "name": "Dior Sauvage Elixir",
+            "reason": "The spicy nutmeg top notes will cut through the Accra humidity perfectly."
+          }
+        }
+      }
+
+      **SCENARIO 3: Comparison (The "Bento Grid")**
+      (Use this when the user is torn between two options or asks for "something like X but lighter")
+      {
+        "type": "comparison",
+        "data": {
+          "message": "An excellent dilemma. Let us weigh the notes.",
+          "products": [
+            { "id": 1, "name": "Good Girl", "trait": "Sweet & Floral" },
+            { "id": 6, "name": "Black Orchid", "trait": "Dark & Earthy" }
+          ]
+        }
+      }
+
+      ---
+
+      **IMPORTANT CONSTRAINTS:**
+      1. Only recommend products from the provided Inventory list.
+      2. Ensure the JSON is valid and minified (no markdown formatting like \`\`\`json).
+      3. If the user asks for something we don't have, suggest the closest alternative from our collection with a persuasive "pivot."
+    `;
 
     const messages = [
-      {
-        role: "system",
-        content: `You are Josie, a luxury perfume sommelier.
-        
-        Current Inventory:
-        ${inventory}
-        
-        --- LOGIC ---
-        1. IF Greeting: Reply politely.
-        2. IF Recommendation Needed:
-           - Recommend ONE perfume. 
-           - DO NOT recommend the same perfume twice in a row. Look at the history!
-           - If the user asks for "another", give a DIFFERENT option.
-           
-        --- FORMATTING ---
-        - No Markdown. Use Emojis for stats.
-        - REQUIRED STATS: ⏳ Longevity, 🌬️ Sillage, 💬 Community.
-        - IF NOT IN INVENTORY: Must end with "We currently don't have that in stock but you can make a request."
-        `
-      },
+      { role: "system", content: systemPrompt },
       ...(history || []),
       { role: "user", content: userMessage }
     ];
@@ -274,72 +322,25 @@ app.post('/api/josie', async (req, res) => {
     const completion = await groq.chat.completions.create({
       messages: messages,
       model: "llama-3.3-70b-versatile",
-      max_tokens: 250
+      // CRITICAL: This forces the AI to actually obey the JSON format
+      response_format: { type: "json_object" } 
     });
 
-    res.json({ reply: completion.choices[0]?.message?.content });
+    const aiResponse = JSON.parse(completion.choices[0]?.message?.content);
+    res.json(aiResponse);
+
   } catch (error) {
     console.error("AI Error:", error);
-    res.json({ reply: "I am having trouble accessing the archives. Please try again." });
-  }
-});
-
-// 4. AI: NEGOTIATOR
-app.post('/api/negotiate', async (req, res) => {
-  const { product, userOffer, history } = req.body;
-  const price = product.price;
-  const offer = parseFloat(userOffer);
-  const ratio = offer / price;
-
-  let systemInstruction = "";
-  let status = "negotiating";
-
-  if (ratio < 0.5) {
-    systemInstruction = `The user offered ${offer} for a ${price} item (too low). You are insulted but polite. Reject it firmly. Do not counter.`;
-    status = "rejected";
-  } else if (ratio < 0.8) {
-    const counter = Math.floor((offer + (price * 0.85)) / 2);
-    systemInstruction = `The user offered ${offer} for a ${price} item. It's decent but we want more. Counter offer with ${counter}. Be persuasive.`;
-    status = "counter";
-  } else {
-    systemInstruction = `The user offered ${offer} for a ${price} item. This is acceptable. Accept the deal warmly. Use the word "ACCEPTED" in your response.`;
-    status = "accepted";
-  }
-
-  try {
-    const messages = [
-      {
-        role: "system",
-        content: `You are The Concierge, a high-end luxury negotiator for Parfum D'Elite. 
-        Your goal is to get the best price, but you have authorization to accept reasonable offers.
-        
-        Current Context:
-        Product: ${product.name}
-        List Price: ${price}
-        User Offer: ${offer}
-        
-        Instruction: ${systemInstruction}
-        
-        Keep your response short (under 2 sentences). Elegant, sophisticated tone.`
-      },
-      ...(history || []),
-      { role: "user", content: `I offer ${offer}` }
-    ];
-
-    const completion = await groq.chat.completions.create({
-      messages: messages,
-      model: "llama-3.3-70b-versatile",
-      max_tokens: 100
+    // Fallback JSON response in case of error
+    res.json({ 
+      type: "text", 
+      data: { 
+        message: "I am currently meditating on the complexities of Oud. Please ask again." 
+      } 
     });
-
-    const reply = completion.choices[0]?.message?.content;
-
-    res.json({ reply, status });
-  } catch (error) {
-    console.error("Negotiation Error:", error);
-    res.status(500).json({ error: "Negotiation failed" });
   }
 });
+
 
 // 5. REQUESTS
 app.post('/api/requests', async (req, res) => {
