@@ -123,7 +123,82 @@ async function sendPasswordResetEmail(email, token) {
   }
 }
 
+/**
+ * Send AI-generated personalized email
+ * @param {Object} user - User object
+ * @param {string} messageType - TIER_UPGRADE, PURCHASE_ANNIVERSARY, or PERSONALIZED_RECOMMENDATION
+ * @param {Object} context - Additional context for AI generation
+ */
+async function sendAIPersonalizedEmail(user, messageType, context) {
+  const { generatePersonalizedMessage } = require('./aiHelpers');
+  
+  let subject = '';
+  let heading = '';
+  
+  switch (messageType) {
+    case 'TIER_UPGRADE':
+      subject = `Welcome to ${user.tier} Tier - Parfum D'Elite`;
+      heading = `You've Reached ${user.tier} Status`;
+      break;
+    case 'PURCHASE_ANNIVERSARY':
+      subject = 'A Special Anniversary - Parfum D\'Elite';
+      heading = 'Celebrating Your Fragrance Journey';
+      break;
+    case 'PERSONALIZED_RECOMMENDATION':
+      subject = 'Curated Just For You - Parfum D\'Elite';
+      heading = 'Your Personal Fragrance Selection';
+      break;
+    default:
+      subject = 'A Message From Parfum D\'Elite';
+      heading = 'Exclusive Update';
+  }
+  
+  try {
+    // Generate AI personalized content
+    const aiMessage = await generatePersonalizedMessage(user, context, messageType);
+    
+    const mailOptions = {
+      from: '"Parfum D\'Elite" <noreply@parfumdelite.com>',
+      to: user.email,
+      subject,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: 'Inter', Arial, sans-serif; background-color: #0a0a0a; color: #ffffff; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 12px; padding: 40px; border: 1px solid #333; }
+            .logo { font-family: 'Playfair Display', serif; color: #C5A059; font-size: 24px; margin-bottom: 20px; }
+            .heading { color: #C5A059; font-size: 20px; margin-bottom: 20px; }
+            .message { color: #e0e0e0; line-height: 1.6; white-space: pre-line; }
+            .footer { color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">Parfum D'Elite</div>
+            <div class="heading">${heading}</div>
+            <div class="message">${aiMessage}</div>
+            <div class="footer">
+              <p>This is an exclusive message for ${user.username}.</p>
+              <p>Current Tier: ${user.tier} | Total Lifetime Value: $${user.spending}</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`AI personalized email sent to ${user.email} (Type: ${messageType})`);
+  } catch (error) {
+    console.error('AI Email sending error:', error);
+    throw new Error('Failed to send personalized email');
+  }
+}
+
 module.exports = {
   sendVerificationEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendAIPersonalizedEmail
 };

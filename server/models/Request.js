@@ -1,20 +1,54 @@
 const mongoose = require('mongoose');
 
 const requestSchema = new mongoose.Schema({
-  userVibe: {
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  userName: {
+    type: String,
+    required: true
+  },
+  userEmail: {
+    type: String,
+    required: true
+  },
+  perfumeName: {
     type: String,
     required: true,
     trim: true
   },
-  aiRecommendation: {
+  description: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
-  requestedAt: {
+  estimatedPrice: {
+    type: Number,
+    default: 0
+  },
+  category: {
+    type: String,
+    enum: ['Highly Niche/Rare', 'Standard Request', 'Uncategorized'],
+    default: 'Uncategorized'
+  },
+  status: {
+    type: String,
+    enum: ['Pending', 'Processing', 'Fulfilled', 'Cancelled'],
+    default: 'Pending'
+  },
+  aiNotes: {
+    type: String,
+    default: ''
+  },
+  createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
+// Index for efficient queries
+requestSchema.index({ status: 1, createdAt: -1 });
+requestSchema.index({ category: 1 });
 
 module.exports = mongoose.model('Request', requestSchema);

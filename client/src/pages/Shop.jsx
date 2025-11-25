@@ -90,6 +90,15 @@ const Shop = () => {
           </div>
         ))}
       </div>
+
+      {/* REQUEST CTA */}
+      <div className="request-cta" style={{ textAlign: 'center', marginTop: '80px', padding: '60px 20px', background: '#f9f9f9', borderRadius: '12px' }}>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2rem', marginBottom: '15px' }}>Didn't find what you're looking for?</h2>
+        <p style={{ color: '#666', marginBottom: '30px' }}>Our archives are vast, but sometimes the perfect scent is yet to be discovered.</p>
+        <Link to="/request">
+          <button className="btn-outline">Make a Request</button>
+        </Link>
+      </div>
     </div>
   );
 };

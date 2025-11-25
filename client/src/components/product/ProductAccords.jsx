@@ -66,7 +66,7 @@ const getTextColor = (hex) => {
     return darkBackgrounds.includes(hex) ? '#FFFFFF' : '#222222';
 };
 
-const ProductAccords = ({ notesArray }) => {
+const ProductAccords = ({ product, notesArray }) => {
     return (
         <div className="accords-section container">
             {/* LEFT: FRAGRANTICA CHART */}
@@ -104,9 +104,8 @@ const ProductAccords = ({ notesArray }) => {
             {/* RIGHT: PERFUMER INFO */}
             <div className="bento-card wide-card">
                 <h3>Perfumer(s)</h3>
-                <p className="perfumer-name">Nathalie Gracia-Cetto</p>
-                <p className="perfumer-name">Quentin Bisch</p>
-                <div className="perfumer-signature">Master Perfumers</div>
+                <p className="perfumer-name">{product.perfumer || "Master Perfumer"}</p>
+                <div className="perfumer-signature">The Nose Behind The Scent</div>
             </div>
         </div>
     );

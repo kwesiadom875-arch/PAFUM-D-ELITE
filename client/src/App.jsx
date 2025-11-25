@@ -15,6 +15,8 @@ import ScentFinder from './pages/ScentFinder';
 import VerifyEmail from './pages/VerifyEmail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Reviews from './pages/Reviews';
+import RequestScent from './pages/RequestScent';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/request" element={<RequestScent />} />
       </Routes>
     </CartProvider>
   );

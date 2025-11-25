@@ -59,6 +59,7 @@ const ProductDetail = () => {
 
       {/* BENTO GRID */}
       <ProductBento
+        product={product}
         top={top}
         heart={heart}
         base={base}
@@ -66,6 +67,7 @@ const ProductDetail = () => {
 
       {/* ACCORDS SECTION */}
       <ProductAccords
+        product={product}
         notesArray={notesArray}
       />
 

@@ -1,17 +1,17 @@
 import React from 'react';
 import { FaGlobe, FaThermometerHalf, FaMars, FaFlask, FaTag, FaStar } from 'react-icons/fa';
 
-const ProductBento = ({ top, heart, base }) => {
+const ProductBento = ({ product, top, heart, base }) => {
     return (
         <div className="bento-grid container">
             <div className="bento-card intel-card animate-pop-in delay-1">
                 <h3>Scent Intel</h3>
                 <ul className="intel-rows">
-                    <li><span className="icon-row"><FaTag /> Brand</span> <span>D'Elite Private</span></li>
-                    <li><span className="icon-row"><FaFlask /> Concentration</span> <span>Eau de Parfum</span></li>
-                    <li><span className="icon-row"><FaMars /> Gender</span> <span>Unisex</span></li>
-                    <li><span className="icon-row"><FaGlobe /> Origin</span> <span>France</span></li>
-                    <li><span className="icon-row"><FaThermometerHalf /> Season</span> <span>Winter</span></li>
+                    <li><span className="icon-row"><FaTag /> Brand</span> <span>{product.brand || "Parfum D'Elite"}</span></li>
+                    <li><span className="icon-row"><FaFlask /> Concentration</span> <span>{product.concentration || "Eau de Parfum"}</span></li>
+                    <li><span className="icon-row"><FaMars /> Gender</span> <span>{product.gender || "Unisex"}</span></li>
+                    <li><span className="icon-row"><FaGlobe /> Origin</span> <span>{product.origin || "France"}</span></li>
+                    <li><span className="icon-row"><FaThermometerHalf /> Season</span> <span>{product.season || "All Year"}</span></li>
                 </ul>
             </div>
 
@@ -19,21 +19,30 @@ const ProductBento = ({ top, heart, base }) => {
                 <h3>Composition</h3>
                 <p className="composition-sub">Olfactory structure</p>
                 <div className="pyramid-visual">
-                    <div className="pyramid-level top"><span className="note-name">{top}</span><span className="note-type">Top</span></div>
-                    <div className="pyramid-level heart"><span className="note-name">{heart}</span><span className="note-type">Heart</span></div>
-                    <div className="pyramid-level base"><span className="note-name">{base}</span><span className="note-type">Base</span></div>
+                    <div className="pyramid-level top" style={{ width: '40%', background: 'rgba(197, 160, 89, 0.15)', clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}>
+                        <span className="note-name">{top}</span>
+                        <span className="note-type">Top</span>
+                    </div>
+                    <div className="pyramid-level heart" style={{ width: '70%', background: 'rgba(197, 160, 89, 0.25)', clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)', marginTop: '-5px' }}>
+                        <span className="note-name">{heart}</span>
+                        <span className="note-type">Heart</span>
+                    </div>
+                    <div className="pyramid-level base" style={{ width: '100%', background: 'rgba(197, 160, 89, 0.35)', clipPath: 'polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)', marginTop: '-5px' }}>
+                        <span className="note-name">{base}</span>
+                        <span className="note-type">Base</span>
+                    </div>
                 </div>
             </div>
 
             <div className="bento-card review-card animate-pop-in delay-3">
                 <div className="score-box">
-                    <span className="big-score">4.9</span>
+                    <span className="big-score">{product.rating || 4.9}</span>
                     <div className="stars"><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></div>
-                    <span className="review-count">2 Reviews</span>
+                    <span className="review-count">Community Verified</span>
                 </div>
                 <div className="review-snippet">
-                    <p>"Lasts all day. The {base} note is incredible."</p>
-                    <div className="snippet-header"><span>Josie</span></div>
+                    <p>"A masterpiece. The {base} note lingers beautifully."</p>
+                    <div className="snippet-header"><span>Verified Buyer</span></div>
                 </div>
             </div>
         </div>

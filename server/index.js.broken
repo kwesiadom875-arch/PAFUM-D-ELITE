@@ -111,7 +111,6 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // 2. PRODUCTS
 app.get('/api/products', async (req, res) => {
   const products = await Product.find();
@@ -343,36 +342,6 @@ app.post('/api/scrape', async (req, res) => {
   }
 });
 
-// 7. ADMIN: GET ALL ORDERS
-app.get('/api/admin/orders', async (req, res) => {
-  try {
-    const users = await User.find({ 'orderHistory.0': { $exists: true } });
-    
-    let allOrders = [];
-    users.forEach(user => {
-      user.orderHistory.forEach(order => {
-        allOrders.push({
-          orderId: order._id || Math.random().toString(36).substr(2, 9),
-          username: user.username,
-          email: user.email,
-          productName: order.productName,
-          finalPrice: order.finalPrice,
-          date: order.date,
-          status: 'Paid'
-        });
-      });
-    });
-
-    allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    res.json(allOrders);
-  } catch (error) {
-    console.error("Admin Orders Error:", error);
-    res.status(500).json({ error: "Failed to fetch orders" });
-  }
-});
-
-// 8. PROXY IMAGE
 app.get('/proxy-image', async (req, res) => {
   const { url } = req.query;
   if (!url) {
@@ -392,116 +361,6 @@ app.get('/proxy-image', async (req, res) => {
   } catch (error) {
     console.error('Error proxying image:', error);
     res.status(500).send('Failed to proxy image');
-  }
-});
-
-// 9. AI: ENRICH PRODUCT METADATA (for Scent Intel section)
-app.post('/api/ai/enrich-product/:productId', async (req, res) => {
-  try {
-    const product = await Product.findOne({ id: req.params.productId });
-    
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    const aiPrompt = `Analyze this perfume and provide metadata in JSON format:
-{"brand":"Brand Name","concentration":"Eau de Parfum/Eau de Toilette/Extrait de Parfum/Eau de Cologne","origin":"Country","season":"Spring/Summer/Fall/Winter/All Year"}
-
-Product Name: ${product.name}
-Description: ${product.description || "No description"}
-Notes: ${product.notes || "Unknown"}
-
-Provide ONLY valid JSON, no explanation:`;
-
-    const aiResponse = await groq.chat.completions.create({
-      messages: [{
-        role: "system",
-        content: "You are a perfume metadata expert. Respond with valid JSON only."
-      }, {
-        role: "user",
-        content: aiPrompt
-      }],
-      model: "llama-3.3-70b-versatile",
-      max_tokens: 150
-    });
-
-    const aiText = aiResponse.choices[0]?.message?.content || "{}";
-    const jsonMatch = aiText.match(/\{[\s\S]*\}/) || [aiText];
-    const enrichedData = JSON.parse(jsonMatch[0]);
-
-    if (enrichedData.brand) product.brand = enrichedData.brand;
-    if (enrichedData.concentration) product.concentration = enrichedData.concentration;
-    if (enrichedData.origin) product.origin = enrichedData.origin;
-    if (enrichedData.season) product.season = enrichedData.season;
-
-    await product.save();
-
-    res.json({
-      message: "Product metadata enriched successfully",
-      enrichedFields: enrichedData,
-      product
-    });
-
-  } catch (error) {
-    console.error("Metadata Enrichment Error:", error);
-    res.status(500).json({ error: "Failed to enrich product metadata" });
-  }
-});
-
-// 10. AI: BATCH ENRICH ALL PRODUCTS
-app.post('/api/ai/enrich-all-products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    const enrichedProducts = [];
-    const errors = [];
-
-    for (const product of products) {
-      try {
-        const aiPrompt = `Product: ${product.name}
-Return JSON: {"brand":"Brand","concentration":"Type","origin":"Country","season":"Season"}`;
-
-        const aiResponse = await groq.chat.completions.create({
-          messages: [{
-            role: "system",
-            content: "Perfume metadata expert. JSON only."
-          }, {
-            role: "user",
-            content: aiPrompt
-          }],
-          model: "llama-3.3-70b-versatile",
-          max_tokens: 100
-        });
-
-        const aiText = aiResponse.choices[0]?.message?.content || "{}";
-        const jsonMatch = aiText.match(/\{[\s\S]*\}/) || [aiText];
-        const data = JSON.parse(jsonMatch[0]);
-
-        if (data.brand) product.brand = data.brand;
-        if (data.concentration) product.concentration = data.concentration;
-        if (data.origin) product.origin = data.origin;
-        if (data.season) product.season = data.season;
-
-        await product.save();
-        enrichedProducts.push(product.name);
-        
-        // Rate limit
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-      } catch (err) {
-        errors.push({ product: product.name, error: err.message });
-      }
-    }
-
-    res.json({
-      message: "Batch enrichment complete",
-      enrichedCount: enrichedProducts.length,
-      enrichedProducts,
-      errors
-    });
-
-  } catch (error) {
-    console.error("Batch Enrichment Error:", error);
-    res.status(500).json({ error: "Failed to batch enrich products" });
   }
 });
 
