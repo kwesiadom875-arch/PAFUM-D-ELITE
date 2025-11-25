@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import API_URL from '../config'; // Use your config URL!
+import API_URL from '../config';
 import './Admin.css';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState('inventory'); // 'inventory', 'orders', 'featured'
+  const [activeTab, setActiveTab] = useState('inventory');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [scrapeUrl, setScrapeUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [enrichStatus, setEnrichStatus] = useState('');
 
   // Featured State
   const [featuredForm, setFeaturedForm] = useState({
     name: '', tagline: '', description: '', image: '', link: '/shop'
   });
 
-  // Updated Form State
+  // Product Form State
   const [form, setForm] = useState({
     name: '', price: '', category: '', description: '', image: '', notes: '',
-    perfumer: '', rating: '', gender: '', season: ''
+    perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10
   });
 
+  // Stock Update State
+  const [stockUpdate, setStockUpdate] = useState({ productId: '', size: '', quantity: 0 });
+
   useEffect(() => {
-    if (activeTab === 'inventory') fetchProducts();
+    if (activeTab === 'inventory' || activeTab === 'stock') fetchProducts();
     if (activeTab === 'orders') fetchOrders();
     if (activeTab === 'featured') fetchFeatured();
   }, [activeTab]);
@@ -66,17 +70,14 @@ const Admin = () => {
     } catch (error) { alert("Failed to update."); }
   };
 
-  // AUTO-FILL LOGIC
   const handleScrape = async () => {
     if (!scrapeUrl) return alert("Paste a Fragrantica link first!");
     setIsLoading(true);
-
     try {
       const res = await axios.post(`${API_URL}/api/scrape`, { url: scrapeUrl });
       const data = res.data;
-
       setForm({
-        ...form, // Keep existing price if set
+        ...form,
         name: data.name || "",
         category: data.category || "Niche",
         description: data.description || "",
@@ -85,7 +86,8 @@ const Admin = () => {
         perfumer: data.perfumer || "Master Perfumer",
         rating: data.rating || 4.5,
         gender: data.gender || "Unisex",
-        season: "All Year" // Fragrantica doesn't have easy text for this, so we default
+        season: "All Year",
+        stockQuantity: 10
       });
       alert("Data Extracted Successfully!");
     } catch (error) {
@@ -100,8 +102,7 @@ const Admin = () => {
       const newProduct = { ...form, id: Math.floor(Math.random() * 100000) };
       await axios.post(`${API_URL}/api/products`, newProduct);
       alert("Product Added!");
-      // Reset
-      setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '' });
+      setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10 });
       setScrapeUrl('');
       fetchProducts();
     } catch (error) { alert("Failed to save."); }
@@ -113,37 +114,52 @@ const Admin = () => {
     fetchProducts();
   };
 
+  const handleBatchEnrich = async () => {
+    if (!window.confirm("This will use AI to enrich all products. Continue?")) return;
+    setEnrichStatus('Enriching... This may take a minute.');
+    try {
+      const res = await axios.post(`${API_URL}/api/ai/enrich-all-products`);
+      console.log("Enrichment Response:", res.data);
+      if (res.data && res.data.results) {
+        setEnrichStatus(`Success! ${res.data.results.length} products enriched.`);
+      } else {
+        setEnrichStatus('Enrichment completed, but no results returned.');
+      }
+      fetchProducts();
+    } catch (error) {
+      console.error("Enrichment Failed:", error);
+      setEnrichStatus('Failed to enrich products. Check console for details.');
+    }
+  };
+
+  const handleStockUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/api/admin/update-stock`, stockUpdate);
+      alert("Stock Updated!");
+      setStockUpdate({ productId: '', size: '', quantity: 0 });
+      fetchProducts();
+    } catch (error) {
+      alert("Failed to update stock.");
+    }
+  };
+
   return (
     <div className="container admin-page">
       <div className="admin-header">
         <h2 className="section-title" style={{ color: '#C5A059', marginBottom: '0' }}>Admin Dashboard</h2>
         <div className="admin-tabs">
-          <button
-            className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inventory')}
-          >
-            Inventory
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-            onClick={() => setActiveTab('orders')}
-          >
-            Orders
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'featured' ? 'active' : ''}`}
-            onClick={() => setActiveTab('featured')}
-          >
-            Featured
-          </button>
+          <button className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
+          <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Orders</button>
+          <button className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`} onClick={() => setActiveTab('stock')}>Stock</button>
+          <button className={`tab-btn ${activeTab === 'scent-intel' ? 'active' : ''}`} onClick={() => setActiveTab('scent-intel')}>Scent Intel AI</button>
+          <button className={`tab-btn ${activeTab === 'featured' ? 'active' : ''}`} onClick={() => setActiveTab('featured')}>Featured</button>
         </div>
       </div>
 
       {activeTab === 'inventory' && (
         <div className="admin-grid">
-          {/* ADD PRODUCT FORM */}
           <div className="glass-card form-section">
-            {/* SCRAPER BOX */}
             <div className="scraper-box" style={{ marginBottom: '20px', borderBottom: '1px solid #333', paddingBottom: '20px' }}>
               <h4 style={{ marginBottom: '10px', color: '#C5A059' }}>Auto-Fill from Fragrantica</h4>
               <div style={{ display: 'flex', gap: '10px' }}>
@@ -164,28 +180,26 @@ const Admin = () => {
                 <input name="name" value={form.name} placeholder="Name" onChange={handleChange} required />
                 <input name="price" value={form.price} type="number" placeholder="Price (GH₵)" onChange={handleChange} required />
               </div>
-
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <input name="category" value={form.category} placeholder="Category (e.g. Woody)" onChange={handleChange} required />
                 <input name="gender" value={form.gender} placeholder="Gender (e.g. Unisex)" onChange={handleChange} />
               </div>
-
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <input name="perfumer" value={form.perfumer} placeholder="Perfumer Name" onChange={handleChange} />
                 <input name="rating" value={form.rating} placeholder="Rating (e.g. 4.5)" onChange={handleChange} />
               </div>
-
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <input name="stockQuantity" value={form.stockQuantity} type="number" placeholder="Initial Stock" onChange={handleChange} />
+                <input name="season" value={form.season} placeholder="Season" onChange={handleChange} />
+              </div>
               {form.image && <img src={form.image} alt="Preview" style={{ width: '50px', height: '50px', objectFit: 'contain', marginBottom: '10px' }} />}
               <input name="image" value={form.image} placeholder="Image URL" onChange={handleChange} required />
-
               <input name="notes" value={form.notes} placeholder="Accords (Comma separated)" onChange={handleChange} required />
               <textarea name="description" value={form.description} placeholder="Description" onChange={handleChange} rows="4" required />
-
               <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>Save to Inventory</button>
             </form>
           </div>
 
-          {/* PRODUCT LIST */}
           <div className="glass-card list-section">
             <h3 style={{ marginBottom: '15px' }}>Inventory</h3>
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -195,6 +209,7 @@ const Admin = () => {
                   <div style={{ flex: 1 }}>
                     <h4>{p.name}</h4>
                     <p style={{ color: '#C5A059' }}>GH₵{p.price}</p>
+                    <p style={{ fontSize: '0.8rem', color: '#888' }}>Stock: {p.stockQuantity}</p>
                   </div>
                   <button className="delete-btn" onClick={() => handleDelete(p.id || p._id)}>Delete</button>
                 </div>
@@ -243,11 +258,117 @@ const Admin = () => {
         </div>
       )}
 
+      {activeTab === 'stock' && (
+        <div className="glass-card form-section" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>Stock Management</h3>
+          <div className="stock-update-box" style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+            <h4>Update Stock Level</h4>
+            <form onSubmit={handleStockUpdate} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
+              <div>
+                <label>Product</label>
+                <select
+                  value={stockUpdate.productId}
+                  onChange={(e) => setStockUpdate({ ...stockUpdate, productId: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px' }}
+                >
+                  <option value="">Select Product</option>
+                  {products.map(p => (
+                    <option key={p.id || p._id} value={p.id || p._id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label>Size (Optional)</label>
+                <input
+                  placeholder="e.g. 50ml"
+                  value={stockUpdate.size}
+                  onChange={(e) => setStockUpdate({ ...stockUpdate, size: e.target.value })}
+                />
+              </div>
+              <div>
+                <label>New Quantity</label>
+                <input
+                  type="number"
+                  value={stockUpdate.quantity}
+                  onChange={(e) => setStockUpdate({ ...stockUpdate, quantity: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-primary">Update</button>
+            </form>
+          </div>
+
+          <h4>Current Inventory Status</h4>
+          <div className="orders-table-wrapper">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Main Stock</th>
+                  <th>Variants</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id}>
+                    <td>{p.name}</td>
+                    <td>{p.stockQuantity}</td>
+                    <td>
+                      {p.sizes && p.sizes.length > 0 ? (
+                        <div style={{ fontSize: '0.8rem' }}>
+                          {p.sizes.map(s => (
+                            <div key={s.size}>{s.size}: {s.stockQuantity}</div>
+                          ))}
+                        </div>
+                      ) : '-'}
+                    </td>
+                    <td>
+                      {p.isAvailable ? (
+                        <span className="status-badge paid">In Stock</span>
+                      ) : (
+                        <span className="status-badge pending">Out of Stock</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'scent-intel' && (
+        <div className="glass-card form-section" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+          <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>Scent Intel AI Enrichment</h3>
+          <p style={{ marginBottom: '30px', color: '#666' }}>
+            Use our AI to automatically analyze all products in the inventory and populate missing metadata:
+            <br /><strong>Brand, Concentration, Gender, Origin, Season, and more.</strong>
+          </p>
+          <div style={{ padding: '30px', background: '#f5f5f5', borderRadius: '12px', border: '1px dashed #C5A059' }}>
+            <h1 style={{ fontSize: '3rem', marginBottom: '20px' }}>🧠 ✨</h1>
+            <button
+              className="btn-primary"
+              onClick={handleBatchEnrich}
+              disabled={enrichStatus.includes('Enriching')}
+              style={{ fontSize: '1.2rem', padding: '15px 40px' }}
+            >
+              {enrichStatus.includes('Enriching') ? 'AI is Working...' : 'Run Batch Enrichment'}
+            </button>
+            {enrichStatus && (
+              <div style={{ marginTop: '20px', padding: '15px', background: 'white', borderRadius: '8px', borderLeft: '4px solid #C5A059' }}>
+                <strong>Status:</strong> {enrichStatus}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {activeTab === 'featured' && (
         <div className="glass-card form-section" style={{ maxWidth: '600px', margin: '0 auto' }}>
           <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>Manage Featured Perfume</h3>
           <p style={{ marginBottom: '20px', color: '#888' }}>This is the perfume that appears at the end of the Home page scroll.</p>
-
           <form onSubmit={handleFeaturedSubmit}>
             <input name="name" value={featuredForm.name} placeholder="Perfume Name" onChange={handleFeaturedChange} required />
             <input name="tagline" value={featuredForm.tagline} placeholder="Tagline (e.g. A journey through...)" onChange={handleFeaturedChange} required />
@@ -255,7 +376,6 @@ const Admin = () => {
             {featuredForm.image && <img src={featuredForm.image} alt="Preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '15px' }} />}
             <textarea name="description" value={featuredForm.description} placeholder="Short Description" onChange={handleFeaturedChange} rows="3" required />
             <input name="link" value={featuredForm.link} placeholder="Link (e.g. /shop)" onChange={handleFeaturedChange} />
-
             <button type="submit" className="btn-primary" style={{ width: '100%' }}>Update Featured Perfume</button>
           </form>
         </div>

@@ -94,3 +94,24 @@
   background: rgba(46, 204, 113, 0.2);
   color: #27ae60;
 }
+
+.status-badge.pending {
+  background: rgba(241, 196, 15, 0.2);
+  color: #f39c12;
+}
+
+.stock-update-box {
+  border: 1px solid #eee;
+}
+
+.stock-update-box h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.stock-update-box label {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 5px;
+}

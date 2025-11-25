@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -52,6 +53,12 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Request Logging Middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // --- ROUTES ---
 
 // 1. AUTH
@@ -85,9 +92,41 @@ app.get('/api/user/profile', verifyToken, async (req, res) => {
 // Record Purchase
 app.post('/api/user/purchase', verifyToken, async (req, res) => {
   try {
-    const { items } = req.body;
+    const { items, deliveryLocation } = req.body;
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    // STEP 1: Validate stock availability for all items
+    for (const item of items) {
+      const product = await Product.findOne({ id: item.productId });
+      if (!product) {
+        return res.status(404).json({ error: `Product not found: ${item.productName}` });
+      }
+
+      const quantity = item.quantity || 1;
+
+      if (item.selectedSize) {
+        // Check size-specific stock
+        const sizeVariant = product.sizes.find(s => s.size === item.selectedSize);
+        if (!sizeVariant) {
+          return res.status(400).json({ error: `Size ${item.selectedSize} not available for ${product.name}` });
+        }
+        if (sizeVariant.stockQuantity < quantity) {
+          return res.status(400).json({ 
+            error: `Insufficient stock for ${product.name} (${item.selectedSize}). Only ${sizeVariant.stockQuantity} available.` 
+          });
+        }
+      } else {
+        // Check main stock
+        if (product.stockQuantity < quantity) {
+          return res.status(400).json({ 
+            error:`Insufficient stock for ${product.name}. Only ${product.stockQuantity} available.` 
+          });
+        }
+      }
+    }
+
+    // STEP 2: Record purchase in user order history
     items.forEach(item => {
       user.orderHistory.push({
         productId: item.productId,
@@ -95,11 +134,16 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
         productImage: item.productImage,
         originalPrice: item.originalPrice,
         finalPrice: item.finalPrice,
+        selectedSize: item.selectedSize || null,
+        quantity: item.quantity || 1,
         negotiated: item.negotiated || false,
+        deliveryLocation: deliveryLocation || null,
         date: new Date()
       });
     });
-    const purchaseTotal = items.reduce((sum, item) => sum + item.finalPrice, 0);
+
+    // STEP 3: Update spending and tier
+    const purchaseTotal = items.reduce((sum, item) => sum + (item.finalPrice * (item.quantity || 1)), 0);
     user.spending += purchaseTotal;
     if (user.spending >= 15000) { user.tier = 'Elite Diamond'; }
     else if (user.spending >= 10001) { user.tier = 'Diamond'; }
@@ -107,8 +151,36 @@ app.post('/api/user/purchase', verifyToken, async (req, res) => {
     else if (user.spending >= 3001) { user.tier = 'Gold'; }
     else { user.tier = 'Bronze'; }
     await user.save();
+
+    // STEP 4: Decrement stock for each item
+    for (const item of items) {
+      const product = await Product.findOne({ id: item.productId });
+      const quantity = item.quantity || 1;
+
+      if (item.selectedSize) {
+        const sizeIndex = product.sizes.findIndex(s => s.size === item.selectedSize);
+        product.sizes[sizeIndex].stockQuantity -= quantity;
+      } else {
+        product.stockQuantity -= quantity;
+      }
+
+      // Update availability status
+      const hasStock = product.sizes.some(s => s.stockQuantity > 0) || product.stockQuantity > 0;
+      product.isAvailable = hasStock;
+      
+      await product.save();
+    }
+
     const updatedUser = await User.findById(req.userId).select('-password');
-    res.json({ message: "Purchase recorded successfully", user: updatedUser });
+    res.json({ 
+      message: "Purchase recorded successfully", 
+      user: updatedUser,
+      orderDetails: {
+        totalItems: items.length,
+        totalAmount: purchaseTotal,
+        deliveryLocation
+      }
+    });
   } catch (error) {
     console.error('Purchase recording error:', error);
     res.status(500).json({ error: error.message });
@@ -394,7 +466,56 @@ app.get('/api/admin/orders', async (req, res) => {
   }
 });
 
-// 8. PROXY IMAGE
+// 8. ADMIN: UPDATE STOCK
+app.post('/api/admin/update-stock', async (req, res) => {
+  try {
+    console.log("Update Stock Request Body:", req.body);
+    const { productId, size, quantity } = req.body;
+    
+    let product = await Product.findOne({ id: productId });
+    if (!product && mongoose.Types.ObjectId.isValid(productId)) {
+      product = await Product.findById(productId);
+    }
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (size) {
+      // Update size-specific stock
+      const sizeIndex = product.sizes.findIndex(s => s.size === size);
+      if (sizeIndex === -1) {
+        return res.status(404).json({ error: `Size ${size} not found for this product` });
+      }
+      product.sizes[sizeIndex].stockQuantity = quantity;
+    } else {
+      // Update main stock
+      product.stockQuantity = quantity;
+    }
+
+    // Update availability
+    const hasStock = product.sizes.some(s => s.stockQuantity > 0) || product.stockQuantity > 0;
+    product.isAvailable = hasStock;
+
+    await product.save();
+
+    res.json({
+      message: "Stock updated successfully",
+      product: {
+        id: product.id,
+        name: product.name,
+        stockQuantity: product.stockQuantity,
+        sizes: product.sizes,
+        isAvailable: product.isAvailable
+      }
+    });
+  } catch (error) {
+    console.error("Stock Update Error:", error);
+    res.status(500).json({ error: "Failed to update stock" });
+  }
+});
+
+// 9. PROXY IMAGE
 app.get('/proxy-image', async (req, res) => {
   const { url } = req.query;
   if (!url) {
@@ -890,6 +1011,125 @@ app.post('/api/ai/extract-notes', async (req, res) => {
   }
 });
 
+// ==============================================
+// PHASE 4.5: SCENT INTEL ENRICHMENT
+// ==============================================
+
+// 15.1 AI: ENRICH SINGLE PRODUCT
+app.post('/api/ai/enrich-product/:productId', async (req, res) => {
+  try {
+    const product = await Product.findOne({ id: req.params.productId });
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    const systemPrompt = `You are a master perfumer and fragrance historian.
+    Analyze the perfume details and provide the following metadata in JSON format:
+    {
+      "brand": "Brand Name",
+      "concentration": "Eau de Parfum, Extrait, etc.",
+      "gender": "Male, Female, Unisex",
+      "origin": "Country (e.g. France, Italy, Oman)",
+      "season": "Best season (e.g. Winter, All Year)",
+      "top": "Top notes (comma separated)",
+      "heart": "Heart notes (comma separated)",
+      "base": "Base notes (comma separated)"
+    }
+    If specific details are missing, infer them based on the perfume's reputation and typical profile.`;
+
+    const userMessage = `Product: ${product.name}
+    Description: ${product.description}
+    Notes: ${product.notes}`;
+
+    const response = await callGroqAI(systemPrompt, userMessage, 0.3, 300);
+    
+    let enrichedData;
+    try {
+      enrichedData = JSON.parse(response);
+    } catch (e) {
+      console.error("Failed to parse AI response", response);
+      return res.status(500).json({ error: "AI response parsing failed" });
+    }
+
+    // Update Product
+    product.brand = enrichedData.brand || "Parfum D'Elite";
+    product.concentration = enrichedData.concentration || "Eau de Parfum";
+    product.gender = enrichedData.gender || "Unisex";
+    product.origin = enrichedData.origin || "France";
+    product.season = enrichedData.season || "All Year";
+    
+    // Update notes if they were split
+    if (enrichedData.top && enrichedData.heart && enrichedData.base) {
+       // We can store these if we add fields to the model, or just keep them in the 'notes' field
+       // For now, let's just update the main metadata fields which are used in ProductBento
+    }
+
+    await product.save();
+
+    res.json({
+      message: "Product enriched successfully",
+      product
+    });
+
+  } catch (error) {
+    console.error("Enrichment Error:", error);
+    res.status(500).json({ error: "Failed to enrich product" });
+  }
+});
+
+// 15.2 AI: BATCH ENRICH ALL PRODUCTS
+app.post('/api/ai/enrich-all-products', async (req, res) => {
+  try {
+    const products = await Product.find();
+    const results = [];
+
+    for (const product of products) {
+      // Skip if already enriched (optional check, but good for performance)
+      // if (product.brand && product.origin) continue;
+
+      const systemPrompt = `You are a master perfumer.
+      Provide JSON metadata for this perfume:
+      {
+        "brand": "Brand Name",
+        "concentration": "Concentration",
+        "gender": "Gender",
+        "origin": "Country",
+        "season": "Season"
+      }`;
+
+      const userMessage = `Name: ${product.name}
+      Desc: ${product.description}`;
+
+      try {
+        const response = await callGroqAI(systemPrompt, userMessage, 0.3, 200);
+        const data = JSON.parse(response);
+
+        product.brand = data.brand || "Parfum D'Elite";
+        product.concentration = data.concentration || "Eau de Parfum";
+        product.gender = data.gender || "Unisex";
+        product.origin = data.origin || "France";
+        product.season = data.season || "All Year";
+
+        await product.save();
+        results.push({ id: product.id, name: product.name, status: "Enriched" });
+      } catch (err) {
+        console.error(`Failed to enrich ${product.name}:`, err);
+        results.push({ id: product.id, name: product.name, status: "Failed" });
+      }
+      
+      // Small delay to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    res.json({
+      message: "Batch enrichment complete",
+      results
+    });
+
+  } catch (error) {
+    console.error("Batch Enrichment Error:", error);
+    res.status(500).json({ error: "Batch enrichment failed" });
+  }
+});
+
 // 16. AI: CATEGORIZE REQUEST (Admin Tool)
 app.post('/api/ai/categorize-request/:requestId', async (req, res) => {
   try {
@@ -1092,7 +1332,7 @@ app.get('/api/ai/restock-predictor', async (req, res) => {
         const sales180 = users.reduce((sum, user) => {
           return sum + user.orderHistory.filter(order => {
             const daysSince = (now - new Date(order.date)) / (1000 * 60 * 60 * 24);
-            return order.productId === product.id.toString() && daysDays <= 180;
+            return order.productId === product.id.toString() && daysSince <= 180;
           }).length;
         }, 0);
 

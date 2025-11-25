@@ -56,39 +56,59 @@ const Shop = () => {
 
       {/* PRODUCT GRID */}
       <div className="product-grid">
-        {filteredProducts.map(product => (
-          <div key={product.id || product._id} className="luxury-card">
+        {filteredProducts.map(product => {
+          // Check stock status
+          const hasStock = product.sizes && product.sizes.length > 0
+            ? product.sizes.some(s => s.stockQuantity > 0)
+            : product.stockQuantity > 0;
 
-            {/* IMAGE FRAME */}
-            <div className="image-frame">
-              {/* Badge */}
-              {product.price > 2000 && <span className="badge-top">Best Seller</span>}
+          const totalStock = product.sizes && product.sizes.length > 0
+            ? product.sizes.reduce((sum, s) => sum + s.stockQuantity, 0)
+            : product.stockQuantity || 0;
 
-              {/* Wishlist Icon */}
-              <button className="wishlist-btn"><FaHeart /></button>
+          return (
+            <div key={product.id || product._id} className="luxury-card">
 
-              <Link to={`/product/${product.id || product._id}`}>
-                <TransparentImg src={product.image} alt={product.name} />
-              </Link>
+              {/* IMAGE FRAME */}
+              <div className="image-frame">
+                {/* Badge */}
+                {product.price > 2000 && <span className="badge-top">Best Seller</span>}
 
-              {/* SLIDE UP ACTION BAR */}
-              <div className="action-overlay">
-                <button onClick={() => addToCart(product)}>
-                  Add to Cart — GH₵{product.price}
-                </button>
+                {!hasStock && <span className="badge-top out-of-stock-badge">Out of Stock</span>}
+                {hasStock && totalStock < 5 && <span className="badge-top low-stock-badge">Only {totalStock} Left</span>}
+
+                {/* Wishlist Icon */}
+                <button className="wishlist-btn"><FaHeart /></button>
+
+                <Link to={`/product/${product.id || product._id}`}>
+                  <TransparentImg src={product.image} alt={product.name} className={!hasStock ? 'grayscale' : ''} />
+                </Link>
+
+                {/* SLIDE UP ACTION BAR */}
+                <div className="action-overlay">
+                  {hasStock ? (
+                    <button onClick={() => addToCart(product)}>
+                      Add to Cart — GH₵{product.price}
+                    </button>
+                  ) : (
+                    <button disabled style={{ background: '#ccc', cursor: 'not-allowed' }}>
+                      Out of Stock
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* TEXT INFO */}
-            <div className="card-details">
-              <span className="card-category">{product.category}</span>
-              <Link to={`/product/${product.id || product._id}`}>
-                <h3 className="card-name">{product.name}</h3>
-              </Link>
-            </div>
+              {/* TEXT INFO */}
+              <div className="card-details">
+                <span className="card-category">{product.category}</span>
+                <Link to={`/product/${product.id || product._id}`}>
+                  <h3 className="card-name">{product.name}</h3>
+                </Link>
+              </div>
 
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
 
       {/* REQUEST CTA */}
