@@ -30,10 +30,24 @@ const Admin = () => {
   // Stock Update State
   const [stockUpdate, setStockUpdate] = useState({ productId: '', size: '', quantity: 0, price: '' });
 
+  // Scraper State for Climate Tests
+  const [climateScrapeUrl, setClimateScrapeUrl] = useState('');
+  const [isClimateScraping, setIsClimateScraping] = useState(false);
+
+  const [climateTests, setClimateTests] = useState([]);
+  const [testers, setTesters] = useState([]);
+  const [climateTestForm, setClimateTestForm] = useState({
+    perfumeName: '', perfumeImage: '', testerId: '', climate: 'Room Temperature', endDate: ''
+  });
+  // User Management State
+  const [users, setUsers] = useState([]);
+
   useEffect(() => {
     if (activeTab === 'inventory' || activeTab === 'stock') fetchProducts();
     if (activeTab === 'orders') fetchOrders();
     if (activeTab === 'featured') fetchFeatured();
+    if (activeTab === 'climate-tests') { fetchClimateTests(); fetchTesters(); }
+    if (activeTab === 'users') fetchUsers();
   }, [activeTab]);
 
   const fetchProducts = async () => {
@@ -192,6 +206,109 @@ const Admin = () => {
     }
   };
 
+  // Climate Testing Functions
+  const fetchClimateTests = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_URL}/api/climate-tests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setClimateTests(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchTesters = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_URL}/api/admin/testers`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTesters(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleClimateTestSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_URL}/api/climate-tests`, climateTestForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Climate test created successfully!');
+      setClimateTestForm({ perfumeName: '', perfumeImage: '', testerId: '', climate: 'Room Temperature', endDate: '' });
+      fetchClimateTests();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to create climate test');
+    }
+  };
+
+  const handleDeleteClimateTest = async (testId) => {
+    if (!window.confirm('Delete this climate test?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/climate-tests/${testId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Climate test deleted');
+      fetchClimateTests();
+    } catch (error) {
+      toast.error('Failed to delete climate test');
+    }
+  };
+
+  // User Management Functions
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_URL}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUsers(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleToggleTester = async (userId, currentStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_URL}/api/admin/users/${userId}/tester`,
+        { isTester: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(`Tester role ${!currentStatus ? 'granted' : 'revoked'}`);
+      fetchUsers();
+    } catch (error) {
+      toast.error('Failed to update user role');
+    }
+  };
+
+  // Scrape Fragrantica for perfume data
+  const handleClimateScrape = async () => {
+    if (!climateScrapeUrl || !climateScrapeUrl.includes('fragrantica.com')) {
+      toast.error('Please enter a valid Fragrantica URL');
+      return;
+    }
+    setIsClimateScraping(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${API_URL}/api/scrape`, 
+        { url: climateScrapeUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Auto-fill the form with scraped data
+      setClimateTestForm({
+        ...climateTestForm,
+        perfumeName: res.data.name || '',
+        perfumeImage: res.data.image || ''
+      });
+      toast.success('Auto-filled from Fragrantica!');
+      setClimateScrapeUrl(''); // Clear the URL input
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to scrape data');
+    } finally {
+      setIsClimateScraping(false);
+    }
+  };
+
   const handleStockUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -215,6 +332,8 @@ const Admin = () => {
           <button className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`} onClick={() => setActiveTab('stock')}>Stock</button>
           <button className={`tab-btn ${activeTab === 'scent-intel' ? 'active' : ''}`} onClick={() => setActiveTab('scent-intel')}>Scent Intel AI</button>
           <button className={`tab-btn ${activeTab === 'featured' ? 'active' : ''}`} onClick={() => setActiveTab('featured')}>Featured</button>
+          <button className={`tab-btn ${activeTab === 'climate-tests' ? 'active' : ''}`} onClick={() => setActiveTab('climate-tests')}>Climate Tests</button>
+          <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Users</button>
         </div>
       </div>
 
@@ -471,6 +590,147 @@ const Admin = () => {
             <input name="link" value={featuredForm.link} placeholder="Link (e.g. /shop)" onChange={handleFeaturedChange} />
             <button type="submit" className="btn-primary" style={{ width: '100%' }}>Update Featured Perfume</button>
           </form>
+        </div>
+      )}
+
+      {activeTab === 'climate-tests' && (
+        <div className="glass-card form-section" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>Climate Testing Management</h3>
+
+          <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+            <h4>Create New Climate Test</h4>
+            
+            {/* Fragrantica Auto-Fill Section */}
+            <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid #ddd' }}>
+              <h5 style={{ marginBottom: '10px', color: '#C5A059', fontSize: '0.95rem' }}>🔗 Auto-Fill from Fragrantica</h5>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  placeholder="Paste Fragrantica URL here..."
+                  value={climateScrapeUrl}
+                  onChange={(e) => setClimateScrapeUrl(e.target.value)}
+                  style={{ flex: 1, marginBottom: 0 }}
+                />
+                <button 
+                  type="button"
+                  className="btn-secondary" 
+                  onClick={handleClimateScrape} 
+                  disabled={isClimateScraping}
+                  style={{ whiteSpace: 'nowrap', padding: '10px 20px' }}
+                >
+                  {isClimateScraping ? "Fetching..." : "Auto-Fill"}
+                </button>
+              </div>
+            </div>
+            <form onSubmit={handleClimateTestSubmit} style={{ display: 'grid', gap: '15px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <input
+                  placeholder="Perfume Name"
+                  value={climateTestForm.perfumeName}
+                  onChange={(e) => setClimateTestForm({ ...climateTestForm, perfumeName: e.target.value })}
+                  required
+                />
+                <input
+                  placeholder="Perfume Image URL"
+                  value={climateTestForm.perfumeImage}
+                  onChange={(e) => setClimateTestForm({ ...climateTestForm, perfumeImage: e.target.value })}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <select
+                  value={climateTestForm.testerId}
+                  onChange={(e) => setClimateTestForm({ ...climateTestForm, testerId: e.target.value })}
+                  required
+                >
+                  <option value="">Select Tester</option>
+                  {testers.map(t => (
+                    <option key={t._id} value={t._id}>{t.username} ({t.email})</option>
+                  ))}
+                </select>
+                <input
+                  placeholder="Climate Conditions"
+                  value={climateTestForm.climate}
+                  onChange={(e) => setClimateTestForm({ ...climateTestForm, climate: e.target.value })}
+                />
+              </div>
+              <input
+                type="date"
+                placeholder="Target End Date"
+                value={climateTestForm.endDate}
+                onChange={(e) => setClimateTestForm({ ...climateTestForm, endDate: e.target.value })}
+              />
+              <button type="submit" className="btn-primary">Create Climate Test</button>
+            </form>
+          </div>
+          <h4>All Climate Tests</h4>
+          <div className="orders-table-wrapper">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  <th>Perfume</th>
+                  <th>Tester</th>
+                  <th>Climate</th>
+                  <th>Status</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {climateTests.map(test => (
+                  <tr key={test._id}>
+                    <td>{test.perfumeName}</td>
+                    <td>{test.testerName}</td>
+                    <td>{test.climate}</td>
+                    <td><span className={`status-badge ${test.status === 'completed' ? 'paid' : 'pending'}`}>{test.status}</span></td>
+                    <td>{test.finalRating ? `${test.finalRating}/10` : '-'}</td>
+                    <td>
+                      <button className="delete-btn" onClick={() => handleDeleteClimateTest(test._id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'users' && (
+        <div className="glass-card form-section" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h3 style={{ marginBottom: '20px', color: '#C5A059' }}>User Management</h3>
+
+          <div className="orders-table-wrapper">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Tier</th>
+                  <th>Admin</th>
+                  <th>Tester</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user._id}>
+                    <td>{user.username}</td>
+                    <td>{user.email}</td>
+                    <td>{user.tier}</td>
+                    <td>{user.isAdmin ? '✓' : '-'}</td>
+                    <td>{user.isTester ? '✓' : '-'}</td>
+                    <td>
+                      <button
+                        className={user.isTester ? "delete-btn" : "btn-secondary"}
+                        onClick={() => handleToggleTester(user._id, user.isTester)}
+                        style={{ padding: '5px 10px', fontSize: '0.8rem' }}
+                      >
+                        {user.isTester ? 'Remove Tester' : 'Make Tester'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

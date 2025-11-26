@@ -227,3 +227,43 @@ exports.updateStock = async (req, res) => {
     res.status(500).json({ error: "Failed to update stock" });
   }
 };
+
+// Toggle tester role for a user
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { isTester } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.isTester = isTester;
+    await user.save();
+
+    res.json({ 
+      message: `User ${isTester ? 'promoted to' : 'removed from'} tester role`,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isTester: user.isTester
+      }
+    });
+  } catch (error) {
+    console.error('Update user role error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get all testers
+exports.getAllTesters = async (req, res) => {
+  try {
+    const testers = await User.find({ isTester: true }).select('-password');
+    res.json(testers);
+  } catch (error) {
+    console.error('Get testers error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

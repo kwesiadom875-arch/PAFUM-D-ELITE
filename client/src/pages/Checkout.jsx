@@ -119,7 +119,7 @@ function DeliveryMap({ onLocationSelect }) {
 }
 
 export default function Checkout() {
-    const { cart, clearCart, user } = useContext(CartContext);
+    const { cart, clearCart, user, refreshUser } = useContext(CartContext);
     const [deliveryLocation, setDeliveryLocation] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [invoiceEmail, setInvoiceEmail] = useState('');
@@ -140,6 +140,23 @@ export default function Checkout() {
                 : item.price;
             return sum + (itemPrice * (item.quantity || 1));
         }, 0);
+    };
+
+    const getDiscountRate = (tier) => {
+        switch (tier) {
+            case 'Elite Diamond': return 0.25;
+            case 'Diamond': return 0.20;
+            case 'Platinum': return 0.15;
+            case 'Gold': return 0.10;
+            case 'Bronze': return 0.05;
+            default: return 0;
+        }
+    };
+
+    const calculateFinalTotal = () => {
+        const subtotal = calculateTotal();
+        const discount = user ? getDiscountRate(user.tier) : 0;
+        return subtotal * (1 - discount);
     };
 
     const handleCheckout = async () => {
@@ -210,7 +227,11 @@ export default function Checkout() {
             }
 
             // Success!
-            alert(`✅ Order placed successfully!\n\nTotal: $${calculateTotal().toFixed(2)}\nItems: ${cart.length}\n\nDelivery to: ${deliveryLocation.address}`);
+            alert(`✅ Order placed successfully!\n\nTotal: GH₵${calculateFinalTotal().toFixed(2)}\nItems: ${cart.length}\n\nDelivery to: ${deliveryLocation.address}`);
+
+            // Refresh user data to get updated tier and spending
+            await refreshUser();
+
             clearCart();
             navigate('/profile');
 
@@ -259,10 +280,10 @@ export default function Checkout() {
                                             <p className="size-badge">Size: {item.selectedSize}</p>
                                         )}
                                         <p className="quantity">Quantity: {item.quantity || 1}</p>
-                                        <p className="price">${itemPrice.toFixed(2)}</p>
+                                        <p className="price">GH₵{itemPrice.toFixed(2)}</p>
                                     </div>
                                     <div className="item-total">
-                                        ${(itemPrice * (item.quantity || 1)).toFixed(2)}
+                                        GH₵{(itemPrice * (item.quantity || 1)).toFixed(2)}
                                     </div>
                                 </div>
                             );
@@ -271,15 +292,24 @@ export default function Checkout() {
                     <div className="total-section">
                         <div className="total-row">
                             <span>Subtotal:</span>
-                            <span>${calculateTotal().toFixed(2)}</span>
+                            <span>GH₵{calculateTotal().toFixed(2)}</span>
                         </div>
+
+                        {/* Discount Display */}
+                        {user && user.tier && (
+                            <div className="total-row discount-row" style={{ color: '#4CAF50' }}>
+                                <span>{user.tier} Discount ({getDiscountRate(user.tier) * 100}%):</span>
+                                <span>-GH₵{(calculateTotal() * getDiscountRate(user.tier)).toFixed(2)}</span>
+                            </div>
+                        )}
+
                         <div className="total-row">
                             <span>Shipping:</span>
                             <span>FREE</span>
                         </div>
                         <div className="total-row grand-total">
                             <strong>Total:</strong>
-                            <strong>${calculateTotal().toFixed(2)}</strong>
+                            <strong>GH₵{calculateFinalTotal().toFixed(2)}</strong>
                         </div>
                     </div>
                 </section>
@@ -357,7 +387,7 @@ export default function Checkout() {
                     onClick={handleCheckout}
                     disabled={processing || !deliveryLocation}
                 >
-                    {processing ? '⏳ Processing...' : `🛍️ Place Order - $${calculateTotal().toFixed(2)}`}
+                    {processing ? '⏳ Processing...' : `🛍️ Place Order - GH₵${calculateFinalTotal().toFixed(2)}`}
                 </button>
 
                 {!deliveryLocation && (

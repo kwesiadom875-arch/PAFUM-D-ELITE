@@ -12,12 +12,24 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getProductById = async (req, res) => {
   try {
-    let product = await Product.findOne({ id: req.params.id });
+    let product;
+    // Check if the ID is numeric (for the custom 'id' field)
+    if (!isNaN(req.params.id)) {
+      product = await Product.findOne({ id: req.params.id });
+    }
+    
+    // If not found or not numeric, check if it's a valid MongoDB ObjectId
     if (!product && mongoose.Types.ObjectId.isValid(req.params.id)) {
       product = await Product.findById(req.params.id);
     }
-    res.json(product || {});
+    
+    if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
   } catch (e) {
+    console.error("Error in getProductById:", e);
     res.status(500).json({ error: e.message });
   }
 };

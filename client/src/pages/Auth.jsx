@@ -1,16 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { FaUser, FaLock, FaEnvelope, FaGoogle, FaFacebookF, FaApple, FaEye, FaEyeSlash, FaArrowRight } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../config';
 import { CartContext } from '../context/CartContext';
 import './Auth.css';
+import gsap from 'gsap';
 
 const Auth = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const { login } = useContext(CartContext);
     const navigate = useNavigate();
     const location = useLocation();
+    const cardRef = useRef(null);
+    const formRef = useRef(null);
 
     // Check query param on mount
     React.useEffect(() => {
@@ -37,10 +40,31 @@ const Auth = () => {
     const [success, setSuccess] = useState('');
 
     const toggleMode = () => {
-        setIsSignUp(!isSignUp);
-        setError('');
-        setSuccess('');
-        setFormData({ username: '', email: '', password: '' });
+        // Animate form flip
+        if (formRef.current) {
+            gsap.to(formRef.current, {
+                rotationY: 90,
+                opacity: 0,
+                duration: 0.3,
+                ease: 'power2.in',
+                onComplete: () => {
+                    setIsSignUp(!isSignUp);
+                    setError('');
+                    setSuccess('');
+                    setFormData({ username: '', email: '', password: '' });
+
+                    gsap.fromTo(formRef.current,
+                        { rotationY: -90, opacity: 0 },
+                        { rotationY: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
+                    );
+                }
+            });
+        } else {
+            setIsSignUp(!isSignUp);
+            setError('');
+            setSuccess('');
+            setFormData({ username: '', email: '', password: '' });
+        }
     };
 
     const handleChange = (e) => {
@@ -89,9 +113,19 @@ const Auth = () => {
         }
     };
 
+    // Entrance animation on mount
+    useEffect(() => {
+        if (cardRef.current) {
+            gsap.fromTo(cardRef.current,
+                { opacity: 0, y: 50, scale: 0.95 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.2)' }
+            );
+        }
+    }, []);
+
     return (
         <div className="auth-wrapper">
-            <div className="auth-card">
+            <div className="auth-card" ref={cardRef}>
                 {/* Header Section */}
                 <div className="auth-header">
                     <div className="auth-logo-icon">
@@ -110,7 +144,7 @@ const Auth = () => {
                 {success && <div className="auth-message success">{success}</div>}
 
                 {/* Form Section */}
-                <form onSubmit={handleSubmit} className="auth-form">
+                <form onSubmit={handleSubmit} className="auth-form" ref={formRef}>
                     {isSignUp && (
                         <div className="input-group">
                             <FaUser className="input-icon" />

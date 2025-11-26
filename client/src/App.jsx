@@ -18,7 +18,7 @@ import Reviews from './pages/Reviews';
 import RequestScent from './pages/RequestScent';
 import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
-
+import ClimateTests from './pages/ClimateTests';  
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -60,6 +60,7 @@ function App() {
           <Route path="/request" element={<RequestScent />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/climate-tests" element={<ClimateTests />} />
         </Routes>
       </AnimatePresence>
     </CartProvider>

@@ -13,5 +13,7 @@ router.get('/users', adminController.getUsers);
 router.get('/orders', adminController.getOrders);
 router.post('/update-stock', adminController.updateStock);
 router.post('/upload-hero-video', adminController.uploadHeroVideo);
+router.put('/users/:userId/tester', adminController.updateUserRole);
+router.get('/testers', adminController.getAllTesters);
 
 module.exports = router;

@@ -43,12 +43,12 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
-        toast.info(`Updated quantity for ${product.name}`);
+        setTimeout(() => toast.info(`Updated quantity for ${product.name}`), 0);
         return prev.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1, price: finalPrice } : item
         );
       }
-      toast.success(`Added ${product.name} to cart`);
+      setTimeout(() => toast.success(`Added ${product.name} to cart`), 0);
       return [...prev, { ...product, quantity: 1, price: finalPrice }];
     });
   };
@@ -57,10 +57,29 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => setCart([]);
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
+  // Refresh user data from API
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.get(`${API_URL}/api/user/profile`, {
+        headers: { Authorization: token }
+      });
+
+      const updatedUser = response.data;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
+
   return (
     <CartContext.Provider value={{
       cart, addToCart, removeFromCart, clearCart, getCartTotal,
-      user, login, logout
+      user, login, logout, refreshUser
     }}>
       {children}
     </CartContext.Provider>

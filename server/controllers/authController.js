@@ -44,6 +44,7 @@ exports.register = async (req, res) => {
   }
 };
 
+// POST /api/auth/verify-email (for API calls)
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.body;
@@ -70,6 +71,52 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+// GET /api/auth/verify-email?token=xxx (for email links)
+exports.verifyEmailGet = async (req, res) => {
+  try {
+    const { token } = req.query; // Read from query params instead of body
+    
+    if (!token) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Verification token is required." 
+      });
+    }
+
+    const user = await User.findOne({ 
+      verificationToken: token,
+      verificationTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid or expired verification token." 
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
+    await user.save();
+
+    const jwtToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
+    
+    res.json({ 
+      success: true, 
+      token: jwtToken, 
+      user: { username: user.username, email: user.email } 
+    });
+
+  } catch (e) {
+    console.error("Email Verification Error:", e);
+    res.status(500).json({ 
+      success: false, 
+      message: "Email verification failed. Please try again." 
+    });
+  }
+};
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -78,7 +125,20 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { username: user.username, email: user.email } });
+    
+    // Return complete user object (excluding password)
+    const userResponse = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin || false,
+      isTester: user.isTester || false,
+      tier: user.tier || 'Bronze',
+      totalSpent: user.totalSpent || 0,
+      isVerified: user.isVerified || false
+    };
+    
+    res.json({ token, user: userResponse });
   } catch (e) { 
     console.error("Login Error:", e);
     res.status(500).json({ message: "Login failed. Please try again." }); 

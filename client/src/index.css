@@ -214,3 +214,13 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
+
+/* GSAP Ripple Effect for Cart Button */
+.cart-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transform: scale(0);
+}
+

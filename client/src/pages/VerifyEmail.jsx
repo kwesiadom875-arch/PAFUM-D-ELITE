@@ -20,8 +20,22 @@ export default function VerifyEmail() {
 
         axios.get(`${API_URL}/api/auth/verify-email?token=${token}`)
             .then(res => {
-                setStatus('success');
-                setMessage(res.data.message);
+                if (res.data.success) {
+                    setStatus('success');
+                    setMessage('Email verified successfully! You are now logged in.');
+
+                    // Auto-login: Store token and user data
+                    localStorage.setItem('token', res.data.token);
+                    localStorage.setItem('user', JSON.stringify(res.data.user));
+
+                    // Redirect to home after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    setStatus('error');
+                    setMessage(res.data.message || 'Verification failed');
+                }
             })
             .catch(err => {
                 setStatus('error');
@@ -45,9 +59,7 @@ export default function VerifyEmail() {
                         <div className="success-icon">✓</div>
                         <h2 className="success-title">Email Verified!</h2>
                         <p className="success-message">{message}</p>
-                        <Link to="/auth" className="btn-primary">
-                            Sign In Now
-                        </Link>
+                        <p className="success-message">Redirecting to home page...</p>
                     </>
                 )}
 

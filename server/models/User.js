@@ -60,6 +60,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isTester: {
+    type: Boolean,
+    default: false
+  },
   verificationToken: {
     type: String,
     sparse: true  // Allows multiple null values
