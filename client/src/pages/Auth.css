@@ -1,5 +1,5 @@
 /* Auth.css - Luxury Card Design */
-:root {
+.auth-wrapper {
     --gold: #C5A059;
     --gold-hover: #b08d4a;
     --dark-bg: #0a0a0a;
@@ -94,7 +94,7 @@
 }
 
 .input-group input {
-    width: 85%;
+    width: 100%;
     padding: 14px 45px 14px 45px;
     background: var(--input-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -103,6 +103,18 @@
     font-size: 0.95rem;
     transition: all 0.3s;
     outline: none;
+    box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+/* Autofill Fix */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover, 
+.input-group input:-webkit-autofill:focus, 
+.input-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #141414 inset !important; /* Match card bg roughly */
+    -webkit-text-fill-color: var(--text-main) !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: var(--text-main);
 }
 
 .input-group input:focus {

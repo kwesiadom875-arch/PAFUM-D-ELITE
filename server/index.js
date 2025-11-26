@@ -41,14 +41,17 @@ const dbAddress = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/parfum_del
 
 mongoose.connect(dbAddress)
   .then(() => {
-    console.log('✅ MongoDB Connected');
+    console.log('[OK] MongoDB Connected');
   })
-  .catch(err => console.error('❌ MongoDB Error:', err));
+  .catch(err => console.error('[ERR] MongoDB Error:', err));
 
 // --- MIDDLEWARE ---
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).json({ message: "No token provided" });
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.status(403).json({ message: "No token provided" });
+  
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7, authHeader.length) : authHeader;
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.id;
@@ -74,7 +77,13 @@ app.post('/api/auth/register', async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
     res.json({ message: "User registered successfully" });
-  } catch (e) { res.status(500).json({ error: "Email exists or error" }); }
+  } catch (e) { 
+    console.error("Register Error:", e);
+    if (e.code === 11000) {
+      return res.status(400).json({ message: "Username or Email already exists" });
+    }
+    res.status(500).json({ message: "Registration failed. Please try again." }); 
+  }
 });
 
 app.post('/api/auth/login', async (req, res) => {
@@ -86,7 +95,10 @@ app.post('/api/auth/login', async (req, res) => {
     }
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, user: { username: user.username, email: user.email } });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { 
+    console.error("Login Error:", e);
+    res.status(500).json({ message: "Login failed. Please try again." }); 
+  }
 });
 
 app.get('/api/user/profile', verifyToken, async (req, res) => {
@@ -437,6 +449,7 @@ app.post('/api/josie', async (req, res) => {
       - **Tone:** Sophisticated, witty, knowledgeable, and slightly exclusive (think "Vogue Editor" meets "Best Friend").
       - **Vocabulary:** Use sensory words (e.g., "opulent," "effervescent," "gourmand," "dry-down").
       - **Honesty:** If a user suggests a heavy Oud for a beach day in 35°C heat, politely warn them.
+      - **Style:** Do NOT use emojis. Use elegant language only.
 
       **YOUR INVENTORY:**
       You have access to the following "Parfum D'Elite" collection:
@@ -1678,4 +1691,4 @@ app.get('/api/ai/admin-daily-summary', async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log('🚀 Server running on http://127.0.0.1:5000'));
+app.listen(5000, () => console.log('[INFO] Server running on http://127.0.0.1:5000'));

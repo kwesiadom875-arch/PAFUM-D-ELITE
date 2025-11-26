@@ -47,14 +47,19 @@ const RecommendedProducts = ({ userId, productId }) => {
 
   return (
     <div className="recommended-products">
-      <h2>{userId ? 'Recommended for You' : 'You Might Also Like'}</h2>
+      <h2 className="section-title">{userId ? 'Curated For You' : 'You Might Also Like'}</h2>
       <div className="products-grid">
         {recommendations.map(product => (
-          <div key={product.id} className="product-card">
-            <img src={product.image} alt={product.name} />
-            <h3>{product.name}</h3>
-            <p>{product.price}</p>
-          </div>
+          <a href={`/product/${product.id}`} key={product.id} className="product-card">
+            <div className="card-image-wrapper">
+              <img src={product.image} alt={product.name} />
+            </div>
+            <div className="card-info">
+              <h3>{product.name}</h3>
+              <p className="card-brand">{product.brand || "Parfum D'Elite"}</p>
+              <p className="card-price">GH₵ {product.price}</p>
+            </div>
+          </a>
         ))}
       </div>
     </div>
