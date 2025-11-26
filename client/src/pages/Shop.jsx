@@ -8,6 +8,9 @@ import TransparentImg from '../components/TransparentImg';
 import QuickViewModal from '../components/QuickViewModal';
 import ErrorBoundary from '../components/ErrorBoundary';
 import './Shop.css';
+import PageTransition from '../components/PageTransition';
+import FadeIn from '../components/animations/FadeIn';
+import AddToCartButton from '../components/AddToCartButton';
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -80,144 +83,145 @@ const Shop = () => {
   };
 
   return (
-    <div className="shop-container container">
+    <PageTransition>
+      <div className="shop-container container">
 
-      {/* HERO SECTION */}
-      <div className="shop-hero">
-        <div className="hero-content">
-          <h1 className="page-title">The Olfactory Archives</h1>
-          <p className="hero-subtitle">Discover a curated collection of rare and exquisite fragrances.</p>
-        </div>
-
-        {/* Search & Sort Bar */}
-        <div className="search-sort-bar">
-          <div className="search-wrapper">
-            <input
-              type="text"
-              placeholder="Search the archives..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="search-input"
-            />
+        {/* HERO SECTION */}
+        <div className="shop-hero">
+          <div className="hero-content">
+            <h1 className="page-title">The Olfactory Archives</h1>
+            <p className="hero-subtitle">Discover a curated collection of rare and exquisite fragrances.</p>
           </div>
 
-          <div className="sort-wrapper">
-            <select value={sortOption} onChange={handleSort} className="sort-select">
-              <option value="newest">Newest Arrivals</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="filter-bar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`filter-btn ${activeFilter === cat ? 'active' : ''}`}
-              onClick={() => handleFilter(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* PRODUCT GRID */}
-      <div className="product-grid">
-        {filteredProducts.map(product => {
-          // Check stock status
-          const hasStock = product.sizes && product.sizes.length > 0
-            ? product.sizes.some(s => s.stockQuantity > 0)
-            : product.stockQuantity > 0;
-
-          const totalStock = product.sizes && product.sizes.length > 0
-            ? product.sizes.reduce((sum, s) => sum + s.stockQuantity, 0)
-            : product.stockQuantity || 0;
-
-          // Badge Logic
-          const isNew = product._id && product._id.length > 10 && Math.random() > 0.7; // Mock logic for "New"
-          const isTrending = product.price > 1500 && Math.random() > 0.8;
-
-          return (
-            <div key={product.id || product._id} className="luxury-card">
-
-              {/* IMAGE FRAME */}
-              <div className="image-frame">
-                {/* Badges */}
-                <div className="badges-container">
-                  {product.price > 2000 && <span className="badge-top badge-bestseller">Best Seller</span>}
-                  {isNew && <span className="badge-top badge-new">New Arrival</span>}
-                  {isTrending && <span className="badge-top badge-trending">Trending</span>}
-
-                  {!hasStock && <span className="badge-top badge-out">Out of Stock</span>}
-                  {hasStock && totalStock < 5 && <span className="badge-top badge-low">Only {totalStock} Left</span>}
-                </div>
-
-                {/* Wishlist Icon */}
-                <button className="wishlist-btn"><FaHeart /></button>
-
-                {/* Quick View Icon */}
-                <button
-                  className="quickview-btn"
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent link click
-                    setSelectedProduct(product);
-                  }}
-                >
-                  <FaEye />
-                </button>
-
-                <Link to={`/product/${product.id || product._id}`}>
-                  <TransparentImg src={product.image} alt={product.name} className={!hasStock ? 'grayscale' : ''} />
-                </Link>
-
-                {/* SLIDE UP ACTION BAR */}
-                <div className="action-overlay">
-                  {hasStock ? (
-                    <button onClick={() => addToCart(product)}>
-                      Add to Cart — GH₵{product.price}
-                    </button>
-                  ) : (
-                    <button disabled style={{ background: '#ccc', cursor: 'not-allowed' }}>
-                      Out of Stock
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* TEXT INFO */}
-              <div className="card-details">
-                <span className="card-category">{product.category}</span>
-                <Link to={`/product/${product.id || product._id}`}>
-                  <h3 className="card-name">{product.name}</h3>
-                </Link>
-              </div>
-
+          {/* Search & Sort Bar */}
+          <div className="search-sort-bar">
+            <div className="search-wrapper">
+              <input
+                type="text"
+                placeholder="Search the archives..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="search-input"
+              />
             </div>
-          );
-        })}
-      </div>
 
-      {/* REQUEST CTA */}
-      <div className="request-cta" style={{ textAlign: 'center', marginTop: '80px', padding: '60px 20px', background: '#f9f9f9', borderRadius: '12px' }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2rem', marginBottom: '15px' }}>Didn't find what you're looking for?</h2>
-        <p style={{ color: '#666', marginBottom: '30px' }}>Our archives are vast, but sometimes the perfect scent is yet to be discovered.</p>
-        <Link to="/request">
-          <button className="btn-outline">Make a Request</button>
-        </Link>
-      </div>
+            <div className="sort-wrapper">
+              <select value={sortOption} onChange={handleSort} className="sort-select">
+                <option value="newest">Newest Arrivals</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
 
-      {/* QUICK VIEW MODAL */}
-      {selectedProduct && (
-        <ErrorBoundary>
-          <QuickViewModal
-            product={selectedProduct}
-            onClose={() => setSelectedProduct(null)}
-          />
-        </ErrorBoundary>
-      )}
-    </div>
+          <div className="filter-bar">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`filter-btn ${activeFilter === cat ? 'active' : ''}`}
+                onClick={() => handleFilter(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* PRODUCT GRID */}
+        <div className="product-grid">
+          {filteredProducts.map((product, index) => {
+            // Check stock status
+            const hasStock = product.sizes && product.sizes.length > 0
+              ? product.sizes.some(s => s.stockQuantity > 0)
+              : product.stockQuantity > 0;
+
+            const totalStock = product.sizes && product.sizes.length > 0
+              ? product.sizes.reduce((sum, s) => sum + s.stockQuantity, 0)
+              : product.stockQuantity || 0;
+
+            // Badge Logic
+            const isNew = product._id && product._id.length > 10 && Math.random() > 0.7; // Mock logic for "New"
+            const isTrending = product.price > 1500 && Math.random() > 0.8;
+
+            return (
+              <FadeIn key={product.id || product._id} delay={index * 0.05}>
+                <div className="luxury-card">
+
+                  {/* IMAGE FRAME */}
+                  <div className="image-frame">
+                    {/* Badges */}
+                    <div className="badges-container">
+                      {product.price > 2000 && <span className="badge-top badge-bestseller">Best Seller</span>}
+                      {isNew && <span className="badge-top badge-new">New Arrival</span>}
+                      {isTrending && <span className="badge-top badge-trending">Trending</span>}
+
+                      {!hasStock && <span className="badge-top badge-out">Out of Stock</span>}
+                      {hasStock && totalStock < 5 && <span className="badge-top badge-low">Only {totalStock} Left</span>}
+                    </div>
+
+                    {/* Wishlist Icon */}
+                    <button className="wishlist-btn"><FaHeart /></button>
+
+                    {/* Quick View Icon */}
+                    <button
+                      className="quickview-btn"
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent link click
+                        setSelectedProduct(product);
+                      }}
+                    >
+                      <FaEye />
+                    </button>
+
+                    <Link to={`/product/${product.id || product._id}`}>
+                      <TransparentImg src={product.image} alt={product.name} className={!hasStock ? 'grayscale' : ''} />
+                    </Link>
+
+                    {/* SLIDE UP ACTION BAR */}
+                    <div className="action-overlay">
+                      <AddToCartButton
+                        onClick={() => addToCart(product)}
+                        price={product.price}
+                        disabled={!hasStock}
+                        className={!hasStock ? 'disabled-btn' : ''}
+                      />
+                    </div>
+                  </div>
+
+                  {/* TEXT INFO */}
+                  <div className="card-details">
+                    <span className="card-category">{product.category}</span>
+                    <Link to={`/product/${product.id || product._id}`}>
+                      <h3 className="card-name">{product.name}</h3>
+                    </Link>
+                  </div>
+
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+
+        {/* REQUEST CTA */}
+        <div className="request-cta" style={{ textAlign: 'center', marginTop: '80px', padding: '60px 20px', background: '#f9f9f9', borderRadius: '12px' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '2rem', marginBottom: '15px' }}>Didn't find what you're looking for?</h2>
+          <p style={{ color: '#666', marginBottom: '30px' }}>Our archives are vast, but sometimes the perfect scent is yet to be discovered.</p>
+          <Link to="/request">
+            <button className="btn-outline">Make a Request</button>
+          </Link>
+        </div>
+
+        {/* QUICK VIEW MODAL */}
+        {selectedProduct && (
+          <ErrorBoundary>
+            <QuickViewModal
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+            />
+          </ErrorBoundary>
+        )}
+      </div>
+    </PageTransition>
   );
 };
 

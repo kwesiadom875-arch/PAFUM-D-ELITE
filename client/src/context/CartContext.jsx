@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { CartContext } from './CartContextType';
 export { CartContext };
 
@@ -42,10 +43,12 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
+        toast.info(`Updated quantity for ${product.name}`);
         return prev.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1, price: finalPrice } : item
         );
       }
+      toast.success(`Added ${product.name} to cart`);
       return [...prev, { ...product, quantity: 1, price: finalPrice }];
     });
   };
