@@ -5,6 +5,7 @@ const FeaturedSchema = new mongoose.Schema({
   tagline: { type: String, required: true },
   description: { type: String, required: true },
   image: { type: String, required: true },
+  videoUrl: { type: String },
   link: { type: String, default: '/shop' }
 });
 

@@ -1,6 +1,90 @@
 const User = require('../models/User');
 const Product = require('../models/Product');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const { spawn } = require('child_process');
+const Featured = require('../models/Featured');
+
+// Configure Multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../../client/public/uploads');
+    if (!fs.existsSync(uploadDir)){
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, 'temp-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage }).single('video');
+
+exports.uploadHeroVideo = (req, res) => {
+  upload(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.status(500).json({ error: err.message });
+    } else if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!req.file) return res.status(400).json({ error: 'No video file uploaded' });
+
+    const tempPath = req.file.path;
+    const outputFilename = `hero-${Date.now()}.mp4`;
+    const outputPath = path.join(req.file.destination, outputFilename);
+    const publicUrl = `/uploads/${outputFilename}`;
+
+    // FFmpeg Re-encoding (All-Intra for smooth scrubbing)
+    const ffmpeg = spawn('ffmpeg', [
+      '-i', tempPath,
+      '-c:v', 'libx264',
+      '-x264-params', 'keyint=1:scenecut=0',
+      '-c:a', 'copy',
+      '-y',
+      outputPath
+    ]);
+
+    ffmpeg.on('close', async (code) => {
+      // Delete temp file
+      try {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+      } catch (e) { console.error("Error deleting temp file:", e); }
+
+      if (code === 0) {
+        try {
+          // Update Featured document
+          let featured = await Featured.findOne().sort({ _id: -1 });
+          if (!featured) {
+            featured = new Featured({ 
+                name: 'Default', 
+                tagline: 'Default', 
+                description: 'Default', 
+                image: '/images/halfeti.png',
+                videoUrl: publicUrl 
+            });
+          } else {
+            featured.videoUrl = publicUrl;
+          }
+          await featured.save();
+
+          res.json({ message: 'Video uploaded and processed successfully', videoUrl: publicUrl });
+        } catch (dbError) {
+          res.status(500).json({ error: 'Database update failed: ' + dbError.message });
+        }
+      } else {
+        res.status(500).json({ error: 'FFmpeg processing failed' });
+      }
+    });
+
+    ffmpeg.stderr.on('data', (data) => {
+      console.log(`FFmpeg: ${data}`);
+    });
+  });
+};
 
 exports.getAnalyticsSummary = async (req, res) => {
   try {

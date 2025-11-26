@@ -65,7 +65,7 @@ const Home = () => {
             playsInline
             preload="auto"
           >
-            <source src="/hero-video-smooth.mp4" type="video/mp4" />
+            <source src={featured && featured.videoUrl ? featured.videoUrl : "/Baccarat Rouge 540-smooth.mp4"} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
 

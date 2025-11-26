@@ -12,5 +12,6 @@ router.get('/analytics/sales-over-time', adminController.getSalesOverTime);
 router.get('/users', adminController.getUsers);
 router.get('/orders', adminController.getOrders);
 router.post('/update-stock', adminController.updateStock);
+router.post('/upload-hero-video', adminController.uploadHeroVideo);
 
 module.exports = router;

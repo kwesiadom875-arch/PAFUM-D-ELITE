@@ -4,6 +4,14 @@
 .text-center { text-align: center; }
 .gold-text { color: #C5A059; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
 
+/* Animations */
+.fade-in { opacity: 0; transform: translateY(20px); animation: fadeInUp 1s forwards; }
+.delay-1 { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- SCROLL HERO (Scrollytelling) --- */
 .scroll-hero-container {
   position: relative;
