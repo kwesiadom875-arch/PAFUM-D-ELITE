@@ -119,11 +119,19 @@ function DeliveryMap({ onLocationSelect }) {
 }
 
 export default function Checkout() {
-    const { cart, clearCart } = useContext(CartContext);
+    const { cart, clearCart, user } = useContext(CartContext);
     const [deliveryLocation, setDeliveryLocation] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [invoiceEmail, setInvoiceEmail] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [processing, setProcessing] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user && user.email) {
+            setInvoiceEmail(user.email);
+        }
+    }, [user]);
 
     const calculateTotal = () => {
         return cart.reduce((sum, item) => {
@@ -137,6 +145,16 @@ export default function Checkout() {
     const handleCheckout = async () => {
         if (!deliveryLocation) {
             alert('⚠️ Please select a delivery location on the map');
+            return;
+        }
+
+        if (!phoneNumber) {
+            alert('⚠️ Please enter a phone number for delivery');
+            return;
+        }
+
+        if (!invoiceEmail) {
+            alert('⚠️ Please enter an email address for the invoice');
             return;
         }
 
@@ -170,6 +188,8 @@ export default function Checkout() {
                     negotiated: item.negotiated || false
                 })),
                 deliveryLocation,
+                phoneNumber,
+                invoiceEmail,
                 paymentMethod
             };
 
@@ -261,6 +281,31 @@ export default function Checkout() {
                             <strong>Total:</strong>
                             <strong>${calculateTotal().toFixed(2)}</strong>
                         </div>
+                    </div>
+                </section>
+
+                {/* Contact Details */}
+                <section className="contact-section">
+                    <h2>📞 Contact Details</h2>
+                    <div className="form-group">
+                        <label>Phone Number for Delivery</label>
+                        <input
+                            type="tel"
+                            placeholder="e.g. +233 55 123 4567"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            className="checkout-input"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Email for Invoice</label>
+                        <input
+                            type="email"
+                            placeholder="e.g. your@email.com"
+                            value={invoiceEmail}
+                            onChange={(e) => setInvoiceEmail(e.target.value)}
+                            className="checkout-input"
+                        />
                     </div>
                 </section>
 

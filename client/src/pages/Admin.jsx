@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_URL from '../config';
+import { toast } from 'react-toastify';
 import './Admin.css';
 
 import Dashboard from '../components/Dashboard';
@@ -23,6 +24,7 @@ const Admin = () => {
     name: '', price: '', category: '', description: '', image: '', notes: '',
     perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10
   });
+  const [editingId, setEditingId] = useState(null);
 
   // Stock Update State
   const [stockUpdate, setStockUpdate] = useState({ productId: '', size: '', quantity: 0, price: '' });
@@ -68,12 +70,12 @@ const Admin = () => {
     e.preventDefault();
     try {
       await axios.post(`${API_URL}/api/featured`, featuredForm);
-      alert("Featured Perfume Updated!");
-    } catch (error) { alert("Failed to update."); }
+      toast.success("Featured Perfume Updated!");
+    } catch (error) { toast.error("Failed to update."); }
   };
 
   const handleScrape = async () => {
-    if (!scrapeUrl) return alert("Paste a Fragrantica link first!");
+    if (!scrapeUrl) return toast.error("Paste a Fragrantica link first!");
     setIsLoading(true);
     try {
       const res = await axios.post(`${API_URL}/api/scrape`, { url: scrapeUrl });
@@ -91,9 +93,9 @@ const Admin = () => {
         season: "All Year",
         stockQuantity: 10
       });
-      alert("Data Extracted Successfully!");
+      toast.success("Data Extracted Successfully!");
     } catch (error) {
-      alert("Could not scrape. Try another link.");
+      toast.error("Could not scrape. Try another link.");
     }
     setIsLoading(false);
   };
@@ -101,13 +103,47 @@ const Admin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newProduct = { ...form, id: Math.floor(Math.random() * 100000) };
-      await axios.post(`${API_URL}/api/products`, newProduct);
-      alert("Product Added!");
+      if (editingId) {
+        // Update existing product
+        await axios.put(`${API_URL}/api/products/${editingId}`, form);
+        toast.success("Product Updated!");
+      } else {
+        // Create new product
+        const newProduct = { ...form, id: Math.floor(Math.random() * 100000) };
+        await axios.post(`${API_URL}/api/products`, newProduct);
+        toast.success("Product Added!");
+      }
+
+      // Reset Form
       setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10 });
       setScrapeUrl('');
+      setEditingId(null);
       fetchProducts();
-    } catch (error) { alert("Failed to save."); }
+    } catch (error) { toast.error("Failed to save."); }
+  };
+
+  const handleEdit = (product) => {
+    setEditingId(product.id || product._id);
+    setForm({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      description: product.description,
+      image: product.image,
+      notes: Array.isArray(product.notes) ? product.notes.join(', ') : product.notes,
+      perfumer: product.perfumer || '',
+      rating: product.rating || '',
+      gender: product.gender || '',
+      season: product.season || '',
+      stockQuantity: product.stockQuantity
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10 });
   };
 
   const handleDelete = async (id) => {
@@ -138,11 +174,11 @@ const Admin = () => {
     e.preventDefault();
     try {
       await axios.post(`${API_URL}/api/admin/update-stock`, stockUpdate);
-      alert("Stock Updated!");
+      toast.success("Stock Updated!");
       setStockUpdate({ productId: '', size: '', quantity: 0, price: '' });
       fetchProducts();
     } catch (error) {
-      alert("Failed to update stock.");
+      toast.error("Failed to update stock.");
     }
   };
 
@@ -201,7 +237,17 @@ const Admin = () => {
               <input name="image" value={form.image} placeholder="Image URL" onChange={handleChange} required />
               <input name="notes" value={form.notes} placeholder="Accords (Comma separated)" onChange={handleChange} required />
               <textarea name="description" value={form.description} placeholder="Description" onChange={handleChange} rows="4" required />
-              <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>Save to Inventory</button>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                  {editingId ? "Update Product" : "Save to Inventory"}
+                </button>
+                {editingId && (
+                  <button type="button" className="btn-secondary" onClick={handleCancelEdit}>
+                    Cancel
+                  </button>
+                )}
+              </div>
             </form>
           </div>
 
@@ -216,7 +262,10 @@ const Admin = () => {
                     <p style={{ color: '#C5A059' }}>GH₵{p.price}</p>
                     <p style={{ fontSize: '0.8rem', color: '#888' }}>Stock: {p.stockQuantity}</p>
                   </div>
-                  <button className="delete-btn" onClick={() => handleDelete(p.id || p._id)}>Delete</button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <button className="btn-secondary" style={{ padding: '5px 10px', fontSize: '0.8rem' }} onClick={() => handleEdit(p)}>Edit</button>
+                    <button className="delete-btn" onClick={() => handleDelete(p.id || p._id)}>Delete</button>
+                  </div>
                 </div>
               ))}
             </div>

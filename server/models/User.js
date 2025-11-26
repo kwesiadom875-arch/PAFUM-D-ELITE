@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema({
     selectedSize: String,
     quantity: Number,
     negotiated: { type: Boolean, default: false },
+    deliveryLocation: Object,
+    phoneNumber: String,
+    invoiceEmail: String,
     date: { type: Date, default: Date.now }
   }],
   wishlist: [{

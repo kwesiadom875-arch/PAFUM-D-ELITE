@@ -3,14 +3,19 @@ import axios from 'axios';
 import API_URL from '../config';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { FaHeart } from 'react-icons/fa';
+import { FaHeart, FaEye } from 'react-icons/fa';
 import TransparentImg from '../components/TransparentImg';
+import QuickViewModal from '../components/QuickViewModal';
+import ErrorBoundary from '../components/ErrorBoundary';
 import './Shop.css';
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('newest');
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { addToCart } = useContext(CartContext);
 
   // Categories for the top bar
@@ -25,22 +30,86 @@ const Shop = () => {
       .catch(err => console.error("Error:", err));
   }, []);
 
-  // Filter Logic
+  // Unified Filter & Sort Logic
+  const applyFilters = (category, search, sort, allProducts = products) => {
+    let result = [...allProducts];
+
+    // 1. Filter by Category
+    if (category !== 'All') {
+      result = result.filter(p => p.category.includes(category));
+    }
+
+    // 2. Filter by Search
+    if (search) {
+      const query = search.toLowerCase();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query) ||
+        (p.notes && p.notes.some(note => note.toLowerCase().includes(query)))
+      );
+    }
+
+    // 3. Sort
+    if (sort === 'price-asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sort === 'price-desc') {
+      result.sort((a, b) => b.price - a.price);
+    } else if (sort === 'newest') {
+      // Assuming newer products have higher IDs or we just keep default order
+      // If there's a createdAt, we'd use that. For now, default is fine.
+    }
+
+    setFilteredProducts(result);
+  };
+
   const handleFilter = (category) => {
     setActiveFilter(category);
-    if (category === 'All') {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(products.filter(p => p.category.includes(category)));
-    }
+    applyFilters(category, searchQuery, sortOption);
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    applyFilters(activeFilter, query, sortOption);
+  };
+
+  const handleSort = (e) => {
+    const sort = e.target.value;
+    setSortOption(sort);
+    applyFilters(activeFilter, searchQuery, sort);
   };
 
   return (
     <div className="shop-container container">
 
-      {/* HEADER */}
-      <div className="shop-header">
-        <h1 className="page-title">The Olfactory Archives</h1>
+      {/* HERO SECTION */}
+      <div className="shop-hero">
+        <div className="hero-content">
+          <h1 className="page-title">The Olfactory Archives</h1>
+          <p className="hero-subtitle">Discover a curated collection of rare and exquisite fragrances.</p>
+        </div>
+
+        {/* Search & Sort Bar */}
+        <div className="search-sort-bar">
+          <div className="search-wrapper">
+            <input
+              type="text"
+              placeholder="Search the archives..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="search-input"
+            />
+          </div>
+
+          <div className="sort-wrapper">
+            <select value={sortOption} onChange={handleSort} className="sort-select">
+              <option value="newest">Newest Arrivals</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
         <div className="filter-bar">
           {categories.map((cat) => (
             <button
@@ -66,19 +135,38 @@ const Shop = () => {
             ? product.sizes.reduce((sum, s) => sum + s.stockQuantity, 0)
             : product.stockQuantity || 0;
 
+          // Badge Logic
+          const isNew = product._id && product._id.length > 10 && Math.random() > 0.7; // Mock logic for "New"
+          const isTrending = product.price > 1500 && Math.random() > 0.8;
+
           return (
             <div key={product.id || product._id} className="luxury-card">
 
               {/* IMAGE FRAME */}
               <div className="image-frame">
-                {/* Badge */}
-                {product.price > 2000 && <span className="badge-top">Best Seller</span>}
+                {/* Badges */}
+                <div className="badges-container">
+                  {product.price > 2000 && <span className="badge-top badge-bestseller">Best Seller</span>}
+                  {isNew && <span className="badge-top badge-new">New Arrival</span>}
+                  {isTrending && <span className="badge-top badge-trending">Trending</span>}
 
-                {!hasStock && <span className="badge-top out-of-stock-badge">Out of Stock</span>}
-                {hasStock && totalStock < 5 && <span className="badge-top low-stock-badge">Only {totalStock} Left</span>}
+                  {!hasStock && <span className="badge-top badge-out">Out of Stock</span>}
+                  {hasStock && totalStock < 5 && <span className="badge-top badge-low">Only {totalStock} Left</span>}
+                </div>
 
                 {/* Wishlist Icon */}
                 <button className="wishlist-btn"><FaHeart /></button>
+
+                {/* Quick View Icon */}
+                <button
+                  className="quickview-btn"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent link click
+                    setSelectedProduct(product);
+                  }}
+                >
+                  <FaEye />
+                </button>
 
                 <Link to={`/product/${product.id || product._id}`}>
                   <TransparentImg src={product.image} alt={product.name} className={!hasStock ? 'grayscale' : ''} />
@@ -119,6 +207,16 @@ const Shop = () => {
           <button className="btn-outline">Make a Request</button>
         </Link>
       </div>
+
+      {/* QUICK VIEW MODAL */}
+      {selectedProduct && (
+        <ErrorBoundary>
+          <QuickViewModal
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+          />
+        </ErrorBoundary>
+      )}
     </div>
   );
 };

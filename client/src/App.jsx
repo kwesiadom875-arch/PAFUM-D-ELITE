@@ -20,10 +20,26 @@ import RequestScent from './pages/RequestScent';
 import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <CartProvider>
       <Navbar />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastStyle={{ backgroundColor: '#1a1a1a', color: '#fcfcfc', border: '1px solid #333' }}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
