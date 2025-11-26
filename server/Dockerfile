@@ -1,5 +1,5 @@
 # Use official Node.js image
-FROM node:20-slimhow
+FROM node:20-slim
 
 # 1. Install Google Chrome dependencies (Crucial for Puppeteer)
 RUN apt-get update \
