@@ -355,19 +355,45 @@
 
 /* --- RESPONSIVE --- */
 @media (max-width: 900px) {
-  .reveal-card { flex-direction: column-reverse; text-align: center; padding: 30px; }
-  .reveal-content { padding-right: 0; margin-top: 20px; }
-  .reveal-image img { height: 200px; }
+  .home-container { padding-bottom: 60px; }
+  .section-title { font-size: 2rem; margin-bottom: 30px; }
+
+  /* Hero */
+  .scroll-hero-container { height: 200vh; }
   .video-overlay h2 { font-size: 2.5rem; }
+  .video-overlay p { font-size: 1.1rem; padding: 0 20px; }
+
+  /* Reveal Card */
+  .product-reveal { width: 95%; bottom: 5%; }
+  .reveal-card { flex-direction: column-reverse; text-align: center; padding: 25px; }
+  .reveal-content { padding-right: 0; margin-top: 20px; }
+  .reveal-content h3 { font-size: 2rem; }
+  .reveal-image img { height: 200px; }
   
-  .curator-section { flex-direction: column; text-align: center; gap: 40px; }
-  .curator-image img { height: 350px; }
-  .curator-bg-letter { left: 50%; transform: translateX(-50%); font-size: 10rem; top: -20px; }
+  /* Curator */
+  .curator-section { flex-direction: column; text-align: center; gap: 40px; margin-top: 100px; }
+  .curator-content h1 { font-size: 2.5rem; }
+  .curator-content p { font-size: 1rem; padding: 0 20px; }
+  .curator-image img { height: 300px; }
+  .curator-bg-letter { left: 50%; transform: translateX(-50%); font-size: 8rem; top: -10px; }
+  .action-row { justify-content: center; flex-wrap: wrap; }
   
-  .collections-grid { flex-direction: column; height: auto; }
-  .collection-card { height: 300px; }
-  .collection-info p { display: block; } /* Always show text on mobile */
+  /* Collections */
+  .collections-section { margin-top: 100px; }
+  .collections-grid { flex-direction: column; height: auto; gap: 15px; }
+  .collection-card { height: 250px; flex: none; }
+  .collection-card:hover { flex: none; } /* Disable expand on mobile */
+  .collection-info { transform: translateY(0); padding: 20px; }
+  .collection-info h3 { font-size: 1.5rem; }
+  .collection-info p { display: block; font-size: 0.9rem; } 
   
-  .footer-cta h2 { font-size: 2.5rem; }
-  .cta-buttons { flex-direction: column; align-items: center; }
+  /* Reviews */
+  .reviews-section { margin-top: 100px; }
+  .review-card { min-width: 280px; padding: 25px; }
+  
+  /* Footer CTA */
+  .footer-cta { margin-top: 100px; padding: 80px 20px; }
+  .footer-cta h2 { font-size: 2rem; }
+  .cta-buttons { flex-direction: column; align-items: center; width: 100%; }
+  .cta-buttons button { width: 100%; max-width: 300px; }
 }

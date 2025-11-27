@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import PropTypes from 'prop-types';
 import TransparentImg from '../TransparentImg';
 import AddToCartButton from '../AddToCartButton';
+import CompareButton from '../compare/CompareButton';
 
 const ProductCard = ({ product, user, addToCart, onQuickView }) => {
     const cardRef = useRef(null);
@@ -79,6 +80,13 @@ const ProductCard = ({ product, user, addToCart, onQuickView }) => {
         >
             {/* IMAGE FRAME */}
             <div className="image-frame">
+                {/* Compare Button (Right Side) */}
+                {!isLocked && (
+                    <div style={{ position: 'absolute', top: '85px', right: '15px', zIndex: 10 }}>
+                        <CompareButton product={product} />
+                    </div>
+                )}
+
                 {/* Badges */}
                 <div className="badges-container">
                     {product.price > 2000 && <span className="badge-top badge-bestseller">Best Seller</span>}

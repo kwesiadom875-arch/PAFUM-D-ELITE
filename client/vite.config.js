@@ -9,4 +9,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './vitest.setup.js',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          animations: ['framer-motion', 'gsap'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
+        },
+      },
+    },
+  },
 })

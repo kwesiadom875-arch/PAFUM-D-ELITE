@@ -5,6 +5,7 @@ import axios from 'axios';
 import API_URL from '../../config';
 
 import TransparentImg from '../TransparentImg';
+import CompareButton from '../compare/CompareButton';
 
 const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
     const [selectedSize, setSelectedSize] = useState(null);
@@ -131,6 +132,9 @@ const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
                     >
                         <FaHeart />
                     </button>
+                    <div style={{ marginLeft: '10px' }}>
+                        <CompareButton product={product} />
+                    </div>
                     {hasStock && <LuxuryNegotiator product={product} onDealAccepted={setFinalPrice} />}
                 </div>
             </div>

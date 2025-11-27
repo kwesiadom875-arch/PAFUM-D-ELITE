@@ -11,13 +11,16 @@ import ProductBento from '../components/product/ProductBento';
 import ProductAccords from '../components/product/ProductAccords';
 import RecommendedProducts from '../components/RecommendedProducts';
 import ProductSkeleton from '../components/ProductSkeleton';
+import ReviewList from '../components/reviews/ReviewList';
+import ReviewForm from '../components/reviews/ReviewForm';
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, user } = useContext(CartContext);
   const [product, setProduct] = useState(null);
   const [finalPrice, setFinalPrice] = useState(null);
   const [negotiatorKey, setNegotiatorKey] = useState(0); // Force negotiator to reset
+  const [refreshReviews, setRefreshReviews] = useState(0);
 
   useEffect(() => {
     // Scroll to top when product changes
@@ -65,6 +68,22 @@ const ProductDetail = () => {
         product={product}
         notesArray={notesArray}
       />
+
+      {/* REVIEWS SECTION */}
+      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
+        <h2 className="section-title text-center" style={{ marginBottom: '40px' }}>Olfactory Impressions</h2>
+
+        <ReviewList productId={id} refreshTrigger={refreshReviews} />
+
+        {user ? (
+          <ReviewForm productId={id} onReviewSubmitted={() => setRefreshReviews(prev => prev + 1)} />
+        ) : (
+          <div className="glass-card text-center" style={{ padding: '30px', marginTop: '30px' }}>
+            <p style={{ color: '#888', marginBottom: '15px' }}>Join the Elite to share your experience.</p>
+            <a href="/login" className="btn-secondary">Log In to Review</a>
+          </div>
+        )}
+      </div>
 
       {/* RECOMMENDED */}
       <RecommendedProducts

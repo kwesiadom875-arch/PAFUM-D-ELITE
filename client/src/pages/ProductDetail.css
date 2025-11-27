@@ -490,54 +490,6 @@
 }
 
 .related-card span {
-  color: #C5A059;
-  font-size: 0.9rem;
-}
-
-/* --- RESPONSIVE (Mobile) --- */
-@media (max-width: 768px) {
-
-  /* 1. Stack Hero Vertically */
-  .pdp-hero {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding-top: 30px;
-  }
-
-  .hero-image-stage {
-    height: 350px;
-  }
-
-  .hero-bottle {
-    height: 300px;
-  }
-
-  /* 2. Stack Bento & Accords */
-  .bento-grid,
-  .accords-section {
-    grid-template-columns: 1fr;
-  }
-
-  /* 3. Reduce Title Size */
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  /* 4. Disable Sticky (if applicable) */
-  .hero-image-stage {
-    position: relative;
-    top: auto;
-  }
-
-  .related-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-/* --- ANIMATIONS --- */
-
-/* 1. Fade In Up (Hero Image) */
-@keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(30px);

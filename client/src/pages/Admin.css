@@ -1,38 +1,102 @@
-.admin-page { margin-top: 40px; }
-
-.admin-header {
+.admin-page {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  min-height: 100vh;
+  margin-top: 0; /* Remove default margin as we want full height */
+  padding-top: 80px; /* Account for fixed navbar if present */
+  background-color: #f8f9fa;
 }
 
-.admin-tabs {
+/* SIDEBAR STYLES */
+.admin-sidebar {
+  width: 250px;
+  background: white;
+  border-right: 1px solid #eee;
+  padding: 20px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  background: #f5f5f5;
-  padding: 5px;
-  border-radius: 8px;
+  position: fixed; /* Keep sidebar fixed */
+  height: calc(100vh - 80px); /* Full height minus navbar */
+  overflow-y: auto;
 }
 
-.tab-btn {
+.sidebar-title {
+  color: #C5A059;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  padding-left: 10px;
+}
+
+.sidebar-btn {
   background: transparent;
   border: none;
-  color: #666;
-  padding: 8px 20px;
+  text-align: left;
+  padding: 12px 15px;
   cursor: pointer;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #666;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.tab-btn.active {
+.sidebar-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.sidebar-btn.active {
   background: var(--gold);
-  color: black;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
+}
+
+/* MAIN CONTENT AREA */
+.admin-content {
+  flex: 1;
+  margin-left: 250px; /* Offset for fixed sidebar */
+  padding: 30px;
+  max-width: 1200px; /* Limit content width */
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .admin-page {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .sidebar-title {
+    display: none; /* Hide title on mobile to save space */
+  }
+
+  .sidebar-btn {
+    white-space: nowrap;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .admin-content {
+    margin-left: 0;
+    padding: 15px;
+  }
 }
 
 .admin-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-@media(min-width: 768px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
+@media(min-width: 1024px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
 
 .form-section input, .form-section textarea {
   width: 100%; 
@@ -41,19 +105,26 @@
   color: #333; 
   padding: 10px; 
   margin-bottom: 10px;
+  border-radius: 6px;
 }
 
 .admin-item {
-  display: flex; align-items: center; gap: 15px; padding: 10px;
+  display: flex; align-items: center; gap: 15px; padding: 15px;
   border-bottom: 1px solid #eee;
+  transition: background 0.2s;
 }
-.admin-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-.delete-btn { background: #ff4d4d; border: none; color: white; padding: 5px 10px; cursor: pointer; margin-left: auto; }
+.admin-item:hover { background: #fcfcfc; }
+
+.admin-item img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+.delete-btn { background: #ff4d4d; border: none; color: white; padding: 6px 12px; cursor: pointer; margin-left: auto; border-radius: 4px; }
 
 /* ORDERS TABLE */
 .orders-section {
   width: 100%;
   overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 .orders-table {
@@ -68,6 +139,7 @@
   border-bottom: 2px solid #eee;
   color: var(--gold);
   font-family: 'Playfair Display', serif;
+  background: #fafafa;
 }
 
 .orders-table td {
@@ -102,6 +174,9 @@
 
 .stock-update-box {
   border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff;
 }
 
 .stock-update-box h4 {

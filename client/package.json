@@ -16,6 +16,7 @@
     "@react-three/fiber": "^9.4.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "express": "^5.1.0",
     "framer-motion": "^12.23.24",
     "gsap": "^3.13.0",

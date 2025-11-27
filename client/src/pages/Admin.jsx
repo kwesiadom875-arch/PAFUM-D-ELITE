@@ -14,32 +14,62 @@ import UsersTab from '../components/admin/UsersTab';
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
 
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'dashboard': return <Dashboard />;
+            case 'inventory': return <InventoryTab />;
+            case 'orders': return <OrdersTab />;
+            case 'stock': return <StockTab />;
+            case 'scent-intel': return <ScentIntelTab />;
+            case 'featured': return <FeaturedTab />;
+            case 'featured-showcase': return <FeaturedShowcaseTab />;
+            case 'climate-tests': return <ClimateTestsTab />;
+            case 'users': return <UsersTab />;
+            default: return <Dashboard />;
+        }
+    };
+
+    const NavItem = ({ id, label, icon }) => (
+        <button
+            className={`sidebar-btn ${activeTab === id ? 'active' : ''}`}
+            onClick={() => setActiveTab(id)}
+        >
+            <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+            {label}
+        </button>
+    );
+
     return (
-        <div className="container admin-page">
-            <div className="admin-header">
-                <h2 className="section-title" style={{ color: '#C5A059', marginBottom: '0' }}>Admin Dashboard</h2>
-                <div className="admin-tabs">
-                    <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
-                    <button className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
-                    <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Orders</button>
-                    <button className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`} onClick={() => setActiveTab('stock')}>Stock</button>
-                    <button className={`tab-btn ${activeTab === 'scent-intel' ? 'active' : ''}`} onClick={() => setActiveTab('scent-intel')}>Scent Intel AI</button>
-                    <button className={`tab-btn ${activeTab === 'featured' ? 'active' : ''}`} onClick={() => setActiveTab('featured')}>Featured</button>
-                    <button className={`tab-btn ${activeTab === 'featured-showcase' ? 'active' : ''}`} onClick={() => setActiveTab('featured-showcase')}>Showcase</button>
-                    <button className={`tab-btn ${activeTab === 'climate-tests' ? 'active' : ''}`} onClick={() => setActiveTab('climate-tests')}>Climate Tests</button>
-                    <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Users</button>
-                </div>
+        <div className="admin-page">
+            {/* SIDEBAR */}
+            <div className="admin-sidebar">
+                <div className="sidebar-title">Admin Panel</div>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <NavItem id="dashboard" label="Dashboard" icon="" />
+                    <NavItem id="inventory" label="Inventory" icon="" />
+                    <NavItem id="orders" label="Orders" icon="" />
+                    <NavItem id="stock" label="Stock Management" icon="" />
+                    <NavItem id="scent-intel" label="Scent Intel AI" icon="" />
+                    <NavItem id="featured" label="Featured" icon="" />
+                    <NavItem id="featured-showcase" label="Showcase" icon="" />
+                    <NavItem id="climate-tests" label="Climate Tests" icon="" />
+                    <NavItem id="users" label="Users" icon="" />
+                </nav>
             </div>
 
-            {activeTab === 'dashboard' && <Dashboard />}
-            {activeTab === 'inventory' && <InventoryTab />}
-            {activeTab === 'orders' && <OrdersTab />}
-            {activeTab === 'stock' && <StockTab />}
-            {activeTab === 'scent-intel' && <ScentIntelTab />}
-            {activeTab === 'featured' && <FeaturedTab />}
-            {activeTab === 'featured-showcase' && <FeaturedShowcaseTab />}
-            {activeTab === 'climate-tests' && <ClimateTestsTab />}
-            {activeTab === 'users' && <UsersTab />}
+            {/* MAIN CONTENT */}
+            <div className="admin-content">
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h2 style={{ fontSize: '2rem', color: '#333' }}>
+                        {activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}
+                    </h2>
+                    <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                        Welcome back, Admin
+                    </div>
+                </div>
+
+                {renderContent()}
+            </div>
         </div>
     );
 };
