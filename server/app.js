@@ -15,9 +15,11 @@ const scraperRoutes = require('./routes/scraperRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const requestRoutes = require('./routes/requestRoutes');
 const featuredRoutes = require('./routes/featuredRoutes');
+const featuredShowcaseRoutes = require('./routes/featuredShowcaseRoutes');
 const negotiationRoutes = require('./routes/negotiationRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const climateTestRoutes = require('./routes/climateTestRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 const app = express();
 app.use(cors({
@@ -60,9 +62,11 @@ app.use('/api', scraperRoutes); // Note: scraperRoutes handles /api/scrape
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/featured', featuredRoutes);
+app.use('/api/featured-showcase', featuredShowcaseRoutes);
 app.use('/api/negotiate', negotiationRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/climate-tests', climateTestRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Proxy Image Route (kept here as it's a utility)
 app.get('/proxy-image', async (req, res) => {

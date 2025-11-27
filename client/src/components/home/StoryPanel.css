@@ -1,0 +1,113 @@
+.story-panel {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-background {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  z-index: 0;
+}
+
+.panel-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 10, 0.8) 0%,
+    rgba(10, 10, 10, 0.6) 50%,
+    rgba(10, 10, 10, 0.9) 100%
+  );
+}
+
+.panel-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  padding: 0 40px;
+  color: #fff;
+}
+
+.panel-number {
+  display: block;
+  font-size: 1rem;
+  color: #C5A059;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 400;
+  margin-bottom: 30px;
+  line-height: 1.1;
+  letter-spacing: 2px;
+}
+
+.panel-description {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* Alternate layouts for different panels */
+.panel-1 .panel-content {
+  text-align: left;
+}
+
+.panel-2 .panel-content {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.panel-3 .panel-content {
+  text-align: right;
+  margin-left: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panel-content {
+    padding: 0 20px;
+  }
+
+  .panel-title {
+    font-size: 2rem;
+  }
+
+  .panel-description {
+    font-size: 1rem;
+  }
+
+  .panel-1 .panel-content,
+  .panel-2 .panel-content,
+  .panel-3 .panel-content {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

@@ -1,0 +1,129 @@
+.hero-showcase-section {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+}
+
+.showcase-scroller {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 80px;
+  padding: 0 5%;
+  will-change: transform;
+}
+
+.showcase-product-card {
+  min-width: 600px;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 60px;
+  transition: all 0.4s ease;
+  box-shadow: none;
+}
+
+.showcase-product-card:hover {
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.showcase-product-image-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.showcase-product-image {
+  height: 400px;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
+  transition: transform 0.5s ease;
+  will-change: transform;
+}
+
+.showcase-product-card:hover .showcase-product-image {
+  transform: scale(1.05) rotate(5deg);
+}
+
+.showcase-product-info {
+  flex: 1;
+  color: #1a1a1a;
+}
+
+.showcase-brand {
+  display: block;
+  color: #C5A059;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.showcase-product-info h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.showcase-price {
+  font-size: 2rem;
+  color: #C5A059;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.showcase-cta {
+  display: inline-block;
+  padding: 15px 40px;
+  background: #C5A059;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid #C5A059;
+}
+
+.showcase-cta:hover {
+  background: transparent;
+  color: #C5A059;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .showcase-scroller {
+    padding: 0 5%;
+  }
+
+  .showcase-product-card {
+    min-width: 90vw;
+    flex-direction: column;
+    height: auto;
+    padding: 40px;
+    gap: 30px;
+  }
+
+  .showcase-product-image {
+    height: 250px;
+  }
+
+  .showcase-product-info h2 {
+    font-size: 2rem;
+  }
+}
+

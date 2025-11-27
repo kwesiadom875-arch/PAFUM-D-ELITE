@@ -9,4 +9,7 @@ router.get('/profile', verifyToken, userController.getProfile);
 // Update user profile
 router.put('/profile', verifyToken, userController.updateProfile);
 
+// Purchase items
+router.post('/purchase', verifyToken, userController.purchase);
+
 module.exports = router;

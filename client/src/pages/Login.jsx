@@ -1,8 +1,10 @@
+
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import API_URL from '../config';
 import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { toast } from 'react-toastify';
 import './AutoCommon.css'; // Shared CSS
 
 const Login = () => {
@@ -19,14 +21,19 @@ const Login = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/api/auth/login`, formData);
+            const res = await axios.post(`${ API_URL } /api/auth / login`, formData);
             login(res.data.user, res.data.token);
-            alert("Welcome back, Elite Member.");
+            toast.success("Welcome back, Elite Member.");
             navigate('/profile');
         } catch (err) {
-            setError(err.response?.data?.message || "Login failed");
+            const msg = err.response?.data?.message || "Login failed";
+            setError(msg);
+            if (!err.response || err.response.status >= 500) {
+                toast.error("Server error. Please try again later.");
+            }
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (

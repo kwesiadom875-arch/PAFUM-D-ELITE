@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 import API_URL from '../config';
+import { retryRequest } from '../utils/errorHandler';
 import './LuxuryNegotiator.css';
 
 const LuxuryNegotiator = ({ product, onDealAccepted }) => {
@@ -63,21 +65,23 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
         content: m.text
       }));
 
-      const res = await axios.post(`${API_URL}/api/negotiate`, {
-        product: { name: product.name, price: product.price },
-        userOffer: userPrice,
-        history: apiHistory
+      await retryRequest(async () => {
+        const res = await axios.post(`${API_URL}/api/negotiate`, {
+          product: { name: product.name, price: product.price },
+          userOffer: userPrice,
+          history: apiHistory
+        });
+
+        const { reply, status } = res.data;
+
+        // 3. Update UI
+        setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
+
+        if (status === 'accepted') {
+          setDealMade(true);
+          onDealAccepted(userPrice);
+        }
       });
-
-      const { reply, status } = res.data;
-
-      // 3. Update UI
-      setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
-
-      if (status === 'accepted') {
-        setDealMade(true);
-        onDealAccepted(userPrice);
-      }
     } catch (error) {
       console.error("Negotiation error:", error);
       setMessages(prev => [...prev, { sender: 'ai', text: "I seem to be having trouble consulting my ledger. Please try again." }]);
@@ -151,6 +155,14 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
       )}
     </>
   );
+};
+
+LuxuryNegotiator.propTypes = {
+  product: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired
+  }).isRequired,
+  onDealAccepted: PropTypes.func.isRequired
 };
 
 export default LuxuryNegotiator;

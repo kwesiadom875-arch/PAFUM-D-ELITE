@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import API_URL from '../config';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './AutoCommon.css';
 
 const Signup = () => {
@@ -18,12 +19,17 @@ const Signup = () => {
         setLoading(true);
         try {
             await axios.post(`${API_URL}/api/auth/register`, formData);
-            alert("Account Created! Please Log In.");
+            toast.success("Account Created! Please Log In.");
             navigate('/login');
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed");
+            const msg = err.response?.data?.message || "Registration failed";
+            setError(msg);
+            if (!err.response || err.response.status >= 500) {
+                toast.error("Server error. Please try again later.");
+            }
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (

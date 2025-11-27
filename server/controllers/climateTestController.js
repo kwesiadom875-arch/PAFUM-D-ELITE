@@ -32,7 +32,7 @@ exports.getAllTests = async (req, res) => {
 // Create new climate test (admin only)
 exports.createTest = async (req, res) => {
   try {
-    const { perfumeName, perfumeImage, testerId, climate, endDate } = req.body;
+    const { perfumeName, perfumeImage, testerId, climate, endDate, brand } = req.body;
 
     // Verify admin
     const adminUser = await User.findById(req.userId);
@@ -52,6 +52,7 @@ exports.createTest = async (req, res) => {
 
     const newTest = new ClimateTest({
       perfumeName,
+      brand: brand || '',
       perfumeImage: perfumeImage || '',
       testerId,
       testerName: tester.username,
@@ -86,9 +87,16 @@ exports.updateTest = async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Testers can only update status and finalRating, not core test details
+    // Testers can update evaluation form fields, but not core test details
     if (!user.isAdmin) {
-      const allowedUpdates = ['status', 'finalRating'];
+      const allowedUpdates = [
+        'status', 
+        'finalRating', 
+        'testingConditions', 
+        'climateObservations', 
+        'recommendation', 
+        'customerNotes'
+      ];
       Object.keys(updates).forEach(key => {
         if (!allowedUpdates.includes(key)) {
           delete updates[key];
@@ -162,6 +170,150 @@ exports.addRemark = async (req, res) => {
     res.json({ message: 'Remark added successfully', test });
   } catch (error) {
     console.error('Add remark error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Submit test for review (assigned tester only)
+exports.submitTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { finalRating } = req.body;
+    const userId = req.userId;
+
+    if (!finalRating || finalRating < 1 || finalRating > 10) {
+      return res.status(400).json({ error: 'Final rating (1-10) is required' });
+    }
+
+    const test = await ClimateTest.findById(id);
+    if (!test) {
+      return res.status(404).json({ error: 'Climate test not found' });
+    }
+
+    const user = await User.findById(userId);
+    
+    // Only assigned tester can submit
+    if (test.testerId.toString() !== userId) {
+      return res.status(403).json({ error: 'Only the assigned tester can submit this test' });
+    }
+
+    // Can only submit if in-progress
+    if (test.status !== 'in-progress') {
+      return res.status(400).json({ error: 'Test must be in-progress to submit' });
+    }
+
+    test.status = 'submitted';
+    test.finalRating = parseInt(finalRating);
+    test.submittedAt = new Date();
+
+    await test.save();
+
+    res.json({ message: 'Test submitted for review successfully', test });
+  } catch (error) {
+    console.error('Submit test error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Mark test as in-review (admin only)
+exports.markInReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const test = await ClimateTest.findById(id);
+    if (!test) {
+      return res.status(404).json({ error: 'Climate test not found' });
+    }
+
+    // Can only review if submitted
+    if (test.status !== 'submitted') {
+      return res.status(400).json({ error: 'Test must be submitted to mark as in-review' });
+    }
+
+    test.status = 'in-review';
+    test.reviewedBy = userId;
+
+    await test.save();
+
+    res.json({ message: 'Test marked as in-review', test });
+  } catch (error) {
+    console.error('Mark in-review error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Approve test (admin only)
+exports.approveTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const test = await ClimateTest.findById(id);
+    if (!test) {
+      return res.status(404).json({ error: 'Climate test not found' });
+    }
+
+    // Can approve from submitted or in-review
+    if (test.status !== 'submitted' && test.status !== 'in-review') {
+      return res.status(400).json({ error: 'Test must be submitted or in-review to approve' });
+    }
+
+    test.status = 'success';
+    test.reviewedBy = userId;
+    test.reviewedAt = new Date();
+
+    await test.save();
+
+    res.json({ message: 'Test approved successfully', test });
+  } catch (error) {
+    console.error('Approve test error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Reject test (admin only)
+exports.rejectTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const test = await ClimateTest.findById(id);
+    if (!test) {
+      return res.status(404).json({ error: 'Climate test not found' });
+    }
+
+    // Can reject from submitted or in-review
+    if (test.status !== 'submitted' && test.status !== 'in-review') {
+      return res.status(400).json({ error: 'Test must be submitted or in-review to reject' });
+    }
+
+    test.status = 'failed';
+    test.reviewedBy = userId;
+    test.reviewedAt = new Date();
+    test.rejectionReason = reason || 'No reason provided';
+
+    await test.save();
+
+    res.json({ message: 'Test rejected', test });
+  } catch (error) {
+    console.error('Reject test error:', error);
     res.status(500).json({ error: error.message });
   }
 };

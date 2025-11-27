@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
     deliveryLocation: Object,
     phoneNumber: String,
     invoiceEmail: String,
+    paymentMethod: String,
+    paymentReference: String,
     date: { type: Date, default: Date.now }
   }],
   wishlist: [{

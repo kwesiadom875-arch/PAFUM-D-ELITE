@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+import API_URL from '../config';
+import { retryRequest } from '../utils/errorHandler';
+import ProductSkeleton from './ProductSkeleton';
 import './RecommendedProducts.css';
 
 const RecommendedProducts = ({ userId, productId }) => {
@@ -8,12 +12,13 @@ const RecommendedProducts = ({ userId, productId }) => {
 
   useEffect(() => {
     const fetchRecommendations = async () => {
+      setLoading(true);
       try {
         let url;
         if (userId) {
-          url = `http://localhost:5000/api/recommendations/user/${userId}`;
+          url = `${API_URL}/api/recommendations/user/${userId}`;
         } else if (productId) {
-          url = `http://localhost:5000/api/recommendations/product/${productId}`;
+          url = `${API_URL}/api/recommendations/product/${productId}`;
         } else {
           setRecommendations([]);
           setLoading(false);
@@ -21,12 +26,15 @@ const RecommendedProducts = ({ userId, productId }) => {
         }
 
         const token = localStorage.getItem('token');
-        const response = await axios.get(url, {
-          headers: {
-            Authorization: token,
-          },
+
+        await retryRequest(async () => {
+          const response = await axios.get(url, {
+            headers: {
+              Authorization: token,
+            },
+          });
+          setRecommendations(response.data);
         });
-        setRecommendations(response.data);
       } catch (error) {
         console.error('Error fetching recommendations:', error);
       } finally {
@@ -38,7 +46,14 @@ const RecommendedProducts = ({ userId, productId }) => {
   }, [userId, productId]);
 
   if (loading) {
-    return <div>Loading recommendations...</div>;
+    return (
+      <div className="recommended-products">
+        <h2 className="section-title">{userId ? 'Curated For You' : 'You Might Also Like'}</h2>
+        <div className="products-grid">
+          <ProductSkeleton count={4} />
+        </div>
+      </div>
+    );
   }
 
   if (recommendations.length === 0) {
@@ -64,6 +79,11 @@ const RecommendedProducts = ({ userId, productId }) => {
       </div>
     </div>
   );
+};
+
+RecommendedProducts.propTypes = {
+  userId: PropTypes.string,
+  productId: PropTypes.string
 };
 
 export default RecommendedProducts;

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import gsap from 'gsap';
 import { FaCheck } from 'react-icons/fa';
 
@@ -118,6 +119,19 @@ const AddToCartButton = ({ onClick, price, disabled, className }) => {
             </div>
         </button>
     );
+};
+
+AddToCartButton.propTypes = {
+    onClick: PropTypes.func,
+    price: PropTypes.number.isRequired,
+    disabled: PropTypes.bool,
+    className: PropTypes.string
+};
+
+AddToCartButton.defaultProps = {
+    onClick: () => { },
+    disabled: false,
+    className: ''
 };
 
 export default AddToCartButton;

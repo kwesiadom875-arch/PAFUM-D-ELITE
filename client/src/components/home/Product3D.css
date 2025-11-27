@@ -1,0 +1,132 @@
+.product-3d-section {
+  position: relative;
+  height: 200vh;
+  background: #0a0a0a;
+}
+
+.canvas-container {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(197, 160, 89, 0.1) 0%,
+    rgba(10, 10, 10, 1) 70%
+  );
+}
+
+.product-name-overlay {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  z-index: 10;
+  color: #fff;
+}
+
+.product-name-overlay h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+.product-name-overlay p {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: #C5A059;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-info-overlay {
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-item[data-scroll-reveal="1"] {
+  animation: revealInfo 0.8s ease-out 0.2s forwards;
+}
+
+.info-item[data-scroll-reveal="2"] {
+  animation: revealInfo 0.8s ease-out 0.4s forwards;
+}
+
+.info-item[data-scroll-reveal="3"] {
+  animation: revealInfo 0.8s ease-out 0.6s forwards;
+}
+
+.info-item[data-scroll-reveal="4"] {
+  animation: revealInfo 0.8s ease-out 0.8s forwards;
+}
+
+@keyframes revealInfo {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #C5A059;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .product-info-overlay {
+    right: 5%;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-info-overlay {
+    top: auto;
+    bottom: 10%;
+    right: 50%;
+    transform: translateX(50%);
+    align-items: center;
+    text-align: center;
+  }
+
+  .info-item {
+    transform: translateY(30px);
+  }
+
+  @keyframes revealInfo {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { CartContext } from '../context/CartContext';
 import TransparentImg from './TransparentImg';
 import { FaTimes, FaShoppingBag } from 'react-icons/fa';
@@ -77,6 +78,31 @@ const QuickViewModal = ({ product, onClose }) => {
             </div>
         </div>
     );
+};
+
+QuickViewModal.propTypes = {
+    product: PropTypes.shape({
+        _id: PropTypes.string,
+        id: PropTypes.string,
+        name: PropTypes.string,
+        price: PropTypes.number,
+        image: PropTypes.string,
+        category: PropTypes.string,
+        description: PropTypes.string,
+        notes: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.arrayOf(PropTypes.string)
+        ]),
+        stockQuantity: PropTypes.number,
+        sizes: PropTypes.arrayOf(PropTypes.shape({
+            stockQuantity: PropTypes.number
+        }))
+    }),
+    onClose: PropTypes.func.isRequired
+};
+
+QuickViewModal.defaultProps = {
+    product: null
 };
 
 export default QuickViewModal;

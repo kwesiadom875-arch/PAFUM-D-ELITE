@@ -34,6 +34,24 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  moderationStatus: {
+    type: String,
+    enum: ['pending', 'in-review', 'success', 'failed'],
+    default: 'pending'
+  },
+  moderatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  moderatedAt: {
+    type: Date,
+    default: null
+  },
+  rejectionReason: {
+    type: String,
+    default: ''
+  },
   createdAt: {
     type: Date,
     default: Date.now

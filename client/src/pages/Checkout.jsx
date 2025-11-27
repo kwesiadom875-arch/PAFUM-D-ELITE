@@ -2,6 +2,8 @@ import { useState, useContext, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { usePaystackPayment } from 'react-paystack';
+import { toast } from 'react-toastify';
 import 'leaflet/dist/leaflet.css';
 import './Checkout.css';
 import L from 'leaflet';
@@ -14,6 +16,8 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+// PAYSTACK PUBLIC KEY - REPLACE WITH YOUR OWN
+const PAYSTACK_PUBLIC_KEY = 'pk_live_8a853c7fcc5a73d4f20ee52019d3ecb070acb83b';
 function DeliveryMap({ onLocationSelect }) {
     const [position, setPosition] = useState([6.5244, -3.3792]); // Default: Lagos, Nigeria
     const [address, setAddress] = useState('');
@@ -60,7 +64,7 @@ function DeliveryMap({ onLocationSelect }) {
 
     const handleUseMyLocation = () => {
         if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+            toast.error("Geolocation is not supported by your browser");
             return;
         }
 
@@ -74,7 +78,7 @@ function DeliveryMap({ onLocationSelect }) {
             },
             (err) => {
                 console.error(err);
-                alert("Unable to retrieve your location");
+                toast.error("Unable to retrieve your location");
                 setLoading(false);
             }
         );
@@ -123,7 +127,7 @@ export default function Checkout() {
     const [deliveryLocation, setDeliveryLocation] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [invoiceEmail, setInvoiceEmail] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' (Paystack) or 'cash'
     const [processing, setProcessing] = useState(false);
     const navigate = useNavigate();
 
@@ -159,33 +163,31 @@ export default function Checkout() {
         return subtotal * (1 - discount);
     };
 
-    const handleCheckout = async () => {
-        if (!deliveryLocation) {
-            alert('⚠️ Please select a delivery location on the map');
-            return;
-        }
+    // Paystack Configuration
+    const config = {
+        reference: (new Date()).getTime().toString(),
+        email: invoiceEmail,
+        amount: Math.round(calculateFinalTotal() * 100), // Amount in kobo/cents
+        publicKey: PAYSTACK_PUBLIC_KEY,
+        currency: 'GHS',
+    };
 
-        if (!phoneNumber) {
-            alert('⚠️ Please enter a phone number for delivery');
-            return;
-        }
+    const initializePayment = usePaystackPayment(config);
 
-        if (!invoiceEmail) {
-            alert('⚠️ Please enter an email address for the invoice');
-            return;
-        }
+    const onSuccess = (reference) => {
+        processOrder(reference);
+    };
 
-        if (cart.length === 0) {
-            alert('Your cart is empty');
-            return;
-        }
+    const onClose = () => {
+        toast.info("Payment cancelled.");
+        setProcessing(false);
+    };
 
-        setProcessing(true);
-
+    const processOrder = async (paymentReference = null) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                alert('Please login to complete purchase');
+                toast.error('Please login to complete purchase');
                 navigate('/auth');
                 return;
             }
@@ -207,7 +209,8 @@ export default function Checkout() {
                 deliveryLocation,
                 phoneNumber,
                 invoiceEmail,
-                paymentMethod
+                paymentMethod,
+                paymentReference: paymentReference ? paymentReference.reference : null
             };
 
             // Send to backend
@@ -227,7 +230,7 @@ export default function Checkout() {
             }
 
             // Success!
-            alert(`✅ Order placed successfully!\n\nTotal: GH₵${calculateFinalTotal().toFixed(2)}\nItems: ${cart.length}\n\nDelivery to: ${deliveryLocation.address}`);
+            toast.success(`Order placed successfully!`);
 
             // Refresh user data to get updated tier and spending
             await refreshUser();
@@ -237,9 +240,41 @@ export default function Checkout() {
 
         } catch (error) {
             console.error('Checkout error:', error);
-            alert(`❌ ${error.message || 'Failed to complete purchase. Please try again.'}`);
+            toast.error(error.message || 'Failed to complete purchase. Please try again.');
         } finally {
             setProcessing(false);
+        }
+    };
+
+    const handleCheckout = () => {
+        if (!deliveryLocation) {
+            toast.warn('Please select a delivery location on the map');
+            return;
+        }
+
+        if (!phoneNumber) {
+            toast.warn('Please enter a phone number for delivery');
+            return;
+        }
+
+        if (!invoiceEmail) {
+            toast.warn('Please enter an email address for the invoice');
+            return;
+        }
+
+        if (cart.length === 0) {
+            toast.warn('Your cart is empty');
+            return;
+        }
+
+        setProcessing(true);
+
+        if (paymentMethod === 'card') {
+            // Trigger Paystack
+            initializePayment(onSuccess, onClose);
+        } else {
+            // Cash on Delivery
+            processOrder();
         }
     };
 
@@ -355,18 +390,8 @@ export default function Checkout() {
                                 checked={paymentMethod === 'card'}
                                 onChange={(e) => setPaymentMethod(e.target.value)}
                             />
-                            <span className="payment-icon">💳</span>
-                            Credit/Debit Card
-                        </label>
-                        <label className={paymentMethod === 'paypal' ? 'active' : ''}>
-                            <input
-                                type="radio"
-                                value="paypal"
-                                checked={paymentMethod === 'paypal'}
-                                onChange={(e) => setPaymentMethod(e.target.value)}
-                            />
-                            <span className="payment-icon">📱</span>
-                            PayPal
+                            <span className="payment-icon"></span>
+                            Pay with Paystack (Card/Mobile Money)
                         </label>
                         <label className={paymentMethod === 'cash' ? 'active' : ''}>
                             <input
@@ -375,7 +400,7 @@ export default function Checkout() {
                                 checked={paymentMethod === 'cash'}
                                 onChange={(e) => setPaymentMethod(e.target.value)}
                             />
-                            <span className="payment-icon">💵</span>
+                            <span className="payment-icon"></span>
                             Cash on Delivery
                         </label>
                     </div>
@@ -387,11 +412,11 @@ export default function Checkout() {
                     onClick={handleCheckout}
                     disabled={processing || !deliveryLocation}
                 >
-                    {processing ? '⏳ Processing...' : `🛍️ Place Order - GH₵${calculateFinalTotal().toFixed(2)}`}
+                    {processing ? 'Processing...' : ` Place Order - GH₵${calculateFinalTotal().toFixed(2)}`}
                 </button>
 
                 {!deliveryLocation && (
-                    <p className="warning-text">⚠️ Please select a delivery location on the map above</p>
+                    <p className="warning-text">Please select a delivery location on the map above</p>
                 )}
             </div>
         </div>
