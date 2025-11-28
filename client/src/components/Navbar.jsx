@@ -47,7 +47,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to="/profile">Profile</Link>
-                {user.isAdmin && <Link to="/admin" style={{ color: '#C5A059' }}>Admin</Link>}
+                {user.isAdmin || user.isSuperAdmin ? <Link to="/admin" style={{ color: '#C5A059' }}>Admin</Link> : null}
                 {user.isTester && <Link to="/climate-tests" style={{ color: '#4CAF50' }}>Climate Tests</Link>}
                 <button className="nav-btn-outline" onClick={handleLogout}>Sign Out</button>
               </>
@@ -78,7 +78,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link to="/profile" onClick={toggleMenu}>Profile</Link>
-              {user.isAdmin && <Link to="/admin" onClick={toggleMenu} style={{ color: '#C5A059' }}>Admin</Link>}
+              {user.isAdmin || user.isSuperAdmin ? <Link to="/admin" style={{ color: '#C5A059' }}>Admin</Link> : null}
               {user.isTester && <Link to="/climate-tests" onClick={toggleMenu} style={{ color: '#4CAF50' }}>Climate Tests</Link>}
               <button className="nav-btn-outline mobile-btn" onClick={handleLogout}>Sign Out</button>
             </>

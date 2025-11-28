@@ -10,6 +10,7 @@ import FeaturedTab from '../components/admin/FeaturedTab';
 import FeaturedShowcaseTab from '../components/admin/FeaturedShowcaseTab';
 import ClimateTestsTab from '../components/admin/ClimateTestsTab';
 import UsersTab from '../components/admin/UsersTab';
+import SiteContentTab from '../components/admin/SiteContentTab';
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -23,6 +24,7 @@ const Admin = () => {
             case 'scent-intel': return <ScentIntelTab />;
             case 'featured': return <FeaturedTab />;
             case 'featured-showcase': return <FeaturedShowcaseTab />;
+            case 'site-content': return <SiteContentTab />;
             case 'climate-tests': return <ClimateTestsTab />;
             case 'users': return <UsersTab />;
             default: return <Dashboard />;
@@ -46,6 +48,7 @@ const Admin = () => {
                 <div className="sidebar-title">Admin Panel</div>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <NavItem id="dashboard" label="Dashboard" icon="" />
+                    <NavItem id="site-content" label="Site Content" icon="" />
                     <NavItem id="inventory" label="Inventory" icon="" />
                     <NavItem id="orders" label="Orders" icon="" />
                     <NavItem id="stock" label="Stock Management" icon="" />

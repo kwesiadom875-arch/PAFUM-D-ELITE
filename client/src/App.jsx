@@ -4,9 +4,11 @@ import { CartProvider } from './context/CartContext';
 import { CompareProvider } from './context/CompareContext';
 import Navbar from './components/Navbar';
 import CompareTray from './components/compare/CompareTray';
+import ScrollToTop from './components/ScrollToTop';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence } from 'framer-motion';
+import Footer from './components/Footer';
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -14,7 +16,7 @@ const Shop = lazy(() => import('./pages/Shop'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Admin = lazy(() => import('./pages/Admin'));
-const Profile = lazy(() => import('./components/Profile')); // Note: Profile was imported from components in original file
+const Profile = lazy(() => import('./components/Profile'));
 const ScentFinder = lazy(() => import('./pages/ScentFinder'));
 const Auth = lazy(() => import('./pages/Auth'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
@@ -26,6 +28,8 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ClimateTests = lazy(() => import('./pages/ClimateTests'));
 const ComparePage = lazy(() => import('./pages/ComparePage'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -49,6 +53,7 @@ function App() {
   return (
     <CartProvider>
       <CompareProvider>
+        <ScrollToTop />
         <Navbar />
         <CompareTray />
         <ToastContainer
@@ -84,9 +89,12 @@ function App() {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/climate-tests" element={<ClimateTests />} />
               <Route path="/compare" element={<ComparePage />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
             </Routes>
           </Suspense>
         </AnimatePresence>
+        {!location.pathname.startsWith('/admin') && <Footer />}
       </CompareProvider>
     </CartProvider>
   );

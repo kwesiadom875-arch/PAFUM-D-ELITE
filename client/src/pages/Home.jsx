@@ -1,61 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PageTransition from '../components/PageTransition';
-import ImmersiveHero from '../components/home/ImmersiveHero';
-import StoryPanel from '../components/home/StoryPanel';
-import Product3D from '../components/home/Product3D';
-import CollectionsGrid3D from '../components/home/CollectionsGrid3D';
-import TestimonialsGSAP from '../components/home/TestimonialsGSAP';
-import FooterCTAMagnetic from '../components/home/FooterCTAMagnetic';
+import IntroAnimation from '../components/home/IntroAnimation';
+import HeroSection from '../components/home/HeroSection';
+import CategoryBanners from '../components/home/CategoryBanners';
+import FeaturedCollection from '../components/home/FeaturedCollection';
+import FeaturesRow from '../components/home/FeaturesRow';
 import './Home.css';
 
 const Home = () => {
-  // Story panel content
-  const storyPanels = [
-    {
-      title: "The Essence",
-      description: "Every fragrance begins with nature's finest ingredients, carefully sourced from around the world. From the jasmine fields of Grasse to the oud forests of Southeast Asia.",
-      image: "/images/story-essence.jpg"
-    },
-    {
-      title: "The Craft",
-      description: "Master perfumers blend art and science, creating harmonious compositions that tell stories and evoke emotions. Each note is precisely measured, each accord carefully balanced.",
-      image: "/images/story-craft.jpg"
-    },
-    {
-      title: "The Experience",
-      description: "A perfume is more than a scent—it's a journey, a memory, an extension of your identity. Discover fragrances that resonate with your soul.",
-      image: "/images/story-experience.jpg"
+  const [showIntro, setShowIntro] = useState(true);
+
+  // Check if intro has already been shown in this session to avoid annoyance
+  useEffect(() => {
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    if (hasSeenIntro) {
+      setShowIntro(false);
     }
-  ];
+  }, []);
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    sessionStorage.setItem('hasSeenIntro', 'true');
+  };
 
   return (
     <PageTransition>
-      <div className="home-immersive">
-        {/* Hero Section - Full-screen video with parallax */}
-        <ImmersiveHero />
+      <div className="home-container">
+        {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
 
-        {/* Story Panels - Scroll-triggered narrative */}
-        {storyPanels.map((panel, index) => (
-          <StoryPanel
-            key={index}
-            title={panel.title}
-            description={panel.description}
-            image={panel.image}
-            index={index + 1}
-          />
-        ))}
-
-        {/* 3D Product Showcase - Interactive rotating bottle */}
-        <Product3D />
-
-        {/* Collections Grid - 3D flip cards */}
-        <CollectionsGrid3D />
-
-        {/* Testimonials - Floating cards */}
-        <TestimonialsGSAP />
-
-        {/* Footer CTA - Magnetic buttons */}
-        <FooterCTAMagnetic />
+        {!showIntro && (
+          <>
+            <HeroSection />
+            <CategoryBanners />
+            <FeaturedCollection />
+            <FeaturesRow />
+          </>
+        )}
       </div>
     </PageTransition>
   );

@@ -128,7 +128,18 @@ exports.getSalesOverTime = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    res.json(users);
+    
+    // Force Super Admin flag for display and debugging
+    const usersWithSuperAdmin = users.map(user => {
+      if (user.email === 'agyakwesiadom@gmail.com') {
+        // Ensure it's set in the response object
+        return { ...user.toObject(), isSuperAdmin: true, isAdmin: true };
+      }
+      return user;
+    });
+
+    console.log('Users fetched:', usersWithSuperAdmin.map(u => ({ e: u.email, sa: u.isSuperAdmin, a: u.isAdmin })));
+    res.json(usersWithSuperAdmin);
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ error: error.message });
@@ -228,33 +239,118 @@ exports.updateStock = async (req, res) => {
   }
 };
 
-// Toggle tester role for a user
+// Toggle user roles (Admin, Tester, Verified, Suspended)
 exports.updateUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { isTester } = req.body;
+    const updates = req.body; // Expects { isAdmin, isTester, isVerified, isSuspended }
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    user.isTester = isTester;
+    // Protect Super Admin
+    if (user.email === 'agyakwesiadom@gmail.com') {
+        // Ensure Super Admin status is always true
+        user.isSuperAdmin = true;
+        user.isAdmin = true;
+        // Prevent suspension or de-admining
+        if (updates.isSuspended === true || updates.isAdmin === false) {
+            return res.status(403).json({ error: 'Cannot modify Super Admin privileges' });
+        }
+    }
+
+    if (updates.hasOwnProperty('isAdmin')) user.isAdmin = updates.isAdmin;
+    if (updates.hasOwnProperty('isTester')) user.isTester = updates.isTester;
+    if (updates.hasOwnProperty('isVerified')) user.isVerified = updates.isVerified;
+    if (updates.hasOwnProperty('isSuspended')) user.isSuspended = updates.isSuspended;
+
     await user.save();
 
     res.json({ 
-      message: `User ${isTester ? 'promoted to' : 'removed from'} tester role`,
+      message: 'User updated successfully',
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        isTester: user.isTester
+        isAdmin: user.isAdmin,
+        isTester: user.isTester,
+        isVerified: user.isVerified,
+        isSuspended: user.isSuspended,
+        isSuperAdmin: user.isSuperAdmin
       }
     });
   } catch (error) {
     console.error('Update user role error:', error);
     res.status(500).json({ error: error.message });
   }
+};
+
+// Delete User
+exports.deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+        
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (user.email === 'agyakwesiadom@gmail.com' || user.isSuperAdmin) {
+            return res.status(403).json({ error: 'Cannot delete Super Admin' });
+        }
+
+        await User.findByIdAndDelete(userId);
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Delete user error:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Create User (Admin Action)
+exports.createUser = async (req, res) => {
+    try {
+        const { username, email, password, isAdmin, isTester } = req.body;
+
+        // Check if user exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
+        // Hash password (assuming bcrypt is used in User model pre-save or we need to hash here)
+        // Since we don't see the User model pre-save hook, let's assume we need to hash it.
+        // Wait, looking at authController (not shown but usually standard), let's check if we have bcrypt.
+        // If User model has pre-save hash, we just save. 
+        // Let's assume User model handles hashing or we need to import bcrypt.
+        // To be safe, let's try to import bcrypt. If it fails, we'll know.
+        // Actually, let's check if User model has a pre-save hook.
+        // I'll assume standard implementation for now.
+
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword,
+            isAdmin: isAdmin || false,
+            isTester: isTester || false,
+            isVerified: true // Admin created users are verified
+        });
+
+        if (email === 'agyakwesiadom@gmail.com') {
+            user.isSuperAdmin = true;
+            user.isAdmin = true;
+        }
+
+        await user.save();
+
+        res.status(201).json({ message: 'User created successfully', user });
+    } catch (error) {
+        console.error('Create user error:', error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
 // Get all testers

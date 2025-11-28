@@ -1,0 +1,109 @@
+.ingredient-section {
+    padding: 8rem 0;
+    background-color: #fff;
+    position: relative;
+}
+
+.ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.ingredient-card {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.4s ease;
+}
+
+.ingredient-card:hover {
+    transform: translateY(-5px);
+}
+
+.ingredient-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s ease;
+}
+
+.ingredient-card:hover .ingredient-image {
+    transform: scale(1.1);
+}
+
+.ingredient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+    transition: background 0.4s ease;
+}
+
+.ingredient-card:hover .ingredient-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
+}
+
+.ingredient-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    color: #fff;
+    transform: translateY(60px); /* Hide description initially */
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.ingredient-card:hover .ingredient-content {
+    transform: translateY(0);
+}
+
+.ingredient-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    color: #C5A059;
+}
+
+.ingredient-origin {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.ingredient-details {
+    opacity: 0;
+    transition: opacity 0.4s ease 0.1s;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    border-top: 1px solid rgba(197, 160, 89, 0.3);
+    padding-top: 1rem;
+}
+
+.ingredient-card:hover .ingredient-details {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .ingredient-content {
+        transform: translateY(0); /* Always show on mobile */
+    }
+    
+    .ingredient-details {
+        opacity: 1;
+        display: block;
+    }
+    
+    .ingredient-card {
+        height: 350px;
+    }
+}

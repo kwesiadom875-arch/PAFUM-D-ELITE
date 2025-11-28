@@ -11,12 +11,34 @@ export const CartProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  // Refresh user data from API
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.get(`${API_URL}/api/user/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const updatedUser = response.data;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+      // Optional: if 401, logout?
+    }
+  };
+
   // On initial load, check for a token in localStorage to keep the user logged in.
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       // Set the auth token for all future axios requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Refresh user data to ensure roles/permissions are up to date
+      refreshUser();
     }
   }, []);
 
@@ -56,25 +78,6 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (id) => setCart(prev => prev.filter(item => item.id !== id));
   const clearCart = () => setCart([]);
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-
-  // Refresh user data from API
-  const refreshUser = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await axios.get(`${API_URL}/api/user/profile`, {
-        headers: { Authorization: token }
-      });
-
-      const updatedUser = response.data;
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
-    } catch (error) {
-      console.error('Failed to refresh user data:', error);
-    }
-  };
 
   return (
     <CartContext.Provider value={{

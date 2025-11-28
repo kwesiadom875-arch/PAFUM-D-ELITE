@@ -80,6 +80,12 @@ async function sendVerificationEmail(email, token) {
 async function sendPasswordResetEmail(email, token) {
   const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`;
   
+  // DEV: Log the URL to console
+  console.log('---------------------------------------------------');
+  console.log(`🔐 PASSWORD RESET LINK FOR ${email}:`);
+  console.log(resetUrl);
+  console.log('---------------------------------------------------');
+  
   const mailOptions = {
     from: '"Parfum D\'Elite" <noreply@parfumdelite.com>',
     to: email,
@@ -118,8 +124,9 @@ async function sendPasswordResetEmail(email, token) {
     await transporter.sendMail(mailOptions);
     console.log(`Password reset email sent to ${email}`);
   } catch (error) {
-    console.error('Email sending error:', error);
-    throw new Error('Failed to send password reset email');
+    console.error('Email sending error (suppressed for dev):', error);
+    // Don't throw, so the flow continues. The link is logged above.
+    // throw new Error('Failed to send password reset email');
   }
 }
 

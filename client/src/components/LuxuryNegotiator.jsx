@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import API_URL from '../config';
@@ -13,16 +14,18 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
   const [messages, setMessages] = useState([
     { sender: 'ai', text: `Greetings. I can authorize a discretionary rate for this ${product.name}. What is your proposal?` }
   ]);
-  const chatEndRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
   };
 
-  // Only scroll when new messages are added, not when typing
+  // Only scroll when new messages are added or typing starts
   useEffect(() => {
     scrollToBottom();
-  }, [messages.length]); // Changed to track message count instead of full messages array
+  }, [messages.length, isTyping]);
 
   // Auto-close modal when deal is made
   useEffect(() => {
@@ -67,15 +70,15 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
 
       await retryRequest(async () => {
         const res = await axios.post(`${API_URL}/api/negotiate`, {
-          product: { name: product.name, price: product.price },
-          userOffer: userPrice,
+          productId: product.id,
+          offer: userPrice,
           history: apiHistory
         });
 
-        const { reply, status } = res.data;
+        const { message, status } = res.data;
 
         // 3. Update UI
-        setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
+        setMessages(prev => [...prev, { sender: 'ai', text: message }]);
 
         if (status === 'accepted') {
           setDealMade(true);
@@ -94,71 +97,73 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
     setIsOpen(false);
   };
 
+  const modalContent = (
+    <div className="negotiator-overlay" onClick={closeModal}>
+      <div className="negotiator-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="chat-header">
+          <div className="header-info">
+            <div className="status-dot"></div>
+            <span>Private Concierge</span>
+          </div>
+          <button className="close-btn" onClick={closeModal}>×</button>
+        </div>
+
+        {/* Chat Window */}
+        <div className="chat-window" ref={chatWindowRef}>
+          {messages.map((m, i) => (
+            <div key={i} className={`msg ${m.sender}`}>
+              {m.text}
+            </div>
+          ))}
+          {isTyping && (
+            <div className="msg ai typing">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
+          )}
+        </div>
+
+        {/* Input Area or Deal Certificate */}
+        {!dealMade ? (
+          <div className="chat-input-area">
+            <input
+              type="number"
+              value={offer}
+              onChange={(e) => setOffer(e.target.value)}
+              placeholder="Enter your offer..."
+              onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
+            />
+            <button className="send-btn" onClick={handleOffer}>→</button>
+          </div>
+        ) : (
+          <div className="deal-certificate">
+            <div className="certificate-icon">✓</div>
+            <h4>Deal Secured</h4>
+            <p>The price has been updated.</p>
+            <p className="closing-message">Closing in 3 seconds...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <button className="btn-outline negotiate-trigger" onClick={() => setIsOpen(true)}>
         Negotiate Price
       </button>
 
-      {/* Modal Overlay */}
-      {isOpen && (
-        <div className="negotiator-overlay" onClick={closeModal}>
-          <div className="negotiator-modal" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="chat-header">
-              <div className="header-info">
-                <div className="status-dot"></div>
-                <span>Private Concierge</span>
-              </div>
-              <button className="close-btn" onClick={closeModal}>×</button>
-            </div>
-
-            {/* Chat Window */}
-            <div className="chat-window">
-              {messages.map((m, i) => (
-                <div key={i} className={`msg ${m.sender}`}>
-                  {m.text}
-                </div>
-              ))}
-              {isTyping && (
-                <div className="msg ai typing">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Input Area or Deal Certificate */}
-            {!dealMade ? (
-              <div className="chat-input-area">
-                <input
-                  type="number"
-                  value={offer}
-                  onChange={(e) => setOffer(e.target.value)}
-                  placeholder="Enter your offer..."
-                  onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
-                />
-                <button className="send-btn" onClick={handleOffer}>→</button>
-              </div>
-            ) : (
-              <div className="deal-certificate">
-                <div className="certificate-icon">✓</div>
-                <h4>Deal Secured</h4>
-                <p>The price has been updated.</p>
-                <p className="closing-message">Closing in 3 seconds...</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Modal Overlay via Portal */}
+      {isOpen && ReactDOM.createPortal(modalContent, document.body)}
     </>
   );
 };
 
 LuxuryNegotiator.propTypes = {
   product: PropTypes.shape({
+    id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired
   }).isRequired,

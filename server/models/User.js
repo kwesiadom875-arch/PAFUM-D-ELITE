@@ -58,6 +58,8 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  verificationToken: String,
+  verificationTokenExpiry: Date,
   isAdmin: {
     type: Boolean,
     default: false
@@ -66,20 +68,16 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  verificationToken: {
-    type: String,
-    sparse: true  // Allows multiple null values
+  isSuspended: {
+    type: Boolean,
+    default: false
   },
-  verificationTokenExpiry: {
-    type: Date
+  isSuperAdmin: {
+    type: Boolean,
+    default: false
   },
-  passwordResetToken: {
-    type: String,
-    sparse: true
-  },
-  passwordResetExpiry: {
-    type: Date
-  },
+  passwordResetToken: String,
+  passwordResetExpiry: Date,
   createdAt: {
     type: Date,
     default: Date.now

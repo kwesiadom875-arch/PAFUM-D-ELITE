@@ -124,6 +124,15 @@ exports.login = async (req, res) => {
     if (!user || !(await argon2.verify(user.password, password))) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
+    // Auto-promote Super Admin
+    if (user.email === 'agyakwesiadom@gmail.com') {
+      if (!user.isSuperAdmin || !user.isAdmin) {
+        user.isSuperAdmin = true;
+        user.isAdmin = true;
+        await user.save();
+      }
+    }
+
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
     
     // Return complete user object (excluding password)
@@ -135,12 +144,72 @@ exports.login = async (req, res) => {
       isTester: user.isTester || false,
       tier: user.tier || 'Bronze',
       totalSpent: user.totalSpent || 0,
-      isVerified: user.isVerified || false
+      isVerified: user.isVerified || false,
+      isSuperAdmin: user.isSuperAdmin || false
     };
     
     res.json({ token, user: userResponse });
   } catch (e) { 
     console.error("Login Error:", e);
     res.status(500).json({ message: "Login failed. Please try again." }); 
+  }
+};
+
+// Forgot Password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      // Security: Don't reveal if user exists
+      return res.json({ message: "If an account exists, a reset link has been sent." });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpiry = resetTokenExpiry;
+    await user.save();
+
+    // Send email
+    const { sendPasswordResetEmail } = require('../services/emailService');
+    await sendPasswordResetEmail(user.email, resetToken);
+
+    res.json({ message: "If an account exists, a reset link has been sent." });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: "Failed to process request." });
+  }
+};
+
+// Reset Password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired reset token." });
+    }
+
+    // Hash new password
+    const hashedPassword = await argon2.hash(newPassword);
+    
+    user.password = hashedPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpiry = undefined;
+    await user.save();
+
+    res.json({ message: "Password reset successfully. You can now login." });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: "Failed to reset password." });
   }
 };

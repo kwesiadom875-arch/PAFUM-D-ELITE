@@ -31,7 +31,15 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     stockQuantity: { type: Number, default: 0 },
     sku: { type: String } // Stock Keeping Unit for tracking
-  }]
+  }],
+
+  // --- ACCESS CONTROL & MARKETING ---
+  accessTier: { 
+    type: String, 
+    enum: ['All', 'Gold', 'Diamond', 'Elite Diamond'], 
+    default: 'All' 
+  },
+  badges: [{ type: String }] // e.g., "Bestseller", "New Arrival", "Limited Edition"
 });
 
 module.exports = mongoose.model('Product', productSchema);

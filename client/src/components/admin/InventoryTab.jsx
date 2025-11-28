@@ -14,8 +14,10 @@ const InventoryTab = () => {
     const [isFetching, setIsFetching] = useState(true);
     const [form, setForm] = useState({
         name: '', price: '', category: '', description: '', image: '', notes: '',
-        perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10
+        perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
+        accessTier: 'All', badges: ''
     });
+
     const [editingId, setEditingId] = useState(null);
     const [formErrors, setFormErrors] = useState({});
 
@@ -111,16 +113,25 @@ const InventoryTab = () => {
         }
 
         try {
+            const productData = {
+                ...form,
+                badges: form.badges ? form.badges.split(',').map(b => b.trim()).filter(b => b) : []
+            };
+
             if (editingId) {
-                await axios.put(`${API_URL}/api/products/${editingId}`, form);
+                await axios.put(`${API_URL}/api/products/${editingId}`, productData);
                 toast.success("Product Updated!");
             } else {
-                const newProduct = { ...form, id: Math.floor(Math.random() * 100000) };
+                const newProduct = { ...productData, id: Math.floor(Math.random() * 100000) };
                 await axios.post(`${API_URL}/api/products`, newProduct);
                 toast.success("Product Added!");
             }
 
-            setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10 });
+            setForm({
+                name: '', price: '', category: '', description: '', image: '', notes: '',
+                perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
+                accessTier: 'All', badges: ''
+            });
             setScrapeUrl('');
             setEditingId(null);
             setFormErrors({});
@@ -143,14 +154,20 @@ const InventoryTab = () => {
             rating: product.rating || '',
             gender: product.gender || '',
             season: product.season || '',
-            stockQuantity: product.stockQuantity
+            stockQuantity: product.stockQuantity,
+            accessTier: product.accessTier || 'All',
+            badges: Array.isArray(product.badges) ? product.badges.join(', ') : ''
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setForm({ name: '', price: '', category: '', description: '', image: '', notes: '', perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10 });
+        setForm({
+            name: '', price: '', category: '', description: '', image: '', notes: '',
+            perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
+            accessTier: 'All', badges: ''
+        });
     };
 
     const handleDelete = async (id) => {
@@ -183,53 +200,103 @@ const InventoryTab = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Product Name</label>
                             <input name="name" value={form.name} placeholder="Name" onChange={handleChange} style={formErrors.name ? { borderColor: 'red' } : {}} />
                             {formErrors.name && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.name}</span>}
                         </div>
-                        <div>
-                            <input name="price" value={form.price} type="number" placeholder="Price (GH₵)" onChange={handleChange} style={formErrors.price ? { borderColor: 'red' } : {}} />
+                        <div className="form-group">
+                            <label>Price (GH₵)</label>
+                            <input name="price" value={form.price} type="number" placeholder="Price" onChange={handleChange} style={formErrors.price ? { borderColor: 'red' } : {}} />
                             {formErrors.price && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.price}</span>}
                         </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Category</label>
                             <input name="category" value={form.category} placeholder="Category (e.g. Woody)" onChange={handleChange} style={formErrors.category ? { borderColor: 'red' } : {}} />
                             {formErrors.category && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.category}</span>}
                         </div>
-                        <input name="gender" value={form.gender} placeholder="Gender (e.g. Unisex)" onChange={handleChange} />
+                        <div className="form-group">
+                            <label>Gender</label>
+                            <input name="gender" value={form.gender} placeholder="Gender (e.g. Unisex)" onChange={handleChange} />
+                        </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <input name="perfumer" value={form.perfumer} placeholder="Perfumer Name" onChange={handleChange} />
-                        <input name="rating" value={form.rating} placeholder="Rating (e.g. 4.5)" onChange={handleChange} />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Perfumer</label>
+                            <input name="perfumer" value={form.perfumer} placeholder="Perfumer Name" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Rating</label>
+                            <input name="rating" value={form.rating} placeholder="Rating (e.g. 4.5)" onChange={handleChange} />
+                        </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div>
-                            <input name="stockQuantity" value={form.stockQuantity} type="number" placeholder="Initial Stock" onChange={handleChange} style={formErrors.stockQuantity ? { borderColor: 'red' } : {}} />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Initial Stock</label>
+                            <input name="stockQuantity" value={form.stockQuantity} type="number" placeholder="10" onChange={handleChange} style={formErrors.stockQuantity ? { borderColor: 'red' } : {}} />
                             {formErrors.stockQuantity && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.stockQuantity}</span>}
                         </div>
-                        <input name="season" value={form.season} placeholder="Season" onChange={handleChange} />
+                        <div className="form-group">
+                            <label>Season</label>
+                            <input name="season" value={form.season} placeholder="Season" onChange={handleChange} />
+                        </div>
                     </div>
-                    {form.image && <img src={form.image} alt="Preview" style={{ width: '50px', height: '50px', objectFit: 'contain', marginBottom: '10px' }} />}
-                    <div>
+
+                    <div className="form-group">
+                        <label>Image URL</label>
+                        {form.image && <img src={form.image} alt="Preview" style={{ width: '50px', height: '50px', objectFit: 'contain', marginBottom: '10px', display: 'block' }} />}
                         <input name="image" value={form.image} placeholder="Image URL" onChange={handleChange} style={formErrors.image ? { borderColor: 'red' } : {}} />
                         {formErrors.image && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.image}</span>}
                     </div>
-                    <div>
-                        <input name="notes" value={form.notes} placeholder="Accords (Comma separated)" onChange={handleChange} />
+
+                    <div className="form-group">
+                        <label>Accords (Comma separated)</label>
+                        <input name="notes" value={form.notes} placeholder="e.g. Oud, Rose, Amber" onChange={handleChange} />
                     </div>
-                    <div>
-                        <textarea name="description" value={form.description} placeholder="Description" onChange={handleChange} rows="4" style={formErrors.description ? { borderColor: 'red' } : {}} />
+
+                    <div className="form-group">
+                        <label>Description</label>
+                        <textarea name="description" value={form.description} placeholder="Product Description" onChange={handleChange} rows="4" style={formErrors.description ? { borderColor: 'red' } : {}} />
                         {formErrors.description && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.description}</span>}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                        <button type="submit" className="btn-primary" style={{ flex: 1 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Access Tier</label>
+                            <select
+                                name="accessTier"
+                                value={form.accessTier}
+                                onChange={handleChange}
+                            >
+                                <option value="All">All Customers</option>
+                                <option value="Gold">Gold Members Only</option>
+                                <option value="Diamond">Diamond Members Only</option>
+                                <option value="Elite Diamond">Elite Diamond Only</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label>Badges (comma separated)</label>
+                            <input
+                                name="badges"
+                                value={form.badges}
+                                onChange={handleChange}
+                                placeholder="e.g. Bestseller, New"
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                        <button type="submit" className="btn-gold" style={{ flex: 1 }}>
                             {editingId ? "Update Product" : "Save to Inventory"}
                         </button>
                         {editingId && (
-                            <button type="button" className="btn-secondary" onClick={handleCancelEdit}>
+                            <button type="button" className="btn-danger" onClick={handleCancelEdit}>
                                 Cancel
                             </button>
                         )}

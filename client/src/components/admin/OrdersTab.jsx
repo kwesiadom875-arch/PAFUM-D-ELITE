@@ -72,7 +72,11 @@ const OrdersTab = () => {
                                     </td>
                                     <td>{order.productName}</td>
                                     <td>GH₵{order.finalPrice}</td>
-                                    <td><span className="status-badge paid">{order.status}</span></td>
+                                    <td>
+                                        <span className={`status-badge ${order.status === 'completed' || order.status === 'paid' ? 'paid' : 'pending'}`}>
+                                            {order.status}
+                                        </span>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

@@ -10,8 +10,8 @@ const Footer = () => {
 
                 {/* Brand Section */}
                 <div className="footer-col brand-col">
-                    <h3 className="footer-logo">Parfum <span style={{ color: '#C5A059' }}>D'Elite</span></h3>
-                    <p>Experience the essence of luxury. Curated scents for the distinguished individual.</p>
+                    <h3 className="footer-logo">PARFUMERIE</h3>
+                    <p className="footer-tagline">Your premier destination for authentic luxury fragrances</p>
                     <div className="social-icons">
                         <a href="#" aria-label="Facebook"><FaFacebook /></a>
                         <a href="#" aria-label="Instagram"><FaInstagram /></a>
@@ -19,37 +19,45 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* Links Section */}
-                <div className="footer-links-group">
-                    <div className="footer-col">
-                        <h4>Shop</h4>
-                        <Link to="/shop">All Perfumes</Link>
-                        <Link to="/shop?category=Luxury">Luxury Collection</Link>
-                        <Link to="/shop?category=Niche">Niche Scents</Link>
-                        <Link to="/find-your-scent">Scent Finder</Link>
-                    </div>
+                {/* Shop Links */}
+                <div className="footer-col">
+                    <h4>Shop</h4>
+                    <Link to="/shop?sort=newest">New Arrivals</Link>
+                    <Link to="/shop?category=Women">Women</Link>
+                    <Link to="/shop?category=Men">Men</Link>
+                    <Link to="/shop">Collections</Link>
+                    <Link to="/shop?onSale=true">Sale</Link>
+                </div>
 
-                    <div className="footer-col">
-                        <h4>Company</h4>
-                        <Link to="/about">About Us</Link>
-                        <Link to="/contact">Contact</Link>
-                        <Link to="/careers">Careers</Link>
-                        <Link to="/terms">Terms & Conditions</Link>
-                    </div>
+                {/* Customer Care */}
+                <div className="footer-col">
+                    <h4>Customer Care</h4>
+                    <Link to="/contact">Contact Us</Link>
+                    <Link to="/shipping">Shipping Info</Link>
+                    <Link to="/returns">Returns</Link>
+                    <Link to="/faq">FAQ</Link>
+                    <Link to="/size-guide">Size Guide</Link>
+                </div>
 
-                    <div className="footer-col">
-                        <h4>Account</h4>
-                        <Link to="/profile">My Profile</Link>
-                        <Link to="/cart">Shopping Bag</Link>
-                        <Link to="/wishlist">Wishlist</Link>
-                        <Link to="/auth?mode=signin">Sign In</Link>
-                    </div>
+                {/* Newsletter */}
+                <div className="footer-col newsletter-col">
+                    <h4>Join the Elite</h4>
+                    <p>Subscribe to receive updates and exclusive offers</p>
+                    <form className="footer-newsletter-form">
+                        <input type="email" placeholder="Your email address" />
+                        <button type="submit" aria-label="Subscribe">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </button>
+                    </form>
                 </div>
 
             </div>
 
             <div className="footer-bottom">
-                <p>&copy; {new Date().getFullYear()} Parfum D'Elite. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} Parfumerie. All rights reserved.</p>
             </div>
         </footer>
     );

@@ -1,0 +1,154 @@
+/* --- THE LUXURY CARD --- */
+.luxury-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+/* 1. Image Frame */
+.image-frame {
+  position: relative;
+  background-color: #FFFFFF;
+  height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid #E5E5E5;
+}
+
+.image-frame img {
+  height: 280px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hover: Zoom Image slightly */
+.luxury-card:hover .image-frame img {
+  transform: scale(1.08) translateY(-10px);
+}
+
+/* 2. Badges & Icons */
+.badges-container {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+  align-items: flex-start;
+}
+
+.badge-top {
+  font-size: 0.65rem; 
+  text-transform: uppercase; 
+  letter-spacing: 1px; 
+  font-weight: 600;
+  padding: 4px 10px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.badge-bestseller { border-left: 3px solid #000; }
+.badge-new { border-left: 3px solid #4caf50; color: #2e7d32; }
+.badge-trending { border-left: 3px solid #ff9800; color: #ef6c00; }
+
+.badge-out {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.badge-low {
+  background: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffe0b2;
+}
+
+.grayscale {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.wishlist-btn {
+  position: absolute; top: 15px; right: 15px;
+  background: transparent; border: none; font-size: 1rem; color: #ccc; cursor: pointer;
+  transition: 0.3s;
+  z-index: 5;
+}
+.wishlist-btn:hover { color: #ff4d4d; transform: scale(1.1); }
+
+.quickview-btn {
+  position: absolute; top: 50px; right: 15px;
+  background: transparent; border: none; font-size: 1rem; color: #ccc; cursor: pointer;
+  transition: 0.3s;
+  z-index: 5;
+  opacity: 0; /* Hidden by default, shown on hover */
+  transform: translateX(10px);
+}
+.luxury-card:hover .quickview-btn {
+  opacity: 1;
+  transform: translateX(0);
+}
+.quickview-btn:hover { color: #1a1a1a; transform: scale(1.1); }
+
+/* 3. The Slide-Up Button */
+.action-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+}
+
+.action-overlay button {
+  width: 100%;
+  background: black;
+  color: white;
+  border: none;
+  padding: 18px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.action-overlay button:hover { background: #333; }
+
+/* Reveal button on hover */
+.luxury-card:hover .action-overlay {
+  transform: translateY(0);
+}
+
+/* 4. Typography Details */
+.card-details { text-align: center; }
+
+.card-category {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #111;
+  margin: 0;
+  transition: 0.3s;
+}
+
+.luxury-card:hover .card-name { color: #C5A059; }
+
+/* Responsive adjustments for cards */
+@media (max-width: 600px) {
+  .image-frame { height: 350px; }
+  .image-frame img { height: 220px; }
+}

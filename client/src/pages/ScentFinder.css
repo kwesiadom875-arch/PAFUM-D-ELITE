@@ -1,113 +1,297 @@
 .finder-page {
   padding: 40px 20px;
   background-color: #f9f9f9;
-  min-height: 80vh;
+  min-height: 90vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
-.finder-window {
+.chat-interface {
   width: 100%;
-  max-width: 900px;
-  padding: 40px;
-  text-align: center;
+  max-width: 800px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-.finder-window h2 {
+/* --- Header --- */
+.chat-header {
+  padding: 20px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.josie-avatar {
+  width: 50px;
+  height: 50px;
+  background: #C5A059;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.header-info h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin: 0;
+  color: #333;
 }
 
-.scent-finder-description {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+.status-indicator {
+  font-size: 0.85rem;
+  color: #4CAF50;
+  font-weight: 500;
 }
 
-.scent-finder-form {
+/* --- Chat Window --- */
+.chat-window {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #fcfcfc;
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.message-row {
+  display: flex;
+  gap: 10px;
+  max-width: 85%;
+}
+
+.message-row.user-row {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
-.scent-finder-input {
-  width: 100%;
-  max-width: 500px;
+.message-avatar.josie {
+  background: #C5A059;
+  color: #fff;
+}
+
+.message-avatar.user {
+  background: #333;
+  color: #fff;
+}
+
+.message-bubble {
   padding: 15px 20px;
+  border-radius: 18px;
   font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 50px 0 0 50px;
-  outline: none;
-  transition: border-color 0.3s;
+  line-height: 1.5;
+  position: relative;
 }
 
-.scent-finder-input:focus {
-  border-color: #C5A059;
+.message-bubble.user {
+  background: #333;
+  color: #fff;
+  border-bottom-right-radius: 4px;
 }
 
-.finder-page .btn-primary {
-  border-radius: 0 50px 50px 0;
-  padding: 15px 30px;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.message-bubble.assistant {
+  background: #fff;
+  color: #333;
+  border: 1px solid #eee;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.loading-message,
-.no-results-message {
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  color: #666;
+/* --- Recommendation Card --- */
+.recommendation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-  text-align: left;
-}
-
-.product-card-link {
+.recommendation-card-link {
   text-decoration: none;
   color: inherit;
 }
 
-.product-card {
+.recommendation-card {
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #C5A059;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 10px;
+  transition: transform 0.2s;
 }
 
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+.recommendation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(197, 160, 89, 0.2);
 }
 
-.product-image {
-  width: 100%;
-  height: 200px;
-  object-fit: contain;
-  background-color: #fff;
-  padding: 10px;
+.rec-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.product-name {
+.rec-card-header h4 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  margin: 1rem 1rem 0.5rem 1rem;
+  margin: 0;
+  font-size: 1.1rem;
 }
 
-.product-price {
-  font-size: 1.1rem;
+.rec-tag {
+  background: #C5A059;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.rec-reason {
+  font-style: italic;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.rec-cta {
+  font-size: 0.85rem;
   font-weight: bold;
   color: #C5A059;
-  margin: 0 1rem 1rem 1rem;
+  text-align: right;
+}
+
+/* --- Comparison Grid --- */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.comparison-card {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  text-align: center;
+}
+
+.comparison-card h5 {
+  margin: 0 0 5px 0;
+  font-size: 0.95rem;
+}
+
+.comparison-trait {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+/* --- Input Area --- */
+.chat-input-area {
+  padding: 20px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  outline: none;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.chat-input-area input:focus {
+  border-color: #C5A059;
+}
+
+.chat-input-area button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #C5A059;
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chat-input-area button:hover:not(:disabled) {
+  background: #b08d4b;
+}
+
+.chat-input-area button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- Typing Animation --- */
+.typing {
+  display: flex;
+  gap: 5px;
+  padding: 15px !important;
+  align-items: center;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #ccc;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .finder-page {
+    padding: 0;
+    height: 100vh;
+  }
+  
+  .chat-interface {
+    height: 100%;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
+  .message-row {
+    max-width: 90%;
+  }
 }

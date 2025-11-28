@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import TransparentImg from '../TransparentImg';
 import AddToCartButton from '../AddToCartButton';
 import CompareButton from '../compare/CompareButton';
+import './ProductCard.css';
 
 const ProductCard = ({ product, user, addToCart, onQuickView }) => {
     const cardRef = useRef(null);

@@ -98,21 +98,75 @@
 .admin-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
 @media(min-width: 1024px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
 
-.form-section input, .form-section textarea {
-  width: 100%; 
-  background: #f9f9f9; 
-  border: 1px solid #ddd; 
-  color: #333; 
-  padding: 10px; 
-  margin-bottom: 10px;
-  border-radius: 6px;
+/* --- FORM STYLES --- */
+.form-group {
+  margin-bottom: 20px;
 }
 
-.admin-item {
-  display: flex; align-items: center; gap: 15px; padding: 15px;
-  border-bottom: 1px solid #eee;
-  transition: background 0.2s;
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #C5A059;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.1);
+}
+
+/* Button Styles */
+.btn-gold {
+  background: #C5A059;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-gold:hover {
+  background: #b08d45;
+}
+
+.btn-danger {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-danger:hover {
+  background: #e60000;
+}
+
 .admin-item:hover { background: #fcfcfc; }
 
 .admin-item img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
@@ -157,25 +211,6 @@
 
 .status-badge {
   padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.status-badge.paid {
-  background: rgba(46, 204, 113, 0.2);
-  color: #27ae60;
-}
-
-.status-badge.pending {
-  background: rgba(241, 196, 15, 0.2);
-  color: #f39c12;
-}
-
-.stock-update-box {
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 8px;
   background: #fff;
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { FaUser, FaLock, FaEnvelope, FaGoogle, FaFacebookF, FaApple, FaEye, FaEyeSlash, FaArrowRight } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../config';
 import { CartContext } from '../context/CartContext';
@@ -192,7 +192,7 @@ const Auth = () => {
 
                     {!isSignUp && (
                         <div className="forgot-password">
-                            <a href="#">Forgot password?</a>
+                            <Link to="/forgot-password" style={{ color: '#C5A059', textDecoration: 'none', fontSize: '0.9rem' }}>Forgot password?</Link>
                         </div>
                     )}
 

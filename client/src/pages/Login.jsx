@@ -1,4 +1,3 @@
-
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import API_URL from '../config';
@@ -21,7 +20,7 @@ const Login = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await axios.post(`${ API_URL } /api/auth / login`, formData);
+            const res = await axios.post(`${API_URL}/api/auth/login`, formData);
             login(res.data.user, res.data.token);
             toast.success("Welcome back, Elite Member.");
             navigate('/profile');
@@ -47,6 +46,12 @@ const Login = () => {
                 <form onSubmit={handleSubmit}>
                     <input name="email" type="email" placeholder="Email Address" onChange={handleChange} required />
                     <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+
+                    <div style={{ textAlign: 'right', marginBottom: '15px' }}>
+                        <Link to="/forgot-password" style={{ color: '#C5A059', fontSize: '0.8rem', textDecoration: 'none' }}>
+                            Forgot Password?
+                        </Link>
+                    </div>
 
                     <button type="submit" className="btn-primary" disabled={loading}>
                         {loading ? "Authenticating..." : "Sign In"}

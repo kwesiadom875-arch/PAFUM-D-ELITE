@@ -1,0 +1,49 @@
+.newsletter-section {
+  padding: 100px 0;
+  background-color: #111;
+  color: white;
+}
+
+.newsletter-subtitle {
+  color: #aaa;
+  margin-bottom: 40px;
+  font-size: 1.1rem;
+}
+
+.newsletter-form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  border-bottom: 1px solid #555;
+}
+
+.newsletter-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 15px;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+}
+
+.newsletter-form button {
+  background: transparent;
+  border: none;
+  color: #C5A059;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 20px;
+  transition: color 0.3s ease;
+}
+
+.newsletter-form button:hover {
+  color: white;
+}
+
+.success-msg {
+  color: #C5A059;
+  font-size: 1.2rem;
+}

@@ -20,6 +20,7 @@ const negotiationRoutes = require('./routes/negotiationRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const climateTestRoutes = require('./routes/climateTestRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const siteConfigRoutes = require('./routes/siteConfigRoutes');
 
 const app = express();
 app.use(cors({
@@ -67,6 +68,7 @@ app.use('/api/negotiate', negotiationRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/climate-tests', climateTestRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/config', siteConfigRoutes);
 
 // Proxy Image Route (kept here as it's a utility)
 app.get('/proxy-image', async (req, res) => {
