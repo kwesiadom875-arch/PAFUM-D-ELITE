@@ -103,7 +103,21 @@ exports.scrapeFragrantica = async (req, res) => {
       }
     }
 
-    const data = { name, image, description, notes, perfumer, rating, gender };
+    // Brand Extraction from URL (Reliable)
+    // URL format: https://www.fragrantica.com/perfume/Brand/Name-ID.html
+    let brand = "Unknown";
+    try {
+      const urlParts = url.split('/perfume/')[1].split('/');
+      if (urlParts.length >= 1) {
+        brand = urlParts[0].replace(/-/g, ' '); // Replace hyphens with spaces
+        // Capitalize words
+        brand = brand.replace(/\b\w/g, l => l.toUpperCase());
+      }
+    } catch (e) {
+      console.log("Could not extract brand from URL");
+    }
+
+    const data = { name, brand, image, description, notes, perfumer, rating, gender };
 
     await browser.close();
     res.json(data);

@@ -13,7 +13,7 @@ const InventoryTab = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
     const [form, setForm] = useState({
-        name: '', price: '', category: '', description: '', image: '', notes: '',
+        name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
         perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
         accessTier: 'All', badges: ''
     });
@@ -59,6 +59,7 @@ const InventoryTab = () => {
             setForm({
                 ...form,
                 name: data.name || "",
+                brand: data.brand || "",
                 category: data.category || "Niche",
                 description: data.description || "",
                 image: data.image || "",
@@ -128,7 +129,7 @@ const InventoryTab = () => {
             }
 
             setForm({
-                name: '', price: '', category: '', description: '', image: '', notes: '',
+                name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
                 perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
                 accessTier: 'All', badges: ''
             });
@@ -145,6 +146,7 @@ const InventoryTab = () => {
         setEditingId(product.id || product._id);
         setForm({
             name: product.name,
+            brand: product.brand || '',
             price: product.price,
             category: product.category,
             description: product.description,
@@ -164,7 +166,7 @@ const InventoryTab = () => {
     const handleCancelEdit = () => {
         setEditingId(null);
         setForm({
-            name: '', price: '', category: '', description: '', image: '', notes: '',
+            name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
             perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
             accessTier: 'All', badges: ''
         });
@@ -207,33 +209,38 @@ const InventoryTab = () => {
                             {formErrors.name && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.name}</span>}
                         </div>
                         <div className="form-group">
-                            <label>Price (GH₵)</label>
-                            <input name="price" value={form.price} type="number" placeholder="Price" onChange={handleChange} style={formErrors.price ? { borderColor: 'red' } : {}} />
-                            {formErrors.price && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.price}</span>}
+                            <label>Brand</label>
+                            <input name="brand" value={form.brand} placeholder="Brand (e.g. Dior)" onChange={handleChange} />
                         </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Price (GH₵)</label>
+                            <input name="price" value={form.price} type="number" placeholder="Price" onChange={handleChange} style={formErrors.price ? { borderColor: 'red' } : {}} />
+                            {formErrors.price && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.price}</span>}
+                        </div>
                         <div className="form-group">
                             <label>Category</label>
                             <input name="category" value={form.category} placeholder="Category (e.g. Woody)" onChange={handleChange} style={formErrors.category ? { borderColor: 'red' } : {}} />
                             {formErrors.category && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.category}</span>}
                         </div>
-                        <div className="form-group">
-                            <label>Gender</label>
-                            <input name="gender" value={form.gender} placeholder="Gender (e.g. Unisex)" onChange={handleChange} />
-                        </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div className="form-group">
+                            <label>Gender</label>
+                            <input name="gender" value={form.gender} placeholder="Gender (e.g. Unisex)" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
                             <label>Perfumer</label>
                             <input name="perfumer" value={form.perfumer} placeholder="Perfumer Name" onChange={handleChange} />
                         </div>
-                        <div className="form-group">
-                            <label>Rating</label>
-                            <input name="rating" value={form.rating} placeholder="Rating (e.g. 4.5)" onChange={handleChange} />
-                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Rating</label>
+                        <input name="rating" value={form.rating} placeholder="Rating (e.g. 4.5)" onChange={handleChange} />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

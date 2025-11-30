@@ -56,9 +56,37 @@ async function testScrape() {
             'p:contains("Nose:") a'
         ];
         
-        for (const selector of perfumerSelectors) {
-            const found = $(selector).first().text().trim();
-            console.log(`Perfumer Selector "${selector}":`, found);
+        // Brand Extraction - Try 2
+        let brand = $('span[itemprop="brand"] span[itemprop="name"]').text().trim(); // Microdata
+        if (!brand) {
+            // Fallback: Parse from Title "Name Brand for..."
+            const title = $('h1[itemprop="name"]').text().trim();
+            // Heuristic: Usually "Name Brand for gender"
+            // We can try to extract if we know the name
+            // Or look for the link to the brand page
+            const brandLink = $('p > a[href^="/designers/"]').first();
+            if (brandLink.length) brand = brandLink.text().trim();
+        }
+        console.log('Brand (Refined):', brand);
+
+        // Pyramid Notes Extraction - Try 2
+        // Look for the "Pyramid" text or similar structure
+        console.log('--- Pyramid Debug 2 ---');
+        
+        // Fragrantica often puts notes in a grid. 
+        // Let's look for text "Top Notes", "Middle Notes", "Base Notes" in the entire body text to see if they exist
+        const bodyText = $('body').text();
+        console.log('Has "Top Notes"?', bodyText.includes("Top Notes"));
+        console.log('Has "Middle Notes"?', bodyText.includes("Middle Notes"));
+        console.log('Has "Base Notes"?', bodyText.includes("Base Notes"));
+
+        // Try to find the container
+        const pyramidDivs = $('div:contains("Top Notes"), div:contains("Middle Notes"), div:contains("Base Notes")');
+        console.log('Pyramid Divs Found:', pyramidDivs.length);
+        
+        if (pyramidDivs.length > 0) {
+             // Just log the first few chars of the first match to see structure
+             console.log('First Pyramid Div Text:', pyramidDivs.first().text().substring(0, 100));
         }
 
         await browser.close();
