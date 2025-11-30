@@ -1,18 +1,6 @@
-import { useState, useContext, useEffect, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import { CartContext } from '../context/CartContext';
-import { useNavigate } from 'react-router-dom';
-import { usePaystackPayment } from 'react-paystack';
-import { toast } from 'react-toastify';
-import './Checkout.css';
-
-// PAYSTACK PUBLIC KEY - REPLACE WITH YOUR OWN
-const PAYSTACK_PUBLIC_KEY = 'pk_live_8a853c7fcc5a73d4f20ee52019d3ecb070acb83b';
-
-const containerStyle = {
-    width: '100%',
+width: '100%',
     height: '400px',
-    borderRadius: '12px'
+        borderRadius: '12px'
 };
 
 const defaultCenter = {
@@ -225,7 +213,7 @@ export default function Checkout() {
             };
 
             // Send to backend
-            const response = await fetch('http://localhost:5000/api/user/purchase', {
+            const response = await fetch(`${API_URL}/api/user/purchase`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

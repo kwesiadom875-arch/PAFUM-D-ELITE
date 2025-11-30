@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 import { CartContext } from './CartContextType';
 export { CartContext };
 
@@ -26,7 +27,6 @@ export const CartProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await axios.get(`${API_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });

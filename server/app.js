@@ -25,7 +25,7 @@ const siteConfigRoutes = require('./routes/siteConfigRoutes');
 const app = express();
 app.use(cors({
   origin: [
-    "https://pafum-d-elite.vercel.app/",
+    "https://pafum-d-elite.vercel.app",
     "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
