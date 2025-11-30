@@ -29,20 +29,18 @@ exports.scrapeFragrantica = async (req, res) => {
     
     const page = await browser.newPage();
     
-    // Set a realistic User Agent to avoid detection
+    // Set a realistic User Agent
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    // Optimize: Block images/fonts to speed up
-    await page.setRequestInterception(true);
-    page.on('request', (req) => {
-      if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    // Disable request interception to ensure full page load (fixes missing elements)
+    // await page.setRequestInterception(true); 
+    
+    try {
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.waitForSelector('h1[itemprop="name"]', { timeout: 10000 });
+    } catch (e) {
+        console.log("Navigation/Selector timeout, continuing with available content...");
+    }
     
     const content = await page.content();
     const $ = cheerio.load(content);
@@ -57,13 +55,41 @@ exports.scrapeFragrantica = async (req, res) => {
     if (titleText.includes("for women")) gender = "Female";
     if (titleText.includes("for men") && !titleText.includes("for women")) gender = "Male";
 
-    const notesList = [];
-    $('.accord-bar').each((i, el) => {
-        notesList.push($(el).text().trim());
-    });
-    const notes = notesList.join(', ');
+    // Pyramid Extraction
+    let notes = "";
+    const pyramidDivs = $('div[style*="flex-flow: wrap"][style*="justify-content: center"]');
     
-    // Enhanced perfumer extraction - try multiple selectors
+    if (pyramidDivs.length >= 3) {
+        // Assuming standard order: Top, Middle, Base
+        const getNotesFromDiv = (div) => {
+            const notesArr = [];
+            $(div).find('div').each((i, el) => {
+                const text = $(el).text().trim();
+                if (text) notesArr.push(text);
+            });
+            // Filter duplicates and empty
+            return [...new Set(notesArr)].filter(n => n.length > 1);
+        };
+
+        const top = getNotesFromDiv(pyramidDivs.eq(0));
+        const middle = getNotesFromDiv(pyramidDivs.eq(1));
+        const base = getNotesFromDiv(pyramidDivs.eq(2));
+
+        if (top.length || middle.length || base.length) {
+            notes = `Top: ${top.join(', ')}; Heart: ${middle.join(', ')}; Base: ${base.join(', ')}`;
+        }
+    }
+
+    // Fallback to Accords if Pyramid not found
+    if (!notes) {
+        const notesList = [];
+        $('.accord-bar').each((i, el) => {
+            notesList.push($(el).text().trim());
+        });
+        notes = notesList.join(', ');
+    }
+    
+    // Enhanced perfumer extraction
     let perfumer = "Master Perfumer";
     const perfumerSelectors = [
       'div[itemprop="brand"] a',
@@ -98,19 +124,16 @@ exports.scrapeFragrantica = async (req, res) => {
         description = aiResponse.choices[0]?.message?.content || description;
       } catch (aiError) {
         console.error("AI description shortening failed:", aiError);
-        // Fallback: just truncate
         description = description.substring(0, 200) + '...';
       }
     }
 
     // Brand Extraction from URL (Reliable)
-    // URL format: https://www.fragrantica.com/perfume/Brand/Name-ID.html
     let brand = "Unknown";
     try {
       const urlParts = url.split('/perfume/')[1].split('/');
       if (urlParts.length >= 1) {
-        brand = urlParts[0].replace(/-/g, ' '); // Replace hyphens with spaces
-        // Capitalize words
+        brand = urlParts[0].replace(/-/g, ' '); 
         brand = brand.replace(/\b\w/g, l => l.toUpperCase());
       }
     } catch (e) {

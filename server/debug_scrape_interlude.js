@@ -69,24 +69,23 @@ async function testScrape() {
         }
         console.log('Brand (Refined):', brand);
 
-        // Pyramid Notes Extraction - Try 2
-        // Look for the "Pyramid" text or similar structure
-        console.log('--- Pyramid Debug 2 ---');
+        // Pyramid Notes Extraction - Header Debug
+        console.log('--- Pyramid Header Debug ---');
         
-        // Fragrantica often puts notes in a grid. 
-        // Let's look for text "Top Notes", "Middle Notes", "Base Notes" in the entire body text to see if they exist
-        const bodyText = $('body').text();
-        console.log('Has "Top Notes"?', bodyText.includes("Top Notes"));
-        console.log('Has "Middle Notes"?', bodyText.includes("Middle Notes"));
-        console.log('Has "Base Notes"?', bodyText.includes("Base Notes"));
-
-        // Try to find the container
-        const pyramidDivs = $('div:contains("Top Notes"), div:contains("Middle Notes"), div:contains("Base Notes")');
-        console.log('Pyramid Divs Found:', pyramidDivs.length);
-        
-        if (pyramidDivs.length > 0) {
-             // Just log the first few chars of the first match to see structure
-             console.log('First Pyramid Div Text:', pyramidDivs.first().text().substring(0, 100));
+        const knownNote = $('*:contains("Oregano")').last();
+        if (knownNote.length) {
+            const noteContainer = knownNote.parent().parent(); // The flex container of notes
+            console.log('Note Container Tag:', noteContainer.get(0).tagName);
+            
+            // Check previous siblings for headers
+            const prev1 = noteContainer.prev();
+            console.log('Prev Sibling 1:', prev1.get(0)?.tagName, prev1.text());
+            
+            const prev2 = prev1.prev();
+            console.log('Prev Sibling 2:', prev2.get(0)?.tagName, prev2.text());
+            
+            // Check Parent 3 text again
+            console.log('Parent 3 Text:', noteContainer.parent().text().substring(0, 300));
         }
 
         await browser.close();
