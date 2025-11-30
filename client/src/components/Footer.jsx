@@ -10,7 +10,7 @@ const Footer = () => {
 
                 {/* Brand Section */}
                 <div className="footer-col brand-col">
-                    <h3 className="footer-logo">PARFUMERIE</h3>
+                    <h3 className="footer-logo">Parfum D'Elite</h3>
                     <p className="footer-tagline">Your premier destination for authentic luxury fragrances</p>
                     <div className="social-icons">
                         <a href="#" aria-label="Facebook"><FaFacebook /></a>

@@ -120,24 +120,49 @@
 @media (max-width: 900px) {
     .footer-container {
         grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        padding: 0 20px;
     }
 }
 
 @media (max-width: 600px) {
+    .site-footer {
+        padding: 60px 0 20px;
+    }
+
     .footer-container {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 50px;
+        text-align: center;
     }
     
     .footer-col {
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-col h4 {
+        margin-bottom: 20px;
+    }
+    
+    .brand-col {
+        order: -1; /* Ensure brand is always top */
+        margin-bottom: 20px;
     }
     
     .social-icons {
         justify-content: center;
+        margin-top: 15px;
     }
     
     .footer-tagline {
-        margin: 0 auto 25px;
+        margin: 0 auto 20px;
+    }
+
+    .footer-newsletter-form {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
     }
 }

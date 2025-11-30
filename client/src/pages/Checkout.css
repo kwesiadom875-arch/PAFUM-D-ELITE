@@ -278,7 +278,17 @@
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .checkout-container {
+    padding: 30px;
+  }
+}
+
 @media (max-width: 768px) {
+  .checkout-page {
+    padding: 40px 15px;
+  }
+
   .checkout-container {
     padding: 20px;
   }
@@ -290,11 +300,17 @@
   .cart-item {
     flex-direction: column;
     text-align: center;
+    position: relative;
   }
 
   .cart-item img {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+  
+  .item-details {
     width: 100%;
-    height: 200px;
   }
 
   .payment-options {
@@ -307,5 +323,13 @@
 
   .delivery-map-container {
     padding: 15px;
+  }
+  
+  .total-row {
+    font-size: 14px;
+  }
+  
+  .grand-total {
+    font-size: 20px;
   }
 }

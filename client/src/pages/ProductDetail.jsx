@@ -76,6 +76,7 @@ const ProductDetail = () => {
         finalPrice={finalPrice}
         addToCart={addToCart}
         setFinalPrice={setFinalPrice}
+        notesArray={notesArray}
       />
 
       {/* BENTO GRID */}
