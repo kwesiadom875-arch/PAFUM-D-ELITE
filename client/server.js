@@ -4,15 +4,15 @@ import axios from 'axios';
 
 const app = express();
 const PORT = 5001;
+const cors = require('cors');
+const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ["https://pafum-d-elite.vercel.app", "http://localhost:5173"], // Allow both your deployed Vercel app AND your local dev environment
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true // If you are using cookies/sessions
+}));
 
-app.get('/proxy-image', async (req, res) => {
-    const { url } = req.query;
-
-    if (!url) {
-        return res.status(400).send('URL is required');
-    }
 
     try {
         const response = await axios({
