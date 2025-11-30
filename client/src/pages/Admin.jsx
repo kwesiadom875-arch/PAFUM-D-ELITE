@@ -6,7 +6,6 @@ import InventoryTab from '../components/admin/InventoryTab';
 import OrdersTab from '../components/admin/OrdersTab';
 import StockTab from '../components/admin/StockTab';
 import ScentIntelTab from '../components/admin/ScentIntelTab';
-import FeaturedTab from '../components/admin/FeaturedTab';
 import FeaturedShowcaseTab from '../components/admin/FeaturedShowcaseTab';
 import ClimateTestsTab from '../components/admin/ClimateTestsTab';
 import UsersTab from '../components/admin/UsersTab';
@@ -22,7 +21,6 @@ const Admin = () => {
             case 'orders': return <OrdersTab />;
             case 'stock': return <StockTab />;
             case 'scent-intel': return <ScentIntelTab />;
-            case 'featured': return <FeaturedTab />;
             case 'featured-showcase': return <FeaturedShowcaseTab />;
             case 'site-content': return <SiteContentTab />;
             case 'climate-tests': return <ClimateTestsTab />;
@@ -53,7 +51,6 @@ const Admin = () => {
                     <NavItem id="orders" label="Orders" icon="" />
                     <NavItem id="stock" label="Stock Management" icon="" />
                     <NavItem id="scent-intel" label="Scent Intel AI" icon="" />
-                    <NavItem id="featured" label="Featured" icon="" />
                     <NavItem id="featured-showcase" label="Showcase" icon="" />
                     <NavItem id="climate-tests" label="Climate Tests" icon="" />
                     <NavItem id="users" label="Users" icon="" />

@@ -23,8 +23,8 @@ const Footer = () => {
                 <div className="footer-col">
                     <h4>Shop</h4>
                     <Link to="/shop?sort=newest">New Arrivals</Link>
-                    <Link to="/shop?category=Women">Women</Link>
-                    <Link to="/shop?category=Men">Men</Link>
+                    <Link to="/shop?category=Luxury">Luxury</Link>
+                    <Link to="/shop?category=Niche">Niche</Link>
                     <Link to="/shop">Collections</Link>
                     <Link to="/shop?onSale=true">Sale</Link>
                 </div>

@@ -21,6 +21,8 @@ const ProductDetail = () => {
   const [finalPrice, setFinalPrice] = useState(null);
   const [negotiatorKey, setNegotiatorKey] = useState(0); // Force negotiator to reset
   const [refreshReviews, setRefreshReviews] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Scroll to top when product changes
@@ -28,14 +30,35 @@ const ProductDetail = () => {
 
     // Reset negotiator by changing key
     setNegotiatorKey(prev => prev + 1);
+    setLoading(true);
+    setError(null);
 
-    axios.get(`${API_URL}/api/products/${id}`).then(res => {
-      setProduct(res.data);
-      setFinalPrice(res.data.price);
-    });
+    axios.get(`${API_URL}/api/products/${id}`)
+      .then(res => {
+        setProduct(res.data);
+        setFinalPrice(res.data.price);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching product:", err);
+        setError("Failed to load product.");
+        setLoading(false);
+      });
   }, [id]);
 
-  if (!product) return <ProductSkeleton />;
+  if (loading) return <ProductSkeleton />;
+
+  if (error || !product) {
+    return (
+      <div className="pdp-dark-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <div className="text-center">
+          <h2 style={{ color: '#C5A059' }}>Product Not Found</h2>
+          <p style={{ color: '#666', marginTop: '10px' }}>The scent you are looking for seems to have evaporated.</p>
+          <a href="/shop" className="btn-gold" style={{ marginTop: '20px', display: 'inline-block' }}>Return to Shop</a>
+        </div>
+      </div>
+    );
+  }
 
   // Parse notes string into an array
   const notesArray = product.notes ? product.notes.split(', ') : ["Generic", "Scent"];

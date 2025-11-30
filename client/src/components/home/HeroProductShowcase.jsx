@@ -39,10 +39,10 @@ const HeroProductShowcase = () => {
             console.error('Failed to fetch featured products, using fallback:', err);
             // Use default fallback
             setProducts([
-                { _id: '1', name: 'Baccarat Rouge 540', brand: 'Maison Francis Kurkdjian', image: '/images/halfeti.png', price: 350 },
-                { _id: '2', name: 'Oud Wood', brand: 'Tom Ford', image: '/images/halfeti.png', price: 280 },
-                { _id: '3', name: 'Aventus', brand: 'Creed', image: '/images/halfeti.png', price: 445 },
-                { _id: '4', name: 'Black Orchid', brand: 'Tom Ford', image: '/images/halfeti.png', price: 295 }
+                { _id: '1', name: 'Baccarat Rouge 540', brand: 'Maison Francis Kurkdjian', image: '/images/mfk_540.jpg', price: 350 },
+                { _id: '2', name: 'Oud Wood', brand: 'Tom Ford', image: '/images/tf_oudwood.jpg', price: 280 },
+                { _id: '3', name: 'Layton', brand: 'Parfums de Marly', image: '/images/pdm_layton.jpg', price: 320 },
+                { _id: '4', name: 'Lost Cherry', brand: 'Tom Ford', image: '/images/tf_cherry.jpg', price: 395 }
             ]);
         } finally {
             setIsFetching(false);

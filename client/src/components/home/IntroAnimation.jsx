@@ -16,21 +16,44 @@ const IntroAnimation = ({ onComplete }) => {
             const tl = gsap.timeline();
 
             // Initial state
-            gsap.set(logoRef.current, { scale: 0, opacity: 0 });
+            gsap.set(logoRef.current, { scale: 2.5, opacity: 0 }); // Set scale initially, animate opacity/parts
+            gsap.set(".logo-part", { opacity: 0 }); // Hide all parts initially
 
             // 1. Typewriter effect for "WELC"
             tl.to(".part-1", { text: "WELC", duration: 0.5, ease: "none" })
 
-                // 2. Logo pops in as 'o'
-                .to(logoRef.current, {
-                    scale: 2.5,
-                    opacity: 1,
-                    duration: 0.5,
-                    ease: "back.out(1.7)"
-                })
+                // 2. Logo Build-Up (Replaces simple pop)
+                .addLabel("logoStart")
+                .to(logoRef.current, { opacity: 1, duration: 0.1 }, "logoStart")
+
+                // Rings spin and scale in
+                .fromTo(".logo-ring-1",
+                    { scale: 0, rotation: -180, opacity: 0, transformOrigin: "50% 50%" },
+                    { scale: 1, rotation: 0, opacity: 1, duration: 0.8, ease: "back.out(1.7)" },
+                    "logoStart"
+                )
+                .fromTo(".logo-ring-2",
+                    { scale: 0, rotation: 180, opacity: 0, transformOrigin: "50% 50%" },
+                    { scale: 1, rotation: 0, opacity: 1, duration: 0.8, ease: "back.out(1.7)" },
+                    "logoStart+=0.1"
+                )
+
+                // Main shape slides up
+                .fromTo(".logo-main",
+                    { y: 100, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+                    "logoStart+=0.2"
+                )
+
+                // Accent slides down
+                .fromTo(".logo-accent",
+                    { y: -50, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+                    "logoStart+=0.3"
+                )
 
                 // 3. Typewriter effect for "ME TO"
-                .to(".part-2", { text: "ME TO", duration: 0.6, ease: "none" })
+                .to(".part-2", { text: "ME TO", duration: 0.6, ease: "none" }, "logoStart+=0.8")
 
                 // 4. Typewriter effect for "PARFUM D'ELITE" (New Line)
                 .to(".part-3", { text: "PARFUM D'ELITE", duration: 1.2, ease: "none" })
@@ -39,7 +62,7 @@ const IntroAnimation = ({ onComplete }) => {
                 .to(cursorRef.current, { opacity: 0, repeat: -1, yoyo: true, duration: 0.5 }, 0)
 
                 // Hold
-                .to({}, { duration: 2.8 })
+                .to({}, { duration: 2.5 })
 
                 // Fade out and complete
                 .to(containerRef.current, {
@@ -67,11 +90,11 @@ const IntroAnimation = ({ onComplete }) => {
                             <svg viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g>
                                     <g>
-                                        <circle cx="500" cy="499.65" r="202.25" style={{ fill: 'none', stroke: '#D4AF46', strokeWidth: 6, strokeMiterlimit: 10 }} />
-                                        <ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -206.8605 499.898)" cx="500" cy="499.65" rx="193.25" ry="193.25" style={{ fill: 'none', stroke: '#D4AF37', strokeWidth: 5, strokeMiterlimit: 10 }} />
+                                        <circle className="logo-part logo-ring-1" cx="500" cy="499.65" r="202.25" style={{ fill: 'none', stroke: '#D4AF46', strokeWidth: 6, strokeMiterlimit: 10 }} />
+                                        <ellipse className="logo-part logo-ring-2" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -206.8605 499.898)" cx="500" cy="499.65" rx="193.25" ry="193.25" style={{ fill: 'none', stroke: '#D4AF37', strokeWidth: 5, strokeMiterlimit: 10 }} />
                                     </g>
                                     <g>
-                                        <path d="M486.28,486.56l-54.05,80.09c13.81-9.65,26.87-14.48,39.18-14.48c11.16,0,26.21,3.9,45.16,11.69l25.23,10.49
+                                        <path className="logo-part logo-main" d="M486.28,486.56l-54.05,80.09c13.81-9.65,26.87-14.48,39.18-14.48c11.16,0,26.21,3.9,45.16,11.69l25.23,10.49
                                             c7.35,3.01,12.35,4.52,15.01,4.52c4.87,0,10.67-4.91,17.4-14.74l4.12,2.52c-0.8,1.24-1.28,1.99-1.46,2.26l-8.77,12.48l-8.5,13.28
                                             c-0.18,0.35-0.8,1.24-1.86,2.66c-8.32-2.04-18.77-5.93-31.34-11.69c-17.44-7.88-30.99-13.28-40.64-16.2s-18.95-4.38-27.89-4.38
                                             c-9.47,0-17.53,2.12-24.17,6.38s-13.28,11.55-19.92,21.91l-3.98-2.79l27.36-41.3c-10.89-13.63-16.34-28.91-16.34-45.82
@@ -86,7 +109,7 @@ const IntroAnimation = ({ onComplete }) => {
                                             L486.28,486.56z M482.16,481.25c-4.87-6.73-9.34-11.55-13.41-14.48s-8.37-4.38-12.88-4.38c-7.7,0-14.1,2.94-19.19,8.83
                                             c-5.09,5.89-7.64,13.35-7.64,22.38c0,12.4,6.06,25.81,18.19,40.24L482.16,481.25z" fill="#000000" />
                                     </g>
-                                    <path d="M507.94,401.65l15.87-22c3.09-4.28,5.58-7.2,7.47-8.76c1.89-1.56,4.03-2.34,6.44-2.34c4.4,0,6.59,2.14,6.59,6.42
+                                    <path className="logo-part logo-accent" d="M507.94,401.65l15.87-22c3.09-4.28,5.58-7.2,7.47-8.76c1.89-1.56,4.03-2.34,6.44-2.34c4.4,0,6.59,2.14,6.59,6.42
                                         c0,3.46-3.37,7.71-10.1,12.73l-24.31,18.34c-1.65,1.22-2.78,1.83-3.4,1.83c-0.96,0-1.44-0.44-1.44-1.32
                                         C505.05,405.93,506.01,404.3,507.94,401.65z" fill="#000000" />
                                 </g>

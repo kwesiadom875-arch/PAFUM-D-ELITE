@@ -11,6 +11,15 @@ export const CartProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  // Logout function
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+    setCart([]); // Clear cart on logout
+  };
+
   // Refresh user data from API
   const refreshUser = async () => {
     try {
@@ -26,8 +35,12 @@ export const CartProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (error) {
-      console.error('Failed to refresh user data:', error);
-      // Optional: if 401, logout?
+      if (error.response && error.response.status === 401) {
+        console.warn('Session expired. Logging out...');
+        logout();
+      } else {
+        console.error('Failed to refresh user data:', error);
+      }
     }
   };
 
@@ -48,15 +61,6 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setUser(userData);
-  };
-
-  // Logout function
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
-    setCart([]); // Clear cart on logout
   };
 
   // --- Cart Logic ---

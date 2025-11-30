@@ -1,76 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LuxuryNegotiator from '../LuxuryNegotiator';
 import { FaHeart } from 'react-icons/fa';
-import axios from 'axios';
-import API_URL from '../../config';
 
-import TransparentImg from '../TransparentImg';
+import ProductImage from './ProductImage';
 import CompareButton from '../compare/CompareButton';
+import useProductActions from '../../hooks/useProductActions';
 
 const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
-    const [selectedSize, setSelectedSize] = useState(null);
-
-    const handleSizeSelect = (sizeOption) => {
-        setSelectedSize(sizeOption.size);
-        setFinalPrice(sizeOption.price);
-    };
-
-    const handleAddToCart = () => {
-        if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-            alert('⚠️ Please select a size before adding to cart');
-            return;
-        }
-
-        const sizeVariant = product.sizes?.find(s => s.size === selectedSize);
-        const itemToAdd = {
-            ...product,
-            selectedSize: selectedSize || null,
-            price: sizeVariant ? sizeVariant.price : finalPrice,
-            quantity: 1
-        };
-
-        addToCart(itemToAdd, finalPrice);
-    };
-
-    const handleAddToWishlist = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                // Or redirect to login
-                alert('Please log in to add to wishlist');
-                return;
-            }
-            await axios.post(`${API_URL}/api/user/wishlist/add/${product._id}`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            alert('Added to wishlist!');
-        } catch (error) {
-            if (error.response && error.response.status === 400) {
-                alert('Product already in wishlist');
-            } else {
-                console.error('Error adding to wishlist:', error);
-                alert('Could not add to wishlist');
-            }
-        }
-    };
-
-    // Check if product has stock
-    const hasStock = product.sizes && product.sizes.length > 0
-        ? product.sizes.some(s => s.stockQuantity > 0)
-        : product.stockQuantity > 0;
-
-    const getTotalStock = () => {
-        if (product.sizes && product.sizes.length > 0) {
-            return product.sizes.reduce((sum, s) => sum + s.stockQuantity, 0);
-        }
-        return product.stockQuantity || 0;
-    };
+    const {
+        selectedSize,
+        handleSizeSelect,
+        handleAddToCart,
+        handleAddToWishlist,
+        hasStock,
+        getTotalStock
+    } = useProductActions(product, addToCart, finalPrice, setFinalPrice);
 
     return (
         <div className="pdp-hero container">
             <div className="hero-image-stage animate-fade-up">
                 <div className="glow-effect"></div>
-                <TransparentImg src={product.image} alt={product.name} className="hero-bottle" />
+                <ProductImage
+                    src={product.image}
+                    alt={product.name}
+                    className="hero-bottle"
+                />
             </div>
 
             <div className="hero-buy-box">
@@ -143,3 +97,4 @@ const ProductHero = ({ product, finalPrice, addToCart, setFinalPrice }) => {
 };
 
 export default ProductHero;
+

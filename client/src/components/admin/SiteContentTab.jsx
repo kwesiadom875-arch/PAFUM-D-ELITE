@@ -125,7 +125,7 @@ const SiteContentTab = () => {
                             type="text"
                             value={heroConfig.backgroundImage}
                             onChange={(e) => handleHeroChange('backgroundImage', e.target.value)}
-                            placeholder="Leave empty to use default video"
+                            placeholder="Leave empty to use default image"
                         />
                     </div>
                 </div>

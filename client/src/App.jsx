@@ -30,6 +30,9 @@ const ClimateTests = lazy(() => import('./pages/ClimateTests'));
 const ComparePage = lazy(() => import('./pages/ComparePage'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const InfoPage = lazy(() => import('./pages/InfoPage'));
+const DriverDashboard = lazy(() => import('./pages/DriverDashboard'));
+const TrackOrder = lazy(() => import('./pages/TrackOrder'));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -91,6 +94,68 @@ function App() {
               <Route path="/compare" element={<ComparePage />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+
+              {/* Delivery Tracker */}
+              <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/track-order/:orderId" element={<TrackOrder />} />
+
+              {/* Static Info Pages */}
+              <Route path="/contact" element={
+                <Suspense fallback={<PageLoader />}>
+                  <InfoPage title="Contact Us">
+                    <p>We are here to assist you with any inquiries.</p>
+                    <h3>Concierge Service</h3>
+                    <p>Email: concierge@parfumdellite.com<br />Phone: +33 1 40 00 00 00</p>
+                    <h3>Hours</h3>
+                    <p>Monday - Friday: 9am - 6pm CET</p>
+                  </InfoPage>
+                </Suspense>
+              } />
+              <Route path="/shipping" element={
+                <Suspense fallback={<PageLoader />}>
+                  <InfoPage title="Shipping Information">
+                    <p>We offer complimentary worldwide shipping on all orders over €200.</p>
+                    <h3>Delivery Times</h3>
+                    <ul>
+                      <li>Europe: 2-4 Business Days</li>
+                      <li>USA & Canada: 3-5 Business Days</li>
+                      <li>Rest of World: 5-7 Business Days</li>
+                    </ul>
+                    <p>All shipments are fully insured and require a signature upon delivery.</p>
+                  </InfoPage>
+                </Suspense>
+              } />
+              <Route path="/returns" element={
+                <Suspense fallback={<PageLoader />}>
+                  <InfoPage title="Returns & Exchanges">
+                    <p>We accept returns of unopened products within 30 days of purchase.</p>
+                    <p>Due to the nature of our products, we cannot accept returns of opened fragrances unless they are defective.</p>
+                    <p>Please contact our concierge to initiate a return.</p>
+                  </InfoPage>
+                </Suspense>
+              } />
+              <Route path="/faq" element={
+                <Suspense fallback={<PageLoader />}>
+                  <InfoPage title="Frequently Asked Questions">
+                    <h3>Are your products authentic?</h3>
+                    <p>Yes, we are an authorized retailer for all brands we carry. Every bottle is sourced directly from the maison.</p>
+                    <h3>Do you offer samples?</h3>
+                    <p>Yes, every order comes with 2 complimentary samples of your choice.</p>
+                  </InfoPage>
+                </Suspense>
+              } />
+              <Route path="/size-guide" element={
+                <Suspense fallback={<PageLoader />}>
+                  <InfoPage title="Size Guide">
+                    <p>Our fragrances are available in the following standard sizes:</p>
+                    <ul>
+                      <li><strong>50ml (1.7 fl oz)</strong>: Perfect for travel or discovering a new scent.</li>
+                      <li><strong>100ml (3.4 fl oz)</strong>: The standard size for your signature scent.</li>
+                      <li><strong>250ml (8.4 fl oz)</strong>: A grand flacon for the true connoisseur.</li>
+                    </ul>
+                  </InfoPage>
+                </Suspense>
+              } />
             </Routes>
           </Suspense>
         </AnimatePresence>

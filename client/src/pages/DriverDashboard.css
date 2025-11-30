@@ -1,0 +1,66 @@
+.driver-dashboard {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.driver-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.driver-dashboard h1 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1a1a1a;
+}
+
+.status-display {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+.status-live {
+    color: #2ecc71;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.btn-block {
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}

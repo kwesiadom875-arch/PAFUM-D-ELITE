@@ -1,48 +1,50 @@
-import { useState, useContext, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { useState, useContext, useEffect, useCallback } from 'react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { usePaystackPayment } from 'react-paystack';
 import { toast } from 'react-toastify';
-import 'leaflet/dist/leaflet.css';
 import './Checkout.css';
-import L from 'leaflet';
-
-// Fix Leaflet marker icon issue
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
 
 // PAYSTACK PUBLIC KEY - REPLACE WITH YOUR OWN
 const PAYSTACK_PUBLIC_KEY = 'pk_live_8a853c7fcc5a73d4f20ee52019d3ecb070acb83b';
+
+const containerStyle = {
+    width: '100%',
+    height: '400px',
+    borderRadius: '12px'
+};
+
+const defaultCenter = {
+    lat: 6.5244,
+    lng: -3.3792
+};
+
 function DeliveryMap({ onLocationSelect }) {
-    const [position, setPosition] = useState([6.5244, -3.3792]); // Default: Lagos, Nigeria
+    const [position, setPosition] = useState(defaultCenter); // Default: Lagos, Nigeria
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
+    const [map, setMap] = useState(null);
 
-    // Map component to handle view changes
-    function MapController({ center }) {
-        const map = useMapEvents({});
-        useEffect(() => {
-            if (center) {
-                map.flyTo(center, 13);
-            }
-        }, [center, map]);
-        return null;
-    }
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
+    });
 
-    function LocationMarker() {
-        useMapEvents({
-            click(e) {
-                setPosition([e.latlng.lat, e.latlng.lng]);
-                reverseGeocode(e.latlng.lat, e.latlng.lng);
-            },
-        });
-        return position ? <Marker position={position} /> : null;
-    }
+    const onLoad = useCallback(function callback(map) {
+        setMap(map);
+    }, []);
+
+    const onUnmount = useCallback(function callback(map) {
+        setMap(null);
+    }, []);
+
+    const onMapClick = useCallback((e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        setPosition({ lat, lng });
+        reverseGeocode(lat, lng);
+    }, []);
 
     const reverseGeocode = async (lat, lng) => {
         setLoading(true);
@@ -72,7 +74,11 @@ function DeliveryMap({ onLocationSelect }) {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const { latitude, longitude } = pos.coords;
-                setPosition([latitude, longitude]);
+                const newPos = { lat: latitude, lng: longitude };
+                setPosition(newPos);
+                if (map) {
+                    map.panTo(newPos);
+                }
                 reverseGeocode(latitude, longitude);
                 setLoading(false);
             },
@@ -97,19 +103,24 @@ function DeliveryMap({ onLocationSelect }) {
                 </button>
             </div>
             <p className="map-instruction">Click anywhere on the map to set your delivery location</p>
-            <MapContainer
-                center={position}
-                zoom={13}
-                style={{ height: '400px', width: '100%', borderRadius: '12px' }}
-                scrollWheelZoom={true}
-            >
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                />
-                <LocationMarker />
-                <MapController center={position} />
-            </MapContainer>
+
+            {isLoaded ? (
+                <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={position}
+                    zoom={13}
+                    onLoad={onLoad}
+                    onUnmount={onUnmount}
+                    onClick={onMapClick}
+                >
+                    <Marker position={position} />
+                </GoogleMap>
+            ) : (
+                <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', borderRadius: '12px' }}>
+                    Loading Map...
+                </div>
+            )}
+
             <div className="selected-address">
                 <strong>Delivery Address:</strong>
                 {loading ? (
