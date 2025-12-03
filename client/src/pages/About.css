@@ -1,0 +1,279 @@
+/* About.css */
+.about-container {
+  background-color: #fff;
+  color: #1a1a1a;
+  overflow-x: hidden;
+}
+
+/* Hero Section */
+.about-hero {
+  height: 80vh;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/about-hero.jpg'); /* Fallback or placeholder */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
+.about-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, transparent 20%, #000 150%);
+}
+
+.about-hero-content {
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.about-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+  color: #D4AF37; /* Gold */
+}
+
+.about-hero p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* Section Common Styles */
+.about-section {
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: #D4AF37;
+  margin: 1rem auto 0;
+}
+
+/* Philosophy Section */
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.philosophy-text h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.philosophy-text p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.philosophy-image {
+  height: 500px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.philosophy-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.philosophy-image:hover img {
+  transform: scale(1.05);
+}
+
+/* Values Section */
+.values-section {
+  background-color: #f9f9f9;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.value-card {
+  background: #fff;
+  padding: 2.5rem;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.value-icon {
+  font-size: 2.5rem;
+  color: #D4AF37;
+  margin-bottom: 1.5rem;
+}
+
+.value-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.value-card p {
+  font-family: 'Nunito', sans-serif;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Founders Section */
+.founders-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-top: 3rem;
+}
+
+.founder-card {
+  text-align: center;
+}
+
+.founder-image {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  overflow: hidden;
+  border: 4px solid #D4AF37;
+  padding: 5px; /* Gap between border and image */
+  background-clip: content-box; /* Ensure image doesn't overlap border */
+}
+
+.founder-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.founder-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.founder-role {
+  font-family: 'Nunito', sans-serif;
+  color: #D4AF37;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.founder-bio {
+  font-family: 'Nunito', sans-serif;
+  color: #555;
+  line-height: 1.7;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* CTA Section */
+.about-cta {
+  background-color: #111;
+  color: #fff;
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.about-cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: #D4AF37;
+}
+
+.about-cta p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background-color: #D4AF37;
+  color: #000;
+  text-decoration: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .philosophy-grid, .founders-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .philosophy-image {
+    height: 300px;
+  }
+  
+  .founder-image {
+    width: 200px;
+    height: 200px;
+  }
+}

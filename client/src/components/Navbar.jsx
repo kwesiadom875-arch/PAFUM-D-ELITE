@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { FaShoppingBag, FaBars, FaTimes, FaTrash } from 'react-icons/fa';
+import { FaShoppingBag, FaBars, FaTimes, FaTrash, FaUser } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -34,35 +34,32 @@ const Navbar = () => {
             <FaBars />
           </div>
 
+          {/* Left Group */}
+          <div className="nav-left desktop-only">
+            <Link to="/shop">Collection</Link>
+            <Link to="/request">Request</Link>
+            <Link to="/about">About</Link>
+          </div>
+
+          {/* Center Logo */}
           <Link to="/" className="logo">
             Parfum <span style={{ color: '#C5A059' }}>D'Elite</span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="nav-links desktop-only">
-            <Link to="/">Home</Link>
-            <Link to="/shop">Collection</Link>
-            <Link to="/find-your-scent" style={{ color: '#C5A059' }}>Ask Josie</Link>
+          {/* Right Group */}
+          <div className="nav-right">
+            <Link to="/find-your-scent" className="desktop-only" style={{ color: '#C5A059', marginRight: '1.5rem' }}>Ask Josie</Link>
 
-            {user ? (
-              <>
-                <Link to="/profile">Profile</Link>
-                {user.isAdmin || user.isSuperAdmin ? <Link to="/admin" style={{ color: '#C5A059' }}>Admin</Link> : null}
-                {user.isTester && <Link to="/climate-tests" style={{ color: '#4CAF50' }}>Climate Tests</Link>}
-                <button className="nav-btn-outline" onClick={handleLogout}>Sign Out</button>
-              </>
-            ) : (
-              <>
-                <Link to="/auth?mode=signin">Sign In</Link>
-                <Link to="/auth?mode=signup" className="nav-btn">Sign Up</Link>
-              </>
-            )}
-          </div>
+            {/* Profile Icon */}
+            <div className="nav-icon" onClick={() => navigate(user ? '/profile' : '/auth?mode=signin')}>
+              <FaUser />
+            </div>
 
-          {/* Cart Icon */}
-          <div className="cart-icon" onClick={toggleCart}>
-            <FaShoppingBag />
-            <span className="cart-count">{cart.length}</span>
+            {/* Cart Icon */}
+            <div className="cart-icon" onClick={toggleCart}>
+              <FaShoppingBag />
+              <span className="cart-count">{cart.length}</span>
+            </div>
           </div>
         </div>
       </nav>
@@ -72,6 +69,7 @@ const Navbar = () => {
         <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={toggleMenu}><FaTimes /></button>
           <Link to="/" onClick={toggleMenu}>Home</Link>
+          <Link to="/about" onClick={toggleMenu}>About</Link>
           <Link to="/shop" onClick={toggleMenu}>Collection</Link>
           <Link to="/find-your-scent" onClick={toggleMenu} style={{ color: '#C5A059' }}>Ask Josie</Link>
 

@@ -33,6 +33,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const InfoPage = lazy(() => import('./pages/InfoPage'));
 const DriverDashboard = lazy(() => import('./pages/DriverDashboard'));
 const TrackOrder = lazy(() => import('./pages/TrackOrder'));
+const About = lazy(() => import('./pages/About'));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -76,6 +77,7 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />

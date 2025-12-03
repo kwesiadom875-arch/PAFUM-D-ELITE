@@ -21,6 +21,11 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const climateTestRoutes = require('./routes/climateTestRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const siteConfigRoutes = require('./routes/siteConfigRoutes');
+const catalogController = require('./controllers/catalogController'); // Direct controller usage for simplicity or create a route file
+
+// We can create a separate route file, but for now let's just add it here or create routes/catalogRoutes.js
+// Let's create routes/catalogRoutes.js to be consistent.
+const catalogRoutes = require('./routes/catalogRoutes');
 
 const app = express();
 app.use(cors({
@@ -69,6 +74,7 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/climate-tests', climateTestRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/config', siteConfigRoutes);
+app.use('/api/catalog', catalogRoutes);
 
 // Proxy Image Route (kept here as it's a utility)
 app.get('/proxy-image', async (req, res) => {

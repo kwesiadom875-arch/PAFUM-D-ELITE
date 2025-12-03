@@ -1,32 +1,116 @@
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Initialize AI Clients
+// Support both GOOGLE_API_KEY and GEMINI_API_KEY
+
+// Lazy initialization for Google AI
+let genAI = null;
+let googleModel = null;
+
+function getGoogleClient() {
+  if (!genAI) {
+    const googleKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    if (!googleKey) {
+      console.error("❌ GOOGLE_API_KEY is missing. Gemini will fail.");
+      throw new Error("GOOGLE_API_KEY is missing");
+    }
+    console.log("✅ GOOGLE_API_KEY / GEMINI_API_KEY detected. Gemini is ready.");
+    genAI = new GoogleGenerativeAI(googleKey);
+    // Use 'gemini-2.0-flash' which is confirmed to be available
+    googleModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  }
+  return googleModel;
+}
+
+// Lazy initialization for Groq to prevent crash if key is missing
+let groq = null;
+function getGroqClient() {
+  if (!groq) {
+    if (!process.env.GROQ_API_KEY) {
+      console.warn("⚠️ GROQ_API_KEY is missing. Fallback will not work.");
+      throw new Error("GROQ_API_KEY is missing");
+    }
+    console.log("✅ GROQ_API_KEY detected. Initializing Groq fallback...");
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groq;
+}
 
 /**
- * Centralized Groq AI API wrapper
+ * Centralized AI API wrapper (Google Gemini with Groq Fallback)
  * @param {string} systemPrompt - System instruction for the AI
  * @param {string} userMessage - User's message/query
  * @param {number} temperature - Creativity level (0.0-1.0)
  * @param {number} maxTokens - Maximum response length
+ * @param {boolean} jsonMode - Whether to enforce JSON output
  * @returns {Promise<string>} - AI response content
  */
-async function callGroqAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 500) {
+async function callAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 500, jsonMode = false) {
+  // 1. Try Google Gemini
   try {
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage }
-      ],
+    console.log("🤖 Attempting to generate response with Google Gemini...");
+    const generationConfig = {
       temperature,
-      max_tokens: maxTokens
+      maxOutputTokens: maxTokens,
+    };
+    
+    if (jsonMode) {
+      generationConfig.responseMimeType = "application/json";
+    }
+
+    const model = getGoogleClient();
+    const result = await model.generateContent({
+      contents: [
+        { role: 'user', parts: [{ text: systemPrompt + "\n\n" + userMessage }] }
+      ],
+      generationConfig,
     });
 
-    return completion.choices[0]?.message?.content || '';
-  } catch (error) {
-    console.error('Groq AI Error:', error);
-    throw new Error('AI service temporarily unavailable');
+    console.log("✅ Google Gemini success");
+    let text = result.response.text();
+    return cleanAIResponse(text);
+  } catch (googleError) {
+    console.warn('⚠️ Google AI failed, switching to Groq fallback:', googleError.message);
+    
+    // 2. Fallback to Groq
+    try {
+      console.log("🤖 Attempting fallback with Groq...");
+      const groqClient = getGroqClient();
+      const completion = await groqClient.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ],
+        temperature,
+        max_tokens: maxTokens,
+        response_format: jsonMode ? { type: "json_object" } : undefined
+      });
+
+      console.log("✅ Groq fallback success");
+      let text = completion.choices[0]?.message?.content || '';
+      return cleanAIResponse(text);
+    } catch (groqError) {
+      console.error('❌ Groq AI Fallback Error:', groqError.message);
+      throw new Error('AI service temporarily unavailable (Both providers failed)');
+    }
   }
 }
+
+/**
+ * Helper to clean AI response (remove markdown code blocks)
+ * @param {string} text 
+ * @returns {string}
+ */
+function cleanAIResponse(text) {
+  if (!text) return "";
+  // Remove ```json ... ``` or just ``` ... ```
+  return text.replace(/```json\n?|\n?```/g, "").replace(/```\n?/g, "").trim();
+}
+
+// Backward compatibility alias
+const callGroqAI = callAI;
 
 /**
  * Extract fragrance notes from abstract description
@@ -41,7 +125,7 @@ async function extractFragranceNotes(description) {
 
   const userMessage = `Extract the fragrance notes that would best represent: "${description}"`;
 
-  const response = await callGroqAI(systemPrompt, userMessage, 0.3, 100);
+  const response = await callAI(systemPrompt, userMessage, 0.3, 100);
   
   // Parse the response into an array
   return response.split(',').map(note => note.trim()).filter(note => note.length > 0);
@@ -86,7 +170,7 @@ async function generatePersonalizedMessage(user, context, messageType) {
       userMessage = `Customer ${user.username} - ${context.message}`;
   }
 
-  return await callGroqAI(systemPrompt, userMessage, 0.7, 300);
+  return await callAI(systemPrompt, userMessage, 0.7, 300);
 }
 
 /**
@@ -107,7 +191,7 @@ async function analyzeReviewSentiment(reviewText) {
   
   Flag reviews that contain profanity, spam, or inappropriate content.`;
 
-  const response = await callGroqAI(systemPrompt, reviewText, 0.3, 200);
+  const response = await callAI(systemPrompt, reviewText, 0.3, 200, true);
   
   try {
     // Try to parse JSON response
@@ -128,6 +212,7 @@ async function analyzeReviewSentiment(reviewText) {
 }
 
 module.exports = {
+  callAI,
   callGroqAI,
   extractFragranceNotes,
   generatePersonalizedMessage,

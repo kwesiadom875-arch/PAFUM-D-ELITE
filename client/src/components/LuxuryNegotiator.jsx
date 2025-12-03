@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import API_URL from '../config';
 import { retryRequest } from '../utils/errorHandler';
+import { CartContext } from '../context/CartContext';
 import './LuxuryNegotiator.css';
 
 const LuxuryNegotiator = ({ product, onDealAccepted }) => {
+  const { user } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
   const [offer, setOffer] = useState('');
   const [dealMade, setDealMade] = useState(false);
@@ -72,13 +74,19 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
         const res = await axios.post(`${API_URL}/api/negotiate`, {
           productId: product.id,
           offer: userPrice,
-          history: apiHistory
+          history: apiHistory,
+          userTier: user?.membershipTier || 'Standard'
         });
 
-        const { message, status } = res.data;
+        const { message, status, counterOffer } = res.data;
 
         // 3. Update UI
-        setMessages(prev => [...prev, { sender: 'ai', text: message }]);
+        setMessages(prev => [...prev, {
+          sender: 'ai',
+          text: message,
+          isCounter: status === 'counter',
+          counterPrice: counterOffer
+        }]);
 
         if (status === 'accepted') {
           setDealMade(true);
@@ -127,15 +135,43 @@ const LuxuryNegotiator = ({ product, onDealAccepted }) => {
 
         {/* Input Area or Deal Certificate */}
         {!dealMade ? (
-          <div className="chat-input-area">
-            <input
-              type="number"
-              value={offer}
-              onChange={(e) => setOffer(e.target.value)}
-              placeholder="Enter your offer..."
-              onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
-            />
-            <button className="send-btn" onClick={handleOffer}>→</button>
+          <div className="chat-input-area-wrapper">
+            {/* Action Buttons for Counter Offer */}
+            {messages[messages.length - 1]?.sender === 'ai' && messages[messages.length - 1]?.isCounter && !isTyping && offer === '' && (
+              <div className="negotiation-actions" style={{ display: 'flex', gap: '10px', marginBottom: '10px', justifyContent: 'center' }}>
+                <button
+                  className="action-btn accept"
+                  style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                  onClick={() => {
+                    setDealMade(true);
+                    onDealAccepted(messages[messages.length - 1].counterPrice);
+                  }}
+                >
+                  Accept GH₵{messages[messages.length - 1].counterPrice}
+                </button>
+                <button
+                  className="action-btn reject"
+                  style={{ background: '#f44336', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                  onClick={() => {
+                    // Just focus input
+                    document.querySelector('.chat-input-area input')?.focus();
+                  }}
+                >
+                  Counter
+                </button>
+              </div>
+            )}
+
+            <div className="chat-input-area">
+              <input
+                type="number"
+                value={offer}
+                onChange={(e) => setOffer(e.target.value)}
+                placeholder="Enter your offer..."
+                onKeyDown={(e) => e.key === 'Enter' && handleOffer()}
+              />
+              <button className="send-btn" onClick={handleOffer}>→</button>
+            </div>
           </div>
         ) : (
           <div className="deal-certificate">

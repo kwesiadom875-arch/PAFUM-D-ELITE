@@ -15,7 +15,8 @@ const InventoryTab = () => {
     const [form, setForm] = useState({
         name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
         perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
-        accessTier: 'All', badges: ''
+        accessTier: 'All', badges: '', negotiationLimit: 0,
+        longevity: 'Moderate', projection: 'Moderate', bestWeather: 'All Year'
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -68,7 +69,12 @@ const InventoryTab = () => {
                 rating: data.rating || 4.5,
                 gender: data.gender || "Unisex",
                 season: "All Year",
-                stockQuantity: 10
+                season: "All Year",
+                stockQuantity: 10,
+                negotiationLimit: 0,
+                longevity: "Moderate",
+                projection: "Moderate",
+                bestWeather: "All Year"
             });
             toast.success("Data Extracted Successfully!");
         } catch (error) {
@@ -116,7 +122,12 @@ const InventoryTab = () => {
         try {
             const productData = {
                 ...form,
-                badges: form.badges ? form.badges.split(',').map(b => b.trim()).filter(b => b) : []
+                badges: form.badges ? form.badges.split(',').map(b => b.trim()).filter(b => b) : [],
+                climateStats: {
+                    longevity: form.longevity,
+                    projection: form.projection,
+                    bestWeather: form.bestWeather
+                }
             };
 
             if (editingId) {
@@ -131,7 +142,8 @@ const InventoryTab = () => {
             setForm({
                 name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
                 perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
-                accessTier: 'All', badges: ''
+                accessTier: 'All', badges: '', negotiationLimit: 0,
+                longevity: 'Moderate', projection: 'Moderate', bestWeather: 'All Year'
             });
             setScrapeUrl('');
             setEditingId(null);
@@ -158,7 +170,12 @@ const InventoryTab = () => {
             season: product.season || '',
             stockQuantity: product.stockQuantity,
             accessTier: product.accessTier || 'All',
-            badges: Array.isArray(product.badges) ? product.badges.join(', ') : ''
+            accessTier: product.accessTier || 'All',
+            badges: Array.isArray(product.badges) ? product.badges.join(', ') : '',
+            negotiationLimit: product.negotiationLimit || 0,
+            longevity: product.climateStats?.longevity || 'Moderate',
+            projection: product.climateStats?.projection || 'Moderate',
+            bestWeather: product.climateStats?.bestWeather || 'All Year'
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -168,7 +185,8 @@ const InventoryTab = () => {
         setForm({
             name: '', brand: '', price: '', category: '', description: '', image: '', notes: '',
             perfumer: '', rating: '', gender: '', season: '', stockQuantity: 10,
-            accessTier: 'All', badges: ''
+            accessTier: 'All', badges: '', negotiationLimit: 0,
+            longevity: 'Moderate', projection: 'Moderate', bestWeather: 'All Year'
         });
     };
 
@@ -224,6 +242,29 @@ const InventoryTab = () => {
                             <label>Category</label>
                             <input name="category" value={form.category} placeholder="Category (e.g. Woody)" onChange={handleChange} style={formErrors.category ? { borderColor: 'red' } : {}} />
                             {formErrors.category && <span style={{ color: 'red', fontSize: '0.8rem' }}>{formErrors.category}</span>}
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Negotiation Limit (Min Price)</label>
+                            <input name="negotiationLimit" value={form.negotiationLimit} type="number" placeholder="0 (Default)" onChange={handleChange} />
+                            <small style={{ color: '#888' }}>0 = Use default logic (85% / 92%)</small>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                        <div className="form-group">
+                            <label>Longevity</label>
+                            <input name="longevity" value={form.longevity} placeholder="e.g. 8+ Hours" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Projection</label>
+                            <input name="projection" value={form.projection} placeholder="e.g. Strong" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Best Weather</label>
+                            <input name="bestWeather" value={form.bestWeather} placeholder="e.g. Humid Evenings" onChange={handleChange} />
                         </div>
                     </div>
 

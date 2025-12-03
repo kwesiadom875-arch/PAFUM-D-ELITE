@@ -8,6 +8,7 @@ import './ProductDetail.css';
 // Import Extracted Components
 import ProductHero from '../components/product/ProductHero';
 import ProductBento from '../components/product/ProductBento';
+import ClimateStats from '../components/product/ClimateStats';
 import ProductAccords from '../components/product/ProductAccords';
 import RecommendedProducts from '../components/RecommendedProducts';
 import ProductSkeleton from '../components/ProductSkeleton';
@@ -78,6 +79,11 @@ const ProductDetail = () => {
         setFinalPrice={setFinalPrice}
         notesArray={notesArray}
       />
+
+      {/* CLIMATE STATS */}
+      <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <ClimateStats climateStats={product.climateStats} />
+      </div>
 
       {/* BENTO GRID */}
       <ProductBento

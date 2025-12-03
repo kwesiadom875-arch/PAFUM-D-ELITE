@@ -1,8 +1,11 @@
 const Product = require('../models/Product');
+const { callAI } = require('../services/aiHelpers');
+
+// Groq SDK is now handled in aiHelpers.js via callAI
 
 exports.negotiatePrice = async (req, res) => {
   try {
-    const { productId, offer, history } = req.body;
+    const { productId, offer, history, userTier } = req.body;
     
     const product = await Product.findOne({ id: productId });
     if (!product) {
@@ -10,53 +13,98 @@ exports.negotiatePrice = async (req, res) => {
     }
 
     const originalPrice = product.price;
-    const minPrice = originalPrice * 0.85; // Max 15% discount
     const currentOffer = parseFloat(offer);
 
-    // 1. Immediate Acceptance
-    if (currentOffer >= originalPrice * 0.95) {
-      return res.json({
-        status: "accepted",
-        finalPrice: currentOffer,
-        message: "I accept your offer. It is a fair price for such quality."
-      });
-    }
-
-    // 2. Hard Rejection (Lowball)
-    if (currentOffer < minPrice) {
-      return res.json({
-        status: "rejected",
-        counterOffer: originalPrice, // Reset to original
-        message: "I'm afraid that is far too low. This is a premium fragrance, not a market stall."
-      });
-    }
-
-    // 3. Negotiation Logic (Counter-offer)
-    // Calculate counter-offer based on rounds (history length)
-    const rounds = history ? history.length : 0;
-    let counterPrice;
-
-    if (rounds === 0) {
-      counterPrice = originalPrice * 0.97; // Start high
-    } else if (rounds === 1) {
-      counterPrice = originalPrice * 0.93;
+    // Dynamic Floor based on Tier or Admin Limit
+    let minPrice;
+    if (product.negotiationLimit && product.negotiationLimit > 0) {
+      minPrice = product.negotiationLimit;
     } else {
-      counterPrice = Math.max(minPrice, originalPrice * 0.90);
+      // Elite Diamond gets less wiggle room because they already have discounts
+      let minPriceRatio = 0.85; // Standard: can go down to 85%
+      if (userTier === 'Elite Diamond') {
+        minPriceRatio = 0.92; // Elite: can only go down to 92%
+      }
+      minPrice = originalPrice * minPriceRatio;
     }
 
-    // If user's offer is very close to our counter, just accept or split difference
-    if (counterPrice - currentOffer < originalPrice * 0.02) {
-       return res.json({
-        status: "accepted",
-        finalPrice: currentOffer,
-        message: "Very well. I shall make an exception for you."
-      });
+    // Determine Negotiation State
+    let status = "counter";
+    let message = "";
+    let finalPrice = null;
+    let counterOffer = null;
+
+    // 1. Immediate Acceptance (High Offer)
+    if (currentOffer >= originalPrice * 0.96) {
+      status = "accepted";
+      finalPrice = currentOffer;
+    } 
+    // 2. Negotiation Logic (Always counter unless accepted)
+    else {
+      // Calculate counter-offer based on rounds
+      // "Determined" logic: Start high (1% discount) and move slowly
+      const rounds = history ? history.length : 0;
+      let calculatedCounter;
+
+      // Decrease by 1% per round, but never below minPrice
+      // Round 0: 99%, Round 1: 98%, Round 2: 97%...
+      const discountFactor = 0.99 - (rounds * 0.01); 
+      calculatedCounter = Math.max(minPrice, originalPrice * discountFactor);
+
+      // If user's offer is very close to our counter (within 1%), accept
+      if (calculatedCounter - currentOffer < originalPrice * 0.01) {
+        status = "accepted";
+        finalPrice = currentOffer;
+      } else {
+        status = "counter";
+        counterOffer = Math.floor(calculatedCounter);
+      }
     }
+
+    // AI Message Generation
+    console.log(`[Negotiation] Status: ${status}, Offer: ${currentOffer}, Counter: ${counterOffer}, Min: ${minPrice}`);
+
+    const systemPrompt = `You are a sophisticated, slightly haughty but polite luxury perfume concierge. 
+    You are negotiating the price of "${product.name}" (Original: GH₵${originalPrice}).
+    User Offer: GH₵${currentOffer}.
+    Your Status: ${status.toUpperCase()}.
+    ${status === 'counter' ? `Your Counter Offer: GH₵${counterOffer}.` : ''}
+    ${status === 'accepted' ? `Final Price: GH₵${finalPrice}.` : ''}
+    
+    Respond in 1-2 short, elegant sentences. 
+    If ACCEPTED: Congratulate them on a fine acquisition.
+    If REJECTED: Politely dismiss the low offer as insulting to the craftsmanship.
+    If COUNTER: Politely propose your counter offer (GH₵${counterOffer}) as a special favor.
+    Do NOT mention the math or percentages. Maintain the persona.`;
+
+    try {
+      // Format history for callAI
+      let conversationHistory = "";
+      if (history && history.length > 0) {
+        conversationHistory = history.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n');
+      }
+      
+      // We pass the conversation history as the "userMessage" part, 
+      // effectively appending it to the system prompt in callAI.
+      // We also append the current offer context if not already in history (it usually isn't fully).
+      const contextMessage = `${conversationHistory}\n\n(Current Context: Status=${status}, Offer=${currentOffer}, Counter=${counterOffer})`;
+
+      message = await callAI(systemPrompt, contextMessage, 0.7, 100);
+    } catch (aiError) {
+      console.error("AI Generation Failed:", aiError);
+      // Fallback messages
+      if (status === 'accepted') message = "Very well. I accept your offer.";
+      else if (status === 'rejected') message = "I'm afraid that is impossible.";
+      else message = `I can offer it to you for GH₵${counterOffer}.`;
+    }
+
+    console.log(`[Negotiation] Response Message: ${message}`);
 
     res.json({
-      status: "counter",
-      counterOffer: Math.floor(counterPrice),
-      message: `That is a bit low. However, I can offer it to you for GH₵${Math.floor(counterPrice)}.`
+      status,
+      finalPrice,
+      counterOffer,
+      message
     });
 
   } catch (error) {

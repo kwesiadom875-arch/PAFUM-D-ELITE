@@ -1,16 +1,8 @@
-const Groq = require("groq-sdk");
+const { callAI } = require('../services/aiHelpers');
 const Product = require('../models/Product');
 
-// Initialize Groq SDK
-// Ensure API Key is present. If not, log a warning but don't crash immediately.
-const apiKey = process.env.GROQ_API_KEY;
-if (!apiKey) {
-  console.warn("WARNING: GROQ_API_KEY is missing in environment variables. AI features will fail.");
-}
+// Groq SDK is now handled in aiHelpers.js via callAI
 
-const groq = new Groq({
-  apiKey: apiKey
-});
 
 exports.chatJosie = async (req, res) => {
   const { userMessage, history } = req.body;
@@ -93,14 +85,20 @@ exports.chatJosie = async (req, res) => {
       { role: "user", content: userMessage }
     ];
 
-    const completion = await groq.chat.completions.create({
-      messages: messages,
-      model: "llama-3.3-70b-versatile",
-      // CRITICAL: This forces the AI to actually obey the JSON format
-      response_format: { type: "json_object" } 
-    });
+    // Convert messages array to a single string for callAI (since it expects system + user)
+    // But callAI takes systemPrompt and userMessage. 
+    // We need to handle history. 
+    // Let's construct a conversation string or update callAI to handle history.
+    // For now, let's append history to the system prompt or user message.
+    
+    let fullConversation = "";
+    if (history && history.length > 0) {
+      fullConversation = history.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n');
+    }
+    const finalUserMessage = fullConversation ? `${fullConversation}\n\nUSER: ${userMessage}` : userMessage;
 
-    const aiResponse = JSON.parse(completion.choices[0]?.message?.content);
+    const aiResponseText = await callAI(systemPrompt, finalUserMessage, 0.7, 1000, true);
+    const aiResponse = JSON.parse(aiResponseText);
     res.json(aiResponse);
 
   } catch (error) {
@@ -133,18 +131,9 @@ exports.scentDiscovery = async (req, res) => {
 
     console.log("Scent Discovery Query:", query);
     
-    // Use the same model as Josie for consistency
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: query }
-      ],
-      model: "llama-3.3-70b-versatile",
-      response_format: { type: "json_object" }
-    });
-
-    console.log("AI Response:", completion.choices[0]?.message?.content);
-    const aiResponse = JSON.parse(completion.choices[0]?.message?.content);
+    const aiResponseText = await callAI(systemPrompt, query, 0.7, 500, true);
+    console.log("AI Response:", aiResponseText);
+    const aiResponse = JSON.parse(aiResponseText);
     const keywords = aiResponse.keywords || [];
 
     if (keywords.length === 0) {
@@ -193,13 +182,8 @@ exports.enrichAllProducts = async (req, res) => {
       `;
 
       try {
-        const completion = await groq.chat.completions.create({
-          messages: [{ role: "system", content: systemPrompt }],
-          model: "llama-3.3-70b-versatile",
-          response_format: { type: "json_object" }
-        });
-
-        const enrichedData = JSON.parse(completion.choices[0]?.message?.content);
+        const enrichedDataText = await callAI(systemPrompt, `Input Product: ${product.name} - ${product.description}`, 0.7, 500, true);
+        const enrichedData = JSON.parse(enrichedDataText);
         
         // Update product
         product.brand = enrichedData.brand || product.brand || "Unknown";

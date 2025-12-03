@@ -1,51 +1,51 @@
-import { useState, useContext, useEffect, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { useState, useContext, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import { usePaystackPayment } from 'react-paystack';
 import { toast } from 'react-toastify';
 import API_URL from '../config';
 import { CartContext } from '../context/CartContext';
 import './Checkout.css';
+import L from 'leaflet';
+
+// Fix for default marker icon
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 // PAYSTACK PUBLIC KEY - REPLACE WITH YOUR OWN
 const PAYSTACK_PUBLIC_KEY = 'pk_live_8a853c7fcc5a73d4f20ee52019d3ecb070acb83b';
-
-const containerStyle = {
-    width: '100%',
-    height: '400px',
-    borderRadius: '12px'
-};
 
 const defaultCenter = {
     lat: 6.5244,
     lng: -3.3792
 };
 
-function DeliveryMap({ onLocationSelect }) {
-    const [position, setPosition] = useState(defaultCenter); // Default: Lagos, Nigeria
-    const [address, setAddress] = useState('');
+function LocationMarker({ onLocationSelect, position, setPosition }) {
     const [loading, setLoading] = useState(false);
-    const [map, setMap] = useState(null);
 
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
+    const map = useMapEvents({
+        click(e) {
+            const { lat, lng } = e.latlng;
+            setPosition({ lat, lng });
+            reverseGeocode(lat, lng);
+        },
     });
 
-    const onLoad = useCallback(function callback(map) {
-        setMap(map);
-    }, []);
-
-    const onUnmount = useCallback(function callback(map) {
-        setMap(null);
-    }, []);
-
-    const onMapClick = useCallback((e) => {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
-        setPosition({ lat, lng });
-        reverseGeocode(lat, lng);
-    }, []);
+    useEffect(() => {
+        if (position) {
+            map.flyTo(position, map.getZoom());
+        }
+    }, [position, map]);
 
     const reverseGeocode = async (lat, lng) => {
         setLoading(true);
@@ -54,16 +54,26 @@ function DeliveryMap({ onLocationSelect }) {
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
             );
             const data = await response.json();
-            setAddress(data.display_name);
             onLocationSelect({ lat, lng, address: data.display_name });
         } catch (error) {
             console.error('Geocoding error:', error);
-            setAddress(`Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
             onLocationSelect({ lat, lng, address: `Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}` });
         } finally {
             setLoading(false);
         }
     };
+
+    return position === null ? null : (
+        <Marker position={position}>
+            <Popup>Selected Location</Popup>
+        </Marker>
+    );
+}
+
+function DeliveryMap({ onLocationSelect }) {
+    const [position, setPosition] = useState(defaultCenter); // Default: Lagos, Nigeria
+    const [address, setAddress] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleUseMyLocation = () => {
         if (!navigator.geolocation) {
@@ -77,11 +87,24 @@ function DeliveryMap({ onLocationSelect }) {
                 const { latitude, longitude } = pos.coords;
                 const newPos = { lat: latitude, lng: longitude };
                 setPosition(newPos);
-                if (map) {
-                    map.panTo(newPos);
-                }
-                reverseGeocode(latitude, longitude);
-                setLoading(false);
+                // Reverse geocode happens in LocationMarker when position updates, 
+                // but we need to trigger it manually or let the effect handle it?
+                // Actually, LocationMarker handles click, but for manual set, we might need to call reverseGeocode too.
+                // Let's just let the user click or we can call it here.
+                // For simplicity, let's just update position and let the user confirm or we can do a fetch here.
+
+                // We'll do a quick fetch here to update address display
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        setAddress(data.display_name);
+                        onLocationSelect({ lat: latitude, lng: longitude, address: data.display_name });
+                    })
+                    .catch(() => {
+                        setAddress(`Coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                        onLocationSelect({ lat: latitude, lng: longitude, address: `Coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
+                    })
+                    .finally(() => setLoading(false));
             },
             (err) => {
                 console.error(err);
@@ -105,22 +128,26 @@ function DeliveryMap({ onLocationSelect }) {
             </div>
             <p className="map-instruction">Click anywhere on the map to set your delivery location</p>
 
-            {isLoaded ? (
-                <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={position}
+            <div style={{ height: '400px', width: '100%', borderRadius: '12px', overflow: 'hidden' }}>
+                <MapContainer
+                    center={[defaultCenter.lat, defaultCenter.lng]}
                     zoom={13}
-                    onLoad={onLoad}
-                    onUnmount={onUnmount}
-                    onClick={onMapClick}
+                    style={{ height: '100%', width: '100%' }}
                 >
-                    <Marker position={position} />
-                </GoogleMap>
-            ) : (
-                <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', borderRadius: '12px' }}>
-                    Loading Map...
-                </div>
-            )}
+                    <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    <LocationMarker
+                        onLocationSelect={(data) => {
+                            setAddress(data.address);
+                            onLocationSelect(data);
+                        }}
+                        position={position}
+                        setPosition={setPosition}
+                    />
+                </MapContainer>
+            </div>
 
             <div className="selected-address">
                 <strong>Delivery Address:</strong>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TransparentImg from '../TransparentImg';
+import API_URL from '../../config';
 
 /**
  * Robust Product Image Component
@@ -22,11 +23,13 @@ const ProductImage = ({ src, alt, className, style }) => {
         setHasError(false);
         setIsLoading(true);
 
-        // Proactive check for known bad domains
-        // Proactive check for known bad domains
         if (!src) {
             setImgSrc(FALLBACK_IMAGE);
-            setIsLoading(false); // Skip loading state for immediate fallback
+            setIsLoading(false);
+        } else if (src.includes('fimgs.net') || src.includes('fragrantica.com')) {
+            // Use proxy for Fragrantica images to avoid 403 Forbidden
+            const proxyUrl = `${API_URL}/proxy-image?url=${encodeURIComponent(src)}`;
+            setImgSrc(proxyUrl);
         } else {
             setImgSrc(src);
         }

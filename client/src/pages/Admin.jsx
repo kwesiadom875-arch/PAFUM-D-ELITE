@@ -10,6 +10,7 @@ import FeaturedShowcaseTab from '../components/admin/FeaturedShowcaseTab';
 import ClimateTestsTab from '../components/admin/ClimateTestsTab';
 import UsersTab from '../components/admin/UsersTab';
 import SiteContentTab from '../components/admin/SiteContentTab';
+import RequestsTab from '../components/admin/RequestsTab';
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,6 +20,7 @@ const Admin = () => {
             case 'dashboard': return <Dashboard />;
             case 'inventory': return <InventoryTab />;
             case 'orders': return <OrdersTab />;
+            case 'requests': return <RequestsTab />;
             case 'stock': return <StockTab />;
             case 'scent-intel': return <ScentIntelTab />;
             case 'featured-showcase': return <FeaturedShowcaseTab />;
@@ -49,6 +51,7 @@ const Admin = () => {
                     <NavItem id="site-content" label="Site Content" icon="" />
                     <NavItem id="inventory" label="Inventory" icon="" />
                     <NavItem id="orders" label="Orders" icon="" />
+                    <NavItem id="requests" label="Requests" icon="" />
                     <NavItem id="stock" label="Stock Management" icon="" />
                     <NavItem id="scent-intel" label="Scent Intel AI" icon="" />
                     <NavItem id="featured-showcase" label="Showcase" icon="" />

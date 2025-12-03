@@ -1,10 +1,8 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
-const Groq = require("groq-sdk");
+const { callAI } = require('../services/aiHelpers');
 
-// Initialize Groq SDK (Re-using the same initialization pattern)
-const apiKey = process.env.GROQ_API_KEY;
-const groq = new Groq({ apiKey: apiKey });
+// Groq SDK is now handled in aiHelpers.js via callAI
 
 exports.scrapeFragrantica = async (req, res) => {
   const { url } = req.body;
@@ -110,18 +108,18 @@ exports.scrapeFragrantica = async (req, res) => {
     // AI Description Shortening
     if (description && description.length > 200) {
       try {
-        const aiResponse = await groq.chat.completions.create({
-          messages: [{
-            role: "system",
-            content: "You are a luxury perfume copywriter. Shorten perfume descriptions to 2-3 elegant sentences (max 150 words). Remove unnecessary details, keep only the essence, mood, and key notes. Be poetic but concise."
-          }, {
-            role: "user",
-            content: `Shorten this perfume description:\n\n${description}`
-          }],
-          model: "llama-3.3-70b-versatile",
-          max_tokens: 200
-        });
-        description = aiResponse.choices[0]?.message?.content || description;
+        // Pre-clean description to remove common scraper junk
+        let cleanDesc = description
+          .replace(/Sponsored.*/i, "")
+          .replace(/Read about this perfume.*/i, "")
+          .replace(/Jomashop.*/i, "")
+          .trim();
+
+        const systemPrompt = "You are a luxury perfume copywriter. Shorten perfume descriptions to 2-3 elegant sentences (max 150 words). Remove unnecessary details, keep only the essence, mood, and key notes. Be poetic but concise.";
+        const userMessage = `Shorten this perfume description:\n\n${cleanDesc}`;
+        
+        const aiResponse = await callAI(systemPrompt, userMessage, 0.7, 200);
+        description = aiResponse || cleanDesc; // Fallback to cleanDesc if AI fails
       } catch (aiError) {
         console.error("AI description shortening failed:", aiError);
         description = description.substring(0, 200) + '...';

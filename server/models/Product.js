@@ -24,6 +24,13 @@ const productSchema = new mongoose.Schema({
   // --- INVENTORY MANAGEMENT ---
   stockQuantity: { type: Number, default: 10 }, // Main stock if no sizes
   isAvailable: { type: Boolean, default: true },
+  negotiationLimit: { type: Number, default: 0 }, // Minimum price for negotiation
+  
+  climateStats: {
+    longevity: { type: String, default: "Moderate" }, // e.g., "8+ Hours"
+    projection: { type: String, default: "Moderate" }, // e.g., "Strong"
+    bestWeather: { type: String, default: "All Year" } // e.g., "Humid Evenings"
+  },
   
   // --- SIZE VARIANTS ---
   sizes: [{

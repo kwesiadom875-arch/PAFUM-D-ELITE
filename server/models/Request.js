@@ -4,7 +4,7 @@ const requestSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
   userName: {
     type: String,
@@ -47,7 +47,6 @@ const requestSchema = new mongoose.Schema({
   }
 });
 
-// Index for efficient queries
 requestSchema.index({ status: 1, createdAt: -1 });
 requestSchema.index({ category: 1 });
 

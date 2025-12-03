@@ -1,52 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import io from 'socket.io-client';
 import API_URL from '../config';
 import './TrackOrder.css';
+import L from 'leaflet';
 
-// Map Container Style
-const containerStyle = {
-    width: '100%',
-    height: '100%'
-};
+// Fix for default marker icon
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Dark Luxury Map Style
-const darkLuxuryStyle = [
-    { elementType: "geometry", stylers: [{ color: "#212121" }] },
-    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-    { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-    { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
-    { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
-    { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
-    { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
-    { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
-    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#181818" }] },
-    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-    { featureType: "poi.park", elementType: "labels.text.stroke", stylers: [{ color: "#1b1b1b" }] },
-    { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
-    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
-    { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#373737" }] },
-    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
-    { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#4e4e4e" }] },
-    { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-    { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-    { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
-    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] }
-];
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const TrackOrder = () => {
     const { orderId } = useParams();
     const [driverLocation, setDriverLocation] = useState(null);
     const [status, setStatus] = useState('Waiting for driver...');
     const socketRef = useRef();
-
-    // IMPORTANT: Replace with your actual Google Maps API Key
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
-    });
 
     useEffect(() => {
         // Connect to socket
@@ -81,31 +59,23 @@ const TrackOrder = () => {
             </div>
 
             <div className="map-container">
-                {isLoaded ? (
-                    <GoogleMap
-                        mapContainerStyle={containerStyle}
-                        center={center}
-                        zoom={14}
-                        options={{
-                            styles: darkLuxuryStyle,
-                            disableDefaultUI: false,
-                            zoomControl: true,
-                            streetViewControl: false,
-                            mapTypeControl: false
-                        }}
-                    >
-                        {driverLocation && (
-                            <Marker
-                                position={driverLocation}
-                                title="Your Driver"
-                            // You can add a custom icon here later
-                            // icon={{ url: '/path/to/car-icon.png' }}
-                            />
-                        )}
-                    </GoogleMap>
-                ) : (
-                    <div className="loading-map">Loading Map...</div>
-                )}
+                <MapContainer
+                    center={[center.lat, center.lng]}
+                    zoom={13}
+                    style={{ height: '100%', width: '100%' }}
+                >
+                    <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {driverLocation && (
+                        <Marker position={[driverLocation.lat, driverLocation.lng]}>
+                            <Popup>
+                                Your Driver
+                            </Popup>
+                        </Marker>
+                    )}
+                </MapContainer>
             </div>
         </div>
     );
