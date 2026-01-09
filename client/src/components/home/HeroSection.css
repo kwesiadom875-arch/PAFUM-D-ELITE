@@ -1,0 +1,222 @@
+/* --- EDITORIAL SPLIT HERO --- */
+.hero-split-section {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+    background-color: #fdfbf7; /* Light Cream Background */
+}
+
+/* LEFT SIDE: Text */
+.hero-split-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background-color: #fdfbf7;
+    z-index: 2;
+}
+
+.hero-text-content {
+    max-width: 500px;
+    text-align: left;
+}
+
+.hero-label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #C5A059;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.hero-title-editorial {
+    font-family: 'Playfair Display', serif;
+    font-size: 5.5rem; /* Massive Editorial Font */
+    line-height: 0.9;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    font-weight: 400;
+    letter-spacing: -2px;
+}
+
+.hero-subtitle-editorial {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    font-weight: 300;
+    max-width: 400px;
+}
+
+.hero-cta-group {
+    display: flex;
+    gap: 20px;
+}
+
+/* RIGHT SIDE: Visual */
+.hero-split-right {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-image-wrapper {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-overlay-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #fdfbf7 0%, transparent 20%, transparent 100%);
+    /* Soft blend into the image */
+}
+
+/* CENTER: The Seal */
+.hero-center-seal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none; /* Let clicks pass through */
+}
+
+.seal-circle {
+    width: 180px;
+    height: 180px;
+    background: rgba(253, 251, 247, 0.8); /* Semi-transparent cream backing */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+.seal-svg {
+    width: 100px;
+    height: 100px;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #C5A059;
+    color: #000;
+    padding: 16px 40px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
+}
+
+.btn-outline-dark {
+    background-color: transparent;
+    color: #1a1a1a;
+    padding: 16px 40px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    border: 1px solid #1a1a1a;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-outline-dark:hover {
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .hero-split-section {
+        flex-direction: column-reverse;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero-split-left {
+        padding: 60px 20px;
+        text-align: center;
+        flex: unset; /* Allow content to dictate height */
+    }
+
+    .hero-text-content {
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .hero-title-editorial {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+    
+    .hero-subtitle-editorial {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+
+    .hero-cta-group {
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-primary, .btn-outline-dark {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .hero-split-right {
+        height: 45vh; /* Slightly reduced height */
+        flex: unset;
+    }
+
+    .hero-overlay-gradient {
+        background: linear-gradient(to bottom, transparent 0%, transparent 60%, #fdfbf7 100%);
+    }
+
+    .hero-center-seal {
+        top: 45vh; /* Position exactly at the split */
+        transform: translate(-50%, -50%);
+    }
+    
+    .seal-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .seal-svg {
+        width: 50px;
+        height: 50px;
+    }
+}

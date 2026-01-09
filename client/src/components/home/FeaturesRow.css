@@ -1,0 +1,57 @@
+.features-row-section {
+    padding: 5rem 0;
+    background-color: #fff;
+    border-top: 1px solid #f0f0f0;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    text-align: center;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.feature-icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: #1a1a1a;
+    color: #C5A059;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    /* Square box as per Figma */
+}
+
+.feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.feature-text {
+    font-size: 0.9rem;
+    color: #888;
+    font-weight: 300;
+}
+
+@media (max-width: 992px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}

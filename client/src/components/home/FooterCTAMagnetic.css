@@ -1,0 +1,234 @@
+.footer-cta-magnetic {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 50%, #f8f8f8 100%);
+  background-size: 200% 100%;
+  overflow: hidden;
+  padding: 100px 20px;
+}
+
+.cta-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+
+.cta-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 5rem;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.cta-content h2 span {
+  display: block;
+}
+
+.cta-content p {
+  font-size: 1.4rem;
+  color: #666;
+  margin-bottom: 60px;
+}
+
+.cta-buttons-magnetic {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-magnetic {
+  position: relative;
+  display: inline-block;
+  padding: 20px 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-hover-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  z-index: 1;
+}
+
+.btn-magnetic:hover .btn-hover-effect {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary-magnetic {
+  background: #C5A059;
+  color: white;
+  border: 2px solid #C5A059;
+}
+
+.btn-primary-magnetic:hover {
+  background: #d4af6a;
+  box-shadow: 0 15px 40px rgba(197, 160, 89, 0.4);
+}
+
+.btn-secondary-magnetic {
+  background: transparent;
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+}
+
+.btn-secondary-magnetic:hover {
+  background: #1a1a1a;
+  color: white;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Floating particles */
+.cta-bg-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197, 160, 89, 0.15), transparent);
+  animation: float-particle 15s ease-in-out infinite;
+}
+
+.particle-1 {
+  width: 100px;
+  height: 100px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  width: 150px;
+  height: 150px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 3s;
+}
+
+.particle-3 {
+  width: 80px;
+  height: 80px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 6s;
+}
+
+.particle-4 {
+  width: 120px;
+  height: 120px;
+  top: 30%;
+  right: 25%;
+  animation-delay: 9s;
+}
+
+.particle-5 {
+  width: 90px;
+  height: 90px;
+  bottom: 30%;
+  right: 10%;
+  animation-delay: 12s;
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.2);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-20px, -80px) scale(0.8);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(-40px, -40px) scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+/* Pulse animation for primary button */
+.btn-primary-magnetic::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50px;
+  background: #C5A059;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: pulse-magnetic 3s ease-in-out infinite;
+}
+
+@keyframes pulse-magnetic {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .footer-cta-magnetic {
+    min-height: 80vh;
+    padding: 60px 20px;
+  }
+
+  .cta-content h2 {
+    font-size: 3rem;
+  }
+
+  .cta-content p {
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+  }
+
+  .cta-buttons-magnetic {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .btn-magnetic {
+    width: 100%;
+    max-width: 300px;
+  }
+}

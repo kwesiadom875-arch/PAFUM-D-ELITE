@@ -1,0 +1,107 @@
+/* --- 7. SCENT WARDROBE --- */
+.scent-wardrobe-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    margin-top: 30px;
+}
+
+.wardrobe-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.wardrobe-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #C5A059;
+    margin-bottom: 15px;
+}
+
+.summary-text {
+    color: #aaa;
+    font-style: italic;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wardrobe-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.wardrobe-note {
+    font-size: 0.75rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.wardrobe-loading {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-style: italic;
+}
+
+.sotd-container {
+    background: rgba(197, 160, 89, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(197, 160, 89, 0.1);
+}
+
+.sotd-container h4 {
+    margin: 0 0 15px 0;
+    color: #C5A059;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.checked-in-msg {
+    color: white;
+    font-size: 1.1rem;
+}
+
+.check-in-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.sotd-select {
+    background: #111;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 15px;
+    border-radius: 5px;
+    flex: 1;
+    max-width: 250px;
+}
+
+.btn-checkin {
+    background: #C5A059;
+    color: black;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-checkin:hover {
+    background: #F0E68C;
+    transform: translateY(-2px);
+}

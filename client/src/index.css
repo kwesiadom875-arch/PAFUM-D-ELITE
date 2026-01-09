@@ -1,0 +1,226 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap");
+
+:root {
+  --gold: #c5a059;
+  --gold-hover: #d4af68;
+  --light-bg: #fafafa;
+  --card-bg: #ffffff;
+  --text-main: #1a1a1a;
+  --text-muted: #666666;
+  --border-color: #e5e5e5;
+  
+  /* User Provided Variables */
+  --gold-start: #C5A059;
+  --gold-end: #E5C585;
+  --shadow-gold: rgba(197, 160, 89, 0.4);
+
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--text-main);
+  background-color: var(--light-bg);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--light-bg);
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.text-gold {
+  color: var(--gold);
+}
+
+/* Enhanced Button Styles */
+/* Enhanced Button Styles - Premium Capsule Design */
+/* 1. The Primary Button (Solid Gold) */
+.btn-primary {
+  position: relative;
+  background: linear-gradient(135deg, var(--gold-start) 0%, var(--gold-end) 100%);
+  color: #000; /* Black text for contrast */
+  padding: 14px 35px;
+  border: none;
+  border-radius: 50px; /* Pill shape is very modern/luxury */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  overflow: hidden; /* Needed for the shine effect */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 5px 15px var(--shadow-gold);
+  z-index: 1;
+}
+
+/* Hover State: Lift & Glow */
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 30px var(--shadow-gold);
+}
+
+/* Click State */
+.btn-primary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px var(--shadow-gold);
+}
+
+/* The "Shine" Effect Sweep */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent
+  );
+  transition: 0.6s;
+  z-index: -1;
+}
+
+.btn-primary:hover::after {
+  left: 100%;
+}
+
+/* 2. The Outline Button (Transparent with Gold Border) */
+.btn-outline {
+  background: transparent;
+  color: var(--gold-start);
+  border: 2px solid var(--gold-start);
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-outline:hover {
+  color: black;
+  border-color: var(--gold-end);
+  box-shadow: 0 0 20px var(--shadow-gold);
+}
+
+/* Fill effect on hover */
+.btn-outline::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 0%; height: 100%;
+  background: var(--gold-start);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.btn-outline:hover::before {
+  width: 100%;
+}
+
+/* Keeping btn-gold consistent with btn-primary for now, or as an alias */
+.btn-gold {
+  position: relative;
+  background: linear-gradient(135deg, var(--gold-start) 0%, var(--gold-end) 100%);
+  color: #000;
+  padding: 14px 35px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 5px 15px var(--shadow-gold);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-gold:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 30px var(--shadow-gold);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* GSAP Ripple Effect for Cart Button */
+.cart-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transform: scale(0);
+}
+

@@ -1,0 +1,56 @@
+// Add this to server/index.js after the profile endpoint (around line 80)
+
+// Record Purchase
+app.post('/api/user/purchase', verifyToken, async (req, res) => {
+  try {
+    const { items } = req.body;
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Add items to order history
+    items.forEach(item => {
+      user.orderHistory.push({
+        productId: item.productId,
+        productName: item.productName,
+        productImage: item.productImage,
+        originalPrice: item.originalPrice,
+        finalPrice: item.finalPrice,
+        negotiated: item.negotiated || false,
+        date: new Date()
+      });
+    });
+
+    // Update spending
+    const purchaseTotal = items.reduce((sum, item) => sum + item.finalPrice, 0);
+    user.spending += purchaseTotal;
+
+    // Recalculate tier based on spending
+    // Bronze: 0-3000, Gold: 3001-7000, Platinum: 7001-10000, Diamond: 10001-15000, Elite Diamond: 15000+
+    if (user.spending >= 15000) {
+      user.tier = 'Elite Diamond';
+    } else if (user.spending >= 10001) {
+      user.tier = 'Diamond';
+    } else if (user.spending >= 7001) {
+      user.tier = 'Platinum';
+    } else if (user.spending >= 3001) {
+      user.tier = 'Gold';
+    } else {
+      user.tier = 'Bronze';
+    }
+
+    await user.save();
+
+    // Return updated user (without password)
+    const updatedUser = await User.findById(req.userId).select('-password');
+    res.json({ 
+      message: "Purchase recorded successfully", 
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Purchase recording error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});

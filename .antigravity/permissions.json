@@ -1,0 +1,35 @@
+{
+  "mode": "turbo",
+  "terminal": {
+    "allow_without_approval": [
+      "ls",
+      "dir",
+      "cd",
+      "pwd",
+      "cat",
+      "grep",
+      "find",
+      "git status",
+      "git diff",
+      "git log",
+      "git branch",
+      "npm list",
+      "pip list",
+      "python --version",
+      "node -v",
+      "echo"
+    ],
+    "allow_tests_without_approval": true,
+    "block_explicitly": [
+      "rm",
+      "rm -rf",
+      "drop",
+      "git push",
+      "git clean"
+    ]
+  },
+  "network": {
+    "allow_localhost": true,
+    "block_external_requests": false
+  }
+}
