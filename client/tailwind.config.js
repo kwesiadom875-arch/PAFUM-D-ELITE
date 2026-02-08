@@ -8,22 +8,25 @@ export default {
     theme: {
         extend: {
             colors: {
-                "primary": "#ecb613",
+                "primary": "#CCA43B",
+                "primary-dark": "#B08D33",
                 "primary-metallic": "#D4AF37",
-                "background-light": "#f8f8f6",
-                "background-light-alt": "#F9F9F7",
-                "background-dark": "#221d10",
-                "background-dark-alt": "#1a1a1a",
+                "background-light": "#FAFAFA",
+                "background-dark": "#121212",
+                "surface-light": "#FFFFFF",
+                "surface-dark": "#1E1E1E",
                 "text-light": "#333333",
-                "text-dark": "#E5E5E5",
+                "text-dark": "#E0E0E0",
+                "gold-light": "#F3E5AB",
                 "accent-gold": "#C5A028",
-                "gold": "#c5a059",
-                "gold-hover": "#d4af68",
             },
             fontFamily: {
-                "display": ["Noto Serif", "Playfair Display", "serif"],
-                "sans": ["Noto Sans", "Lato", "sans-serif"],
+                "display": ["Playfair Display", "serif"],
                 "body": ["Lato", "sans-serif"],
+                "sans": ["Lato", "sans-serif"],
+            },
+            borderRadius: {
+                DEFAULT: "4px",
             },
             animation: {
                 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

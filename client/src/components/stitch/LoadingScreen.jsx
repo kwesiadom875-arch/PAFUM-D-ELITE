@@ -1,9 +1,8 @@
-
 import React from 'react';
 
 const LoadingScreen = () => {
     return (
-        <div className="bg-background-light-alt dark:bg-background-dark-alt min-h-screen flex flex-col items-center justify-center transition-colors duration-500 overflow-hidden">
+        <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col items-center justify-center transition-colors duration-500 overflow-hidden">
             <nav className="absolute top-0 w-full p-8 flex justify-between items-center opacity-0 animate-fade-in delay-1000">
                 <div className="text-xs tracking-[0.2em] font-body uppercase text-gray-400 dark:text-gray-500">Collection</div>
                 <div className="text-xs tracking-[0.2em] font-body uppercase text-gray-400 dark:text-gray-500">Cart (0)</div>
@@ -18,18 +17,8 @@ const LoadingScreen = () => {
                         <rect height="20" opacity="0.6" rx="1" stroke="currentColor" strokeWidth="0.5" width="30" x="35" y="55"></rect>
                         <line stroke="currentColor" strokeWidth="1" x1="50" x2="50" y1="20" y2="30"></line>
                     </svg>
-                    <div className="absolute inset-0 overflow-hidden"
-                        style={{
-                            maskImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNMzUsMzAgVjIwIEg0MiBWMTIgSDU4IFYyMCBINjUgVjMwIEM2NSwzMCA3NSwzMCA3NSw1MCBWODggSDI1IFY1MCBDMjUsMzAgMzUsMzAgMzUsMzAgWiIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')",
-                            WebkitMaskImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNMzUsMzAgVjIwIEg0MiBWMTIgSDU4IFYyMCBINjUgVjMwIEM2NSwzMCA3NSwzMCA3NSw1MCBWODggSDI1IFY1MCBDMjUsMzAgMzUsMzAgMzUsMzAgWiIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')",
-                            maskSize: 'contain',
-                            maskRepeat: 'no-repeat',
-                            maskPosition: 'center',
-                            WebkitMaskSize: 'contain',
-                            WebkitMaskRepeat: 'no-repeat',
-                            WebkitMaskPosition: 'center'
-                        }}>
-                        <div className="absolute bottom-0 left-0 w-full h-[100%] bg-primary-metallic opacity-20 animate-fill-up"></div>
+                    <div className="absolute inset-0 overflow-hidden" style={{ maskImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNMzUsMzAgVjIwIEg0MiBWMTIgSDU4IFYyMCBINjUgVjMwIEM2NSwzMCA3NSwzMCA3NSw1MCBWODggSDI1IFY1MCBDMjUsMzAgMzUsMzAgMzUsMzAgWiIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')", WebkitMaskImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNMzUsMzAgVjIwIEg0MiBWMTIgSDU4IFYyMCBINjUgVjMwIEM2NSwzMCA3NSwzMCA3NSw1MCBWODggSDI1IFY1MCBDMjUsMzAgMzUsMzAgMzUsMzAgWiIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')", maskSize: "contain", maskRepeat: "no-repeat", maskPosition: "center", WebkitMaskSize: "contain", WebkitMaskRepeat: "no-repeat", WebkitMaskPosition: "center" }}>
+                        <div className="liquid absolute bottom-0 left-0 w-full h-full bg-primary-metallic opacity-20 animate-[fillUp_2.5s_ease-in-out_infinite]"></div>
                     </div>
                 </div>
                 <h1 className="font-display text-2xl md:text-3xl tracking-widest text-text-light dark:text-text-dark mb-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
@@ -39,7 +28,7 @@ const LoadingScreen = () => {
                     Loading your essence...
                 </p>
                 <div className="w-48 h-[1px] bg-gray-200 dark:bg-gray-800 relative overflow-hidden mt-2 rounded-full">
-                    <div className="absolute top-0 left-0 h-full w-full bg-primary-metallic origin-left animate-progress"></div>
+                    <div className="absolute top-0 left-0 h-full w-full bg-primary-metallic origin-left animate-[progress_2s_ease-in-out_infinite]"></div>
                 </div>
             </main>
             <div className="absolute bottom-8 text-[10px] tracking-[0.3em] uppercase text-gray-300 dark:text-gray-600 animate-fade-in" style={{ animationDelay: '800ms' }}>

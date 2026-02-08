@@ -79,13 +79,25 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const decreaseCartItem = (id) => {
+    setCart((prev) => {
+      const existing = prev.find(item => item.id === id);
+      if (existing.quantity === 1) {
+        return prev.filter(item => item.id !== id);
+      }
+      return prev.map(item =>
+        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+      );
+    });
+  };
+
   const removeFromCart = (id) => setCart(prev => prev.filter(item => item.id !== id));
   const clearCart = () => setCart([]);
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
     <CartContext.Provider value={{
-      cart, addToCart, removeFromCart, clearCart, getCartTotal,
+      cart, addToCart, decreaseCartItem, removeFromCart, clearCart, getCartTotal,
       user, login, logout, refreshUser
     }}>
       {children}

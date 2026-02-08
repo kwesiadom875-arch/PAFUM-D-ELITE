@@ -34,6 +34,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const InfoPage = lazy(() => import('./pages/InfoPage'));
 const DriverDashboard = lazy(() => import('./pages/DriverDashboard'));
 const TrackOrder = lazy(() => import('./pages/TrackOrder'));
+const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
 const About = lazy(() => import('./pages/About'));
 
 import LoadingScreen from './components/stitch/LoadingScreen';
@@ -48,7 +49,7 @@ function App() {
     <CartProvider>
       <CompareProvider>
         <ScrollToTop />
-        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && <Navbar />}
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && <Navbar />}
         <CompareTray />
         <ToastContainer
           position="top-center"
@@ -91,6 +92,7 @@ function App() {
               {/* Delivery Tracker */}
               <Route path="/driver" element={<DriverDashboard />} />
               <Route path="/track-order/:orderId" element={<TrackOrder />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
 
               {/* Static Info Pages */}
               <Route path="/contact" element={
@@ -152,7 +154,7 @@ function App() {
             </Routes>
           </Suspense>
         </AnimatePresence>
-        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && <Footer />}
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && <Footer />}
       </CompareProvider>
     </CartProvider>
   );
