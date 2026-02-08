@@ -21,13 +21,36 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage }).single('video');
+const fileFilter = (req, file, cb) => {
+  const allowedMimeTypes = [
+    'video/mp4',
+    'video/quicktime',
+    'video/x-m4v',
+    'video/webm',
+    'video/x-msvideo'
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only video files are allowed.'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 500 * 1024 * 1024 } // 500MB limit
+}).single('video');
 
 exports.uploadHeroVideo = (req, res) => {
   upload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       return res.status(500).json({ error: err.message });
     } else if (err) {
+      if (err.message === 'Invalid file type. Only video files are allowed.') {
+        return res.status(400).json({ error: err.message });
+      }
       return res.status(500).json({ error: err.message });
     }
 
