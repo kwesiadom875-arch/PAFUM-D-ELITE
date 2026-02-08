@@ -69,24 +69,6 @@ async function testScrape() {
         }
         console.log('Brand (Refined):', brand);
 
-        // Pyramid Notes Extraction - Header Debug
-        console.log('--- Pyramid Header Debug ---');
-        
-        const knownNote = $('*:contains("Oregano")').last();
-        if (knownNote.length) {
-            const noteContainer = knownNote.parent().parent(); // The flex container of notes
-            console.log('Note Container Tag:', noteContainer.get(0).tagName);
-            
-            // Check previous siblings for headers
-            const prev1 = noteContainer.prev();
-            console.log('Prev Sibling 1:', prev1.get(0)?.tagName, prev1.text());
-            
-            const prev2 = prev1.prev();
-            console.log('Prev Sibling 2:', prev2.get(0)?.tagName, prev2.text());
-            
-            // Check Parent 3 text again
-            console.log('Parent 3 Text:', noteContainer.parent().text().substring(0, 300));
-        }
 
         await browser.close();
 
