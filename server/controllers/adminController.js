@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const Featured = require('../models/Featured');
+const argon2 = require('argon2');
 
 // Configure Multer
 const storage = multer.diskStorage({
