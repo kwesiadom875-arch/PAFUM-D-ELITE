@@ -26,6 +26,7 @@ const catalogController = require('./controllers/catalogController'); // Direct 
 // We can create a separate route file, but for now let's just add it here or create routes/catalogRoutes.js
 // Let's create routes/catalogRoutes.js to be consistent.
 const catalogRoutes = require('./routes/catalogRoutes');
+const imageProxyRoutes = require('./routes/imageProxyRoutes');
 
 const app = express();
 app.use(cors({
@@ -76,27 +77,7 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/config', siteConfigRoutes);
 app.use('/api/catalog', catalogRoutes);
 
-// Proxy Image Route (kept here as it's a utility)
-app.get('/proxy-image', async (req, res) => {
-  const { url } = req.query;
-  if (!url) {
-    return res.status(400).send('No URL provided');
-  }
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.statusText}`);
-    }
-    const contentType = response.headers.get('content-type');
-    if (contentType) {
-      res.setHeader('Content-Type', contentType);
-    }
-    response.body.pipe(res);
-  } catch (error) {
-    console.error('Error proxying image:', error);
-    res.status(500).send('Failed to proxy image');
-  }
-});
+// Proxy Image Route (Secure)
+app.use('/proxy-image', imageProxyRoutes);
 
 module.exports = app;
