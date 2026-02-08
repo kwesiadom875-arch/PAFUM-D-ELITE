@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const Featured = require('../models/Featured');
+const argon2 = require('argon2');
 
 // Configure Multer
 const storage = multer.diskStorage({
@@ -318,17 +319,7 @@ exports.createUser = async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Hash password (assuming bcrypt is used in User model pre-save or we need to hash here)
-        // Since we don't see the User model pre-save hook, let's assume we need to hash it.
-        // Wait, looking at authController (not shown but usually standard), let's check if we have bcrypt.
-        // If User model has pre-save hash, we just save. 
-        // Let's assume User model handles hashing or we need to import bcrypt.
-        // To be safe, let's try to import bcrypt. If it fails, we'll know.
-        // Actually, let's check if User model has a pre-save hook.
-        // I'll assume standard implementation for now.
-
-        const bcrypt = require('bcryptjs');
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await argon2.hash(password);
 
         const user = new User({
             username,
