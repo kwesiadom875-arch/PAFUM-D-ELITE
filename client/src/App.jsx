@@ -36,21 +36,10 @@ const DriverDashboard = lazy(() => import('./pages/DriverDashboard'));
 const TrackOrder = lazy(() => import('./pages/TrackOrder'));
 const About = lazy(() => import('./pages/About'));
 
+import LoadingScreen from './components/stitch/LoadingScreen';
+
 // Loading Fallback
-const PageLoader = () => (
-  <div style={{
-    height: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: '#f8f9fa',
-    color: '#C5A059',
-    fontSize: '1.2rem',
-    fontWeight: '500'
-  }}>
-    Loading Parfum D'Elite...
-  </div>
-);
+const PageLoader = LoadingScreen;
 
 function App() {
   const location = useLocation();
@@ -59,7 +48,7 @@ function App() {
     <CartProvider>
       <CompareProvider>
         <ScrollToTop />
-        <Navbar />
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && <Navbar />}
         <CompareTray />
         <ToastContainer
           position="top-center"
@@ -163,7 +152,7 @@ function App() {
             </Routes>
           </Suspense>
         </AnimatePresence>
-        {!location.pathname.startsWith('/admin') && <Footer />}
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && <Footer />}
       </CompareProvider>
     </CartProvider>
   );

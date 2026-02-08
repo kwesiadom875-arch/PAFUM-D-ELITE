@@ -1,0 +1,13 @@
+/* Stitch Design Tokens */
+
+:root {
+  /* Colors */
+  --primary-color: #000;
+  --secondary-color: #fff;
+  
+  /* Typography */
+  --font-family-base: sans-serif;
+  
+  /* Spacing */
+  --spacing-unit: 8px;
+}

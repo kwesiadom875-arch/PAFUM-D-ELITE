@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parfum D'Elite - Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Lato:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CCA43B",
+                        "primary-dark": "#B08D33",
+                        "background-light": "#FAFAFA",
+                        "background-dark": "#121212",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "gold-light": "#F3E5AB",
+                    },
+                    fontFamily: {
+                        display: ["Playfair Display", "serif"],
+                        body: ["Lato", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.form-input-minimal {
+            border: none;
+            border-bottom: 1px solid #E5E7EB;
+            border-radius: 0;
+            padding-left: 0;
+            padding-right: 0;
+            background-color: transparent;
+        }
+        .form-input-minimal:focus {
+            border-color: #CCA43B;
+            box-shadow: none;
+            ring: 0;
+            outline: none;
+        }
+        .dark .form-input-minimal {
+            border-bottom-color: #374151;
+            color: #E0E0E0;
+        }
+        .dark .form-input-minimal:focus {
+            border-color: #CCA43B;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-body transition-colors duration-300">
+<nav class="sticky top-0 z-50 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-gray-500 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">Collection</a>
+<a class="hover:text-primary transition-colors" href="#">Request</a>
+<a class="hover:text-primary transition-colors" href="#">About</a>
+<a class="hover:text-primary transition-colors" href="#">Scent Map</a>
+</div>
+<div class="flex-shrink-0 flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+<a class="font-display text-2xl font-bold tracking-wider text-black dark:text-white" href="#">
+                        Parfum <span class="text-primary italic">D'Elite</span>
+</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-xs uppercase font-semibold text-primary hover:text-primary-dark tracking-widest hidden sm:block">Ask Josie</button>
+<button class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">person</span>
+</button>
+<button class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined text-xl">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">1</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="flex flex-col lg:flex-row gap-16">
+<div class="flex-1 lg:max-w-3xl">
+<h1 class="font-display text-3xl md:text-4xl text-gray-900 dark:text-white mb-10">Checkout</h1>
+<div class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-display text-xl text-gray-900 dark:text-white">1. Shipping Information</h2>
+<span class="text-xs text-primary uppercase tracking-wider font-semibold">Step 1 of 3</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">First Name</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="Enter first name" type="text"/>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Last Name</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="Enter last name" type="text"/>
+</div>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Street Address</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="Enter street address" type="text"/>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Apartment, suite, etc. (optional)</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="Apartment, suite, etc." type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">City</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="City" type="text"/>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Country/Region</label>
+<select class="form-input-minimal w-full py-2 bg-transparent text-gray-700 dark:text-gray-300 cursor-pointer">
+<option>Ghana</option>
+<option>United States</option>
+<option>United Kingdom</option>
+<option>France</option>
+</select>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Postal Code</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="Postal Code" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Email</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="email@example.com" type="email"/>
+</div>
+<div class="group">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Phone</label>
+<input class="form-input-minimal w-full py-2 placeholder-gray-300" placeholder="+233 XX XXX XXXX" type="tel"/>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-display text-xl text-gray-900 dark:text-white">2. Delivery Method</h2>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="space-y-4">
+<label class="relative flex items-center justify-between p-4 border border-primary/30 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-surface-dark/50 transition-colors bg-primary/5 dark:bg-primary/10">
+<div class="flex items-center">
+<input checked="" class="h-4 w-4 text-primary border-gray-300 focus:ring-primary bg-transparent" name="delivery" type="radio"/>
+<div class="ml-4">
+<span class="block text-sm font-semibold text-gray-900 dark:text-white">Standard Delivery</span>
+<span class="block text-xs text-gray-500 dark:text-gray-400">3-5 business days</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-gray-900 dark:text-white">Free</span>
+</label>
+<label class="relative flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded cursor-pointer hover:border-primary/50 transition-colors">
+<div class="flex items-center">
+<input class="h-4 w-4 text-primary border-gray-300 focus:ring-primary bg-transparent" name="delivery" type="radio"/>
+<div class="ml-4">
+<span class="block text-sm font-semibold text-gray-900 dark:text-white">Express Delivery</span>
+<span class="block text-xs text-gray-500 dark:text-gray-400">1-2 business days</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-gray-900 dark:text-white">GH₵150.00</span>
+</label>
+</div>
+</div>
+</div>
+<div class="mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-display text-xl text-gray-900 dark:text-white">3. Payment Details</h2>
+<div class="flex space-x-2 text-gray-400">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span class="text-xs uppercase tracking-wide">Secure</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex space-x-4 mb-8">
+<button class="flex-1 py-3 border border-primary bg-primary/5 text-primary rounded flex items-center justify-center space-x-2 transition-colors">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="text-xs font-bold uppercase tracking-wide">Card</span>
+</button>
+<button class="flex-1 py-3 border border-gray-200 dark:border-gray-700 text-gray-500 hover:border-primary/50 hover:text-primary rounded flex items-center justify-center space-x-2 transition-colors">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-xs font-bold uppercase tracking-wide">Mobile Money</span>
+</button>
+</div>
+<div class="space-y-6">
+<div class="group relative">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Card Number</label>
+<div class="relative">
+<input class="form-input-minimal w-full py-2 pl-10 placeholder-gray-300" placeholder="0000 0000 0000 0000" type="text"/>
+<span class="material-symbols-outlined absolute left-0 top-2 text-primary text-xl">credit_card</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div class="group relative">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Expiration Date</label>
+<div class="relative">
+<input class="form-input-minimal w-full py-2 pl-10 placeholder-gray-300" placeholder="MM / YY" type="text"/>
+<span class="material-symbols-outlined absolute left-0 top-2 text-primary text-xl">calendar_month</span>
+</div>
+</div>
+<div class="group relative">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">CVC</label>
+<div class="relative">
+<input class="form-input-minimal w-full py-2 pl-10 placeholder-gray-300" placeholder="123" type="text"/>
+<span class="material-symbols-outlined absolute left-0 top-2 text-primary text-xl">lock</span>
+</div>
+</div>
+</div>
+<div class="group relative">
+<label class="block text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Cardholder Name</label>
+<div class="relative">
+<input class="form-input-minimal w-full py-2 pl-10 placeholder-gray-300" placeholder="Name on card" type="text"/>
+<span class="material-symbols-outlined absolute left-0 top-2 text-primary text-xl">person</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:w-96 relative">
+<div class="sticky top-24">
+<h2 class="font-display text-xl text-gray-900 dark:text-white mb-6">Order Summary</h2>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+<div class="w-20 h-20 bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 p-2 flex-shrink-0">
+<img alt="Hacivat Nishane" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb3CChSGS05n-SeQ8zrWS8uNt0ZnDDIF3qBVEeRbEQg3seGUexbo8VmcCse-XArAWkCVcKKAmoTgDMQ2ykn97FOeON5H5yVmcPOwxjy1KugtW-VwiTKwcig_StQZ5pvG5Gw7rSVQ7Ow-1PmMy9nybsNDaE1qpM-5U_Lpe0Nbs3j-NdA6iZJTtjJs8bPktcgKM2EF_oN8NVAZhjfwphhsTNPaBJt0vOzTgupg2P4pJBBwz8COjmTQKcUMYwgbNXWqSioXxNvtY6qM4"/>
+</div>
+<div class="flex-1">
+<h3 class="font-display text-base font-semibold text-gray-900 dark:text-white leading-tight mb-1">Hacivat Nishane</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Extrait de Parfum</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Qty: 1</p>
+</div>
+<div class="text-right">
+<p class="font-semibold text-gray-900 dark:text-white text-sm">GH₵500</p>
+</div>
+</div>
+<div class="space-y-3 mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+<div class="flex justify-between text-sm">
+<span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+<span class="font-semibold text-gray-900 dark:text-white">GH₵500.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-500 dark:text-gray-400">Shipping</span>
+<span class="text-primary font-semibold">Free</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-500 dark:text-gray-400">Taxes</span>
+<span class="font-semibold text-gray-900 dark:text-white">GH₵0.00</span>
+</div>
+</div>
+<div class="flex justify-between items-end mb-8">
+<span class="font-display text-lg text-gray-900 dark:text-white">Total</span>
+<div class="text-right">
+<span class="text-xs text-gray-400 mb-1 block">GHS</span>
+<span class="font-display text-2xl font-bold text-primary">500.00</span>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded shadow-md hover:shadow-lg transition-all duration-300 uppercase tracking-widest text-sm flex items-center justify-center space-x-2 mb-4">
+<span>Place Order</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+<p class="text-center text-[10px] text-gray-400 leading-relaxed">
+                            By placing your order, you agree to our <a class="underline hover:text-primary" href="#">Terms of Service</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.
+                        </p>
+</div>
+<div class="mt-6 flex justify-center space-x-4 grayscale opacity-50">
+<div class="flex items-center space-x-1 text-xs text-gray-500">
+<span class="material-symbols-outlined">verified_user</span>
+<span>Secure Checkout</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 py-12 mt-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+<a class="font-display text-2xl font-bold tracking-wider text-black dark:text-white mb-6" href="#">
+                Parfum <span class="text-primary italic">D'Elite</span>
+</a>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Luxury Scents for the Elite.</p>
+<div class="flex space-x-6">
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">social_leaderboard</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+</div>
+<p class="text-gray-400 dark:text-gray-600 text-xs mt-8">© 2023 Parfum D'Elite. All rights reserved.</p>
+</div>
+</footer>
+
+</body></html>

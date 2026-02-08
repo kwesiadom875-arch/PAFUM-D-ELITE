@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parfum D'Elite - Order Confirmation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Lato:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#CCA43B",
+                        "primary-dark": "#B08D33",
+                        "background-light": "#FAFAFA",
+                        "background-dark": "#121212",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "gold-light": "#F3E5AB",
+                    },
+                    fontFamily: {
+                        display: ["Playfair Display", "serif"],
+                        body: ["Lato", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-body transition-colors duration-300 flex flex-col min-h-screen">
+<nav class="sticky top-0 z-50 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-gray-500 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">Collection</a>
+<a class="hover:text-primary transition-colors" href="#">Request</a>
+<a class="hover:text-primary transition-colors" href="#">About</a>
+<a class="hover:text-primary transition-colors" href="#">Scent Map</a>
+</div>
+<div class="flex-shrink-0 flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+<a class="font-display text-2xl font-bold tracking-wider text-black dark:text-white" href="#">
+                        Parfum <span class="text-primary italic">D'Elite</span>
+</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-xs uppercase font-semibold text-primary hover:text-primary-dark tracking-widest hidden sm:block">Ask Josie</button>
+<button class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">person</span>
+</button>
+<button class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined text-xl">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 flex-grow flex items-center justify-center">
+<div class="w-full text-center">
+<div class="mb-8 flex justify-center">
+<div class="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-5xl text-primary">check_circle</span>
+</div>
+</div>
+<h1 class="font-display text-4xl md:text-5xl text-gray-900 dark:text-white mb-6">Thank you for your order, Eleanor!</h1>
+<p class="text-lg text-gray-500 dark:text-gray-400 mb-2">We've received your order and it will be processed shortly.</p>
+<p class="text-sm font-semibold text-primary uppercase tracking-widest mb-12">Order #PDE-827364</p>
+<div class="bg-surface-light dark:bg-surface-dark border border-gray-100 dark:border-gray-800 rounded-lg p-8 md:p-10 shadow-sm max-w-2xl mx-auto mb-12 text-left">
+<h2 class="font-display text-xl text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">Order Summary</h2>
+<div class="flex items-center gap-6 mb-8">
+<div class="h-20 w-20 bg-gray-50 dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 p-2 flex-shrink-0">
+<img alt="Hacivat Nishane" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb3CChSGS05n-SeQ8zrWS8uNt0ZnDDIF3qBVEeRbEQg3seGUexbo8VmcCse-XArAWkCVcKKAmoTgDMQ2ykn97FOeON5H5yVmcPOwxjy1KugtW-VwiTKwcig_StQZ5pvG5Gw7rSVQ7Ow-1PmMy9nybsNDaE1qpM-5U_Lpe0Nbs3j-NdA6iZJTtjJs8bPktcgKM2EF_oN8NVAZhjfwphhsTNPaBJt0vOzTgupg2P4pJBBwz8COjmTQKcUMYwgbNXWqSioXxNvtY6qM4"/>
+</div>
+<div class="flex-1">
+<h3 class="font-display text-lg font-semibold text-gray-900 dark:text-white">Hacivat Nishane</h3>
+<p class="text-sm text-gray-500 dark:text-gray-400">Extrait de Parfum - 50ml</p>
+</div>
+<div class="text-right">
+<p class="font-semibold text-gray-900 dark:text-white">GH₵500.00</p>
+<p class="text-xs text-gray-400">Qty: 1</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-100 dark:border-gray-800 pt-8">
+<div>
+<h3 class="text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3">Shipping Address</h3>
+<p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                        Eleanor Pena<br/>
+                        4517 Washington Ave.<br/>
+                        Manchester, Kentucky 39495<br/>
+                        United States
+                    </p>
+</div>
+<div>
+<h3 class="text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3">Estimated Delivery</h3>
+<p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                        Standard Delivery<br/>
+<span class="font-medium text-gray-900 dark:text-white">Sept 24 - Sept 28</span>
+</p>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Paid</span>
+<span class="font-display text-2xl font-bold text-primary">GH₵500.00</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+<button class="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded shadow-md hover:shadow-lg transition-all duration-300 uppercase tracking-widest text-xs font-bold">
+                Continue Shopping
+            </button>
+<div class="flex gap-4">
+<a class="text-xs uppercase tracking-widest font-bold text-gray-500 hover:text-primary transition-colors px-6 py-4 border border-transparent hover:border-gray-200 rounded" href="#">Track Order</a>
+<a class="text-xs uppercase tracking-widest font-bold text-gray-500 hover:text-primary transition-colors px-6 py-4 border border-transparent hover:border-gray-200 rounded" href="#">View Receipt</a>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 py-12 mt-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+<a class="font-display text-2xl font-bold tracking-wider text-black dark:text-white mb-6" href="#">
+                Parfum <span class="text-primary italic">D'Elite</span>
+</a>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Luxury Scents for the Elite.</p>
+<div class="flex space-x-6">
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">social_leaderboard</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="text-gray-400 hover:text-primary" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+</div>
+<p class="text-gray-400 dark:text-gray-600 text-xs mt-8">© 2023 Parfum D'Elite. All rights reserved.</p>
+</div>
+</footer>
+
+</body></html>

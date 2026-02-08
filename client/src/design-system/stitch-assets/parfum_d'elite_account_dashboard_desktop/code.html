@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parfum D'Elite Account Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ecb613",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#221d10",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-[#181611] dark:text-gray-100 flex flex-col">
+<!-- Top Header -->
+<header class="sticky top-0 z-50 w-full border-b border-[#e6e3db] dark:border-[#3a3528] bg-white/80 dark:bg-[#1a160c]/80 backdrop-blur-md">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
+<!-- Brand -->
+<div class="flex items-center gap-4">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">spa</span>
+</div>
+<h2 class="font-display text-2xl font-bold tracking-tight text-[#181611] dark:text-white">Parfum D'Elite</h2>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-sm font-medium hover:text-primary transition-colors dark:text-gray-300" href="#">Shop</a>
+<a class="text-sm font-medium hover:text-primary transition-colors dark:text-gray-300" href="#">Discovery Set</a>
+<a class="text-sm font-medium hover:text-primary transition-colors dark:text-gray-300" href="#">Our Story</a>
+<a class="text-sm font-medium hover:text-primary transition-colors dark:text-gray-300" href="#">Journal</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center w-64 bg-background-light dark:bg-background-dark rounded-full px-4 py-2">
+<span class="material-symbols-outlined text-gray-400 text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full ml-2 placeholder-gray-400 dark:text-white" placeholder="Search" type="text"/>
+</div>
+<button class="relative hover:text-primary transition-colors dark:text-gray-300">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">2</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-[#e6e3db] dark:border-[#3a3528]">
+<img alt="Isabella Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGT-pbnn1hrb5ZuKYGrskiYhJsbTVR33Syaodk0ugs8DSW3ETyAjZBzOLqRD_mQAwZbUf6FNNkVBkaGdyEphnBDjnzborRwRAqH-w1li4r1vqyfgk_yr3IPzQnnFYPSdROvZKA_TxD_0bznAJKpnf0ITIrAEb5bfHZU9XVru5R7wKhtwDouLmEZqKmCRJMCKsICK5yv5WaEKHLvI-1JV6Wse2b2Z6eVqU_WugYhIsRGplzsi92zEKA4rO9TBoH1G9boay8zLq11PU"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Layout -->
+<div class="flex flex-1 max-w-[1440px] mx-auto w-full px-6 lg:px-10 py-10 gap-10">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:flex flex-col w-64 shrink-0">
+<!-- User Short Profile -->
+<div class="flex items-center gap-4 mb-10 pb-6 border-b border-[#e6e3db] dark:border-[#3a3528]">
+<div class="w-16 h-16 rounded-full overflow-hidden border border-[#e6e3db] dark:border-[#3a3528]">
+<img alt="Profile Picture" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA86Si99SiVvKHd4VNeAC6ngyIZt_2cQq55To-vQxzejbKrxEWONr6631cD4oWRyKuffW8_n03gLWLDcKtbRC5Gp6U7SdNLLoSew9Q_XuxkBETQkVGy-AsPuWb5N0SZjGPqqa2ClaKtY96sMs10NkWagVCfjtY-_hOkD9v_KdjwxaEW8daZy1TUft9d32HFYrMy1sOLzKNz3nrWIhzcBjYCJA6WuZOhs4QA5kIgRVV5sDMtMzLhtZXTgQQMxnSLojzhBsN4TbFUlNc"/>
+</div>
+<div>
+<h3 class="font-display font-medium text-lg dark:text-white">Isabella M.</h3>
+<span class="text-xs font-bold uppercase tracking-wider text-primary">Elite Member</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-medium transition-colors" href="#">
+<span class="material-symbols-outlined fill-current">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-background-light dark:hover:bg-[#2a2518] hover:text-[#181611] dark:hover:text-white rounded-lg font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+                    Orders
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-background-light dark:hover:bg-[#2a2518] hover:text-[#181611] dark:hover:text-white rounded-lg font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">filter_vintage</span>
+                    My Scents
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-background-light dark:hover:bg-[#2a2518] hover:text-[#181611] dark:hover:text-white rounded-lg font-medium transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+                    Profile
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-background-light dark:hover:bg-[#2a2518] hover:text-[#181611] dark:hover:text-white rounded-lg font-medium transition-colors mt-auto" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col gap-10">
+<!-- Welcome Header -->
+<section>
+<h1 class="font-display text-4xl font-bold text-[#181611] dark:text-white mb-2">Welcome back, Isabella</h1>
+<p class="text-gray-500 dark:text-gray-400">Here's what's happening with your account today.</p>
+</section>
+<!-- Stats Cards -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat 1 -->
+<div class="bg-white dark:bg-[#1a160c] p-6 rounded-xl border border-[#e6e3db] dark:border-[#3a3528] shadow-sm flex flex-col justify-between h-36 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">shopping_cart</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Orders</p>
+<p class="font-display text-3xl font-bold dark:text-white">12</p>
+</div>
+<div class="text-xs font-medium text-green-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                        Last order 2 days ago
+                    </div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col justify-between h-36 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-4 opacity-20">
+<span class="material-symbols-outlined text-6xl">diamond</span>
+</div>
+<div>
+<p class="text-sm font-medium text-white/80 mb-1">Loyalty Points</p>
+<p class="font-display text-3xl font-bold">5,400</p>
+</div>
+<div class="text-xs font-medium text-white/90 bg-white/20 w-fit px-2 py-1 rounded">
+                        +120 pts earned recently
+                    </div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-white dark:bg-[#1a160c] p-6 rounded-xl border border-[#e6e3db] dark:border-[#3a3528] shadow-sm flex flex-col justify-between h-36 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">favorite</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">My Scents</p>
+<p class="font-display text-3xl font-bold dark:text-white">8</p>
+</div>
+<div class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Floral &amp; Woody notes preferred
+                    </div>
+</div>
+</section>
+<!-- Dashboard Content Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Left Column (Tables & Info) -->
+<div class="xl:col-span-2 flex flex-col gap-8">
+<!-- Recent Orders Table -->
+<div class="bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-[#e6e3db] dark:border-[#3a3528]">
+<h2 class="font-display text-xl font-bold dark:text-white">Recent Orders</h2>
+<a class="text-sm font-medium text-primary hover:text-primary/80" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-background-light dark:bg-[#221d10] text-gray-500 dark:text-gray-400">
+<tr>
+<th class="px-6 py-4 font-medium">Order ID</th>
+<th class="px-6 py-4 font-medium">Date</th>
+<th class="px-6 py-4 font-medium">Items</th>
+<th class="px-6 py-4 font-medium">Status</th>
+<th class="px-6 py-4 font-medium text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e6e3db] dark:divide-[#3a3528]">
+<tr class="group hover:bg-background-light/50 dark:hover:bg-[#221d10]/50 transition-colors">
+<td class="px-6 py-4 font-medium dark:text-white">#ORD-7392</td>
+<td class="px-6 py-4 text-gray-500 dark:text-gray-400">Oct 24, 2023</td>
+<td class="px-6 py-4 dark:text-gray-300">Midnight Rose (50ml)</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                Shipped
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right font-medium dark:text-white">$145.00</td>
+</tr>
+<tr class="group hover:bg-background-light/50 dark:hover:bg-[#221d10]/50 transition-colors">
+<td class="px-6 py-4 font-medium dark:text-white">#ORD-7310</td>
+<td class="px-6 py-4 text-gray-500 dark:text-gray-400">Sep 12, 2023</td>
+<td class="px-6 py-4 dark:text-gray-300">Discovery Set Vol. 1</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                Delivered
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right font-medium dark:text-white">$45.00</td>
+</tr>
+<tr class="group hover:bg-background-light/50 dark:hover:bg-[#221d10]/50 transition-colors">
+<td class="px-6 py-4 font-medium dark:text-white">#ORD-7255</td>
+<td class="px-6 py-4 text-gray-500 dark:text-gray-400">Aug 05, 2023</td>
+<td class="px-6 py-4 dark:text-gray-300">Amber Woods (100ml)</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                Delivered
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right font-medium dark:text-white">$210.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recommended Section -->
+<div>
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-display text-xl font-bold dark:text-white">Recommended for You</h2>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white">
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Product Card 1 -->
+<div class="group bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] overflow-hidden hover:shadow-lg transition-all duration-300">
+<div class="aspect-[4/5] bg-gray-50 dark:bg-[#221d10] relative overflow-hidden">
+<img alt="Golden perfume bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Golden perfume bottle on white surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXLGZ_Gjo6VMA65eHHMDJYEoHo3nCKNLfToXwM3AJCNhPszJiiC52ZTtwL-jJfFGD1AvFMLQMUzpIXKjvsU6m4mXkSR0Ddt7PFi8t-r788D2nEh8hlJqnXWdrsQdRnt2oUn_D-bLAZmJCx_TTmkfbgZk6Ju8XnZUmypYCTos4YT67B_NMTU_TeLcJOvFDZtjnJY-AaRJTWFsZDysoKscqT0aSwVphvrPptftBS5-0GBMqfasZU055Who8jUcpcHQJ3JwUiH8K_oVo"/>
+<button class="absolute bottom-4 right-4 bg-white dark:bg-[#2a2518] text-[#181611] dark:text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+<span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-4">
+<h3 class="font-display font-bold text-lg text-[#181611] dark:text-white mb-1">Velvet Santal</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Woody • Spicy • Warm</p>
+<div class="flex items-center justify-between">
+<span class="font-medium text-[#181611] dark:text-white">$185.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] overflow-hidden hover:shadow-lg transition-all duration-300">
+<div class="aspect-[4/5] bg-gray-50 dark:bg-[#221d10] relative overflow-hidden">
+<img alt="Clear perfume bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Elegant clear perfume bottle with floral essence" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe3dJU8p_ADKAuzudOR01v6RdXTVsXtu_tviexCCrdmOhCXapV1ERmhe1C-rZ3cmg_K7NQs7nkfLh-Zwwa3dQAC9PcvD7_uY_M3uuTTz97AnJpiFqYukZc2NE4v5cNfN75B6JddJBJ9xiMZTMdqgCvBMEpbYDsUxar6kpvGGeDj0OaqNKe2w3ACcaaCRkjLxeK68yf9nJKqjaCXVxDp7YhTsdJF6thW-PPDUxgR7_7F6WnZilMVG4mGg9nY8LtQbH7ncBTmrj7C98"/>
+<button class="absolute bottom-4 right-4 bg-white dark:bg-[#2a2518] text-[#181611] dark:text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+<span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-4">
+<h3 class="font-display font-bold text-lg text-[#181611] dark:text-white mb-1">Jasmine Noir</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Floral • Fresh • Light</p>
+<div class="flex items-center justify-between">
+<span class="font-medium text-[#181611] dark:text-white">$160.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] overflow-hidden hover:shadow-lg transition-all duration-300 hidden lg:block">
+<div class="aspect-[4/5] bg-gray-50 dark:bg-[#221d10] relative overflow-hidden">
+<img alt="Dark amber perfume bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Dark amber glass perfume bottle with minimalist label" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2gspYfia3H7bcercYI9o6PiF-aTJjHwaDbyXY-1eAIVBAIlOmWsggkgRxUyqImrk4JGRJMSmvC2l_RYb58II9r1zJ5xf0R0tjfGrediuko7kF3-jimLD18W2Oe-zYm8iHS0Fa-SXl61qfwHmeUEnVz5-zRlzTwRyZffMv8f2dJpgl6hC6TxD-yjE6Pdy6hdjenI6F3UW5H4ntS5cxUI0Ib_SM_COev1427-PXX0kb8FSJap1DDorWafvQyo3w_EfMqYowraCw-0A"/>
+<button class="absolute bottom-4 right-4 bg-white dark:bg-[#2a2518] text-[#181611] dark:text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+<span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+</button>
+</div>
+<div class="p-4">
+<h3 class="font-display font-bold text-lg text-[#181611] dark:text-white mb-1">Oud Royal</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Oud • Intense • Smoky</p>
+<div class="flex items-center justify-between">
+<span class="font-medium text-[#181611] dark:text-white">$220.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Scent Profile & Address) -->
+<div class="flex flex-col gap-8">
+<!-- My Scent Profile Widget -->
+<div class="bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] p-6">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-display text-xl font-bold dark:text-white">My Scent Profile</h2>
+<button class="text-primary hover:text-primary/80">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Favorite Notes</h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-background-light dark:bg-[#221d10] text-[#181611] dark:text-white text-sm rounded-full border border-[#e6e3db] dark:border-[#3a3528]">Sandalwood</span>
+<span class="px-3 py-1 bg-background-light dark:bg-[#221d10] text-[#181611] dark:text-white text-sm rounded-full border border-[#e6e3db] dark:border-[#3a3528]">Bergamot</span>
+<span class="px-3 py-1 bg-background-light dark:bg-[#221d10] text-[#181611] dark:text-white text-sm rounded-full border border-[#e6e3db] dark:border-[#3a3528]">Vetiver</span>
+<span class="px-3 py-1 bg-background-light dark:bg-[#221d10] text-[#181611] dark:text-white text-sm rounded-full border border-[#e6e3db] dark:border-[#3a3528]">Jasmine</span>
+</div>
+</div>
+<hr class="border-[#e6e3db] dark:border-[#3a3528]"/>
+<div>
+<h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Olfactory Families</h4>
+<div class="flex items-center gap-3">
+<div class="flex-1 text-center p-3 rounded-lg bg-background-light dark:bg-[#221d10] border border-[#e6e3db] dark:border-[#3a3528]">
+<span class="material-symbols-outlined text-primary mb-1">forest</span>
+<p class="text-xs font-medium dark:text-white">Woody</p>
+</div>
+<div class="flex-1 text-center p-3 rounded-lg bg-background-light dark:bg-[#221d10] border border-[#e6e3db] dark:border-[#3a3528]">
+<span class="material-symbols-outlined text-primary mb-1">local_florist</span>
+<p class="text-xs font-medium dark:text-white">Floral</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-[#e6e3db] dark:border-[#3a3528]">
+<button class="w-full py-3 bg-[#181611] dark:bg-white text-white dark:text-[#181611] font-medium rounded-lg hover:opacity-90 transition-opacity">
+                                Take Scent Quiz Again
+                            </button>
+</div>
+</div>
+<!-- Shipping Address Widget -->
+<div class="bg-white dark:bg-[#1a160c] rounded-xl border border-[#e6e3db] dark:border-[#3a3528] p-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-display text-lg font-bold dark:text-white">Default Shipping</h2>
+<a class="text-xs font-bold text-primary uppercase tracking-wider" href="#">Manage</a>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-2 bg-background-light dark:bg-[#221d10] rounded-full text-gray-500">
+<span class="material-symbols-outlined text-xl">home_pin</span>
+</div>
+<div>
+<p class="font-medium text-[#181611] dark:text-white">Isabella Montclair</p>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                    428 Rue du Faubourg<br/>
+                                    Paris, 75008<br/>
+                                    France
+                                </p>
+</div>
+</div>
+</div>
+<!-- Need Help? -->
+<div class="bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 p-6 flex items-center gap-4">
+<div class="p-3 bg-white dark:bg-[#1a160c] rounded-full text-primary shadow-sm">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div>
+<h3 class="font-display font-bold text-[#181611] dark:text-white">Need Assistance?</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400">Contact our Concierge.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

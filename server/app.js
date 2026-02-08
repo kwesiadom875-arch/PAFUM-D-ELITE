@@ -32,7 +32,8 @@ const app = express();
 app.use(cors({
   origin: [
     "https://pafum-d-elite.vercel.app",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://pafum-d-elite.onrender.com"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true

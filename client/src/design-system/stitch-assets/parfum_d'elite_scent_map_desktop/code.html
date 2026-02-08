@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parfum D'Elite - Scent Map Discovery</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#d4af37","background-light": "#fcfbf9","background-dark": "#181611", 
+              "surface-light": "#f4f1ea","surface-dark": "#232018",
+              "border-light": "#e5e0d1",
+              "border-dark": "#393528",
+              "text-main": "#2d2a26","text-muted": "#8a8579"
+            },
+            fontFamily: {
+              "display": ["Noto Serif", "serif"],
+              "sans": ["Noto Sans", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fcfbf9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5e0d1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }@keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px 1px rgba(212, 175, 55, 0.2); }
+            50% { box-shadow: 0 0 15px 4px rgba(212, 175, 55, 0.4); }
+        }
+        .scent-node {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }.map-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 2s ease-out forwards;
+        }
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-light text-text-main font-display overflow-hidden h-screen flex flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light px-10 py-3 bg-white z-20 shadow-sm">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-text-main">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined text-2xl">diamond</span>
+</div>
+<h2 class="text-text-main text-lg font-bold leading-tight tracking-[-0.015em]">Parfum D'Elite</h2>
+</div>
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Shop</a>
+<a class="text-text-main text-sm font-medium leading-normal border-b border-primary pb-0.5" href="#">Discovery</a>
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">About</a>
+<a class="text-text-muted hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Journal</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<div class="hidden lg:flex w-full max-w-xs items-center rounded-lg bg-surface-light border border-border-light px-3 py-2">
+<span class="material-symbols-outlined text-text-muted">search</span>
+<input class="w-full bg-transparent border-none text-text-main text-sm placeholder-text-muted focus:ring-0 ml-2" placeholder="Search fragrances..."/>
+</div>
+<div class="flex gap-4">
+<button class="text-text-muted hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white font-bold">2</span>
+</button>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<aside class="w-80 border-r border-border-light bg-surface-light flex flex-col z-10 overflow-y-auto">
+<div class="p-6 border-b border-border-light">
+<h1 class="text-2xl font-black text-text-main mb-2">Scent Map</h1>
+<p class="text-text-muted text-sm leading-relaxed">Navigate our constellation of fragrances connected by shared olfactory notes.</p>
+</div>
+<div class="flex-1 p-4 space-y-4">
+<details class="group open:bg-white/50 rounded-lg transition-colors" open="">
+<summary class="flex cursor-pointer items-center justify-between p-3 select-none hover:bg-white/30 rounded-lg transition-colors">
+<span class="text-text-main font-medium">Olfactory Family</span>
+<span class="material-symbols-outlined text-text-muted group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-3 pb-4 space-y-3 pt-2">
+<label class="flex items-center gap-3 cursor-pointer group/item">
+<input checked="" class="h-4 w-4 rounded border-border-light bg-white text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="text-text-muted group-hover/item:text-text-main text-sm transition-colors">Woody</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group/item">
+<input class="h-4 w-4 rounded border-border-light bg-white text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="text-text-muted group-hover/item:text-text-main text-sm transition-colors">Floral</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group/item">
+<input class="h-4 w-4 rounded border-border-light bg-white text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="text-text-muted group-hover/item:text-text-main text-sm transition-colors">Oriental</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group/item">
+<input checked="" class="h-4 w-4 rounded border-border-light bg-white text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="text-text-muted group-hover/item:text-text-main text-sm transition-colors">Fresh</span>
+</label>
+</div>
+</details>
+<div class="h-px bg-border-light mx-3"></div>
+<details class="group open:bg-white/50 rounded-lg transition-colors">
+<summary class="flex cursor-pointer items-center justify-between p-3 select-none hover:bg-white/30 rounded-lg transition-colors">
+<span class="text-text-main font-medium">Intensity</span>
+<span class="material-symbols-outlined text-text-muted group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-3 pb-6 pt-2">
+<div class="relative h-1 bg-border-light rounded-full mb-6 mx-2">
+<div class="absolute left-0 top-0 h-full bg-primary/40 w-3/4 rounded-full"></div>
+<div class="absolute left-3/4 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-primary border-2 border-white rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"></div>
+</div>
+<div class="flex justify-between text-xs text-text-muted px-1 font-sans">
+<span>Light</span>
+<span>Moderate</span>
+<span class="text-text-main font-medium">Intense</span>
+</div>
+</div>
+</details>
+<div class="h-px bg-border-light mx-3"></div>
+<details class="group open:bg-white/50 rounded-lg transition-colors">
+<summary class="flex cursor-pointer items-center justify-between p-3 select-none hover:bg-white/30 rounded-lg transition-colors">
+<span class="text-text-main font-medium">Occasion</span>
+<span class="material-symbols-outlined text-text-muted group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-3 pb-4 space-y-2 pt-2">
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full border border-border-light bg-white text-xs text-text-muted hover:border-primary hover:text-primary transition-colors shadow-sm">Daytime</button>
+<button class="px-3 py-1.5 rounded-full border border-primary bg-primary/10 text-xs text-primary font-medium transition-colors">Evening</button>
+<button class="px-3 py-1.5 rounded-full border border-border-light bg-white text-xs text-text-muted hover:border-primary hover:text-primary transition-colors shadow-sm">Date Night</button>
+<button class="px-3 py-1.5 rounded-full border border-border-light bg-white text-xs text-text-muted hover:border-primary hover:text-primary transition-colors shadow-sm">Office</button>
+</div>
+</div>
+</details>
+</div>
+<div class="p-6 border-t border-border-light mt-auto bg-surface-light">
+<button class="w-full py-3 bg-text-main text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-primary transition-colors shadow-md">
+                    Reset Filters
+                </button>
+</div>
+</aside>
+<main class="flex-1 relative bg-background-light overflow-hidden cursor-move">
+<div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(#d1ccc0 1.5px, transparent 1.5px); background-size: 40px 40px;">
+</div>
+<div class="absolute inset-0 w-full h-full flex items-center justify-center transform scale-100 origin-center transition-transform duration-700 ease-out" id="map-container">
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
+<line class="map-line" stroke="#d4af37" stroke-opacity="0.3" stroke-width="1.5" x1="50%" x2="30%" y1="50%" y2="35%"></line>
+<line class="map-line" stroke="#d4af37" stroke-opacity="0.3" stroke-width="1.5" x1="50%" x2="70%" y1="50%" y2="65%"></line>
+<line class="map-line" stroke="#d4af37" stroke-opacity="0.2" stroke-width="1" x1="50%" x2="65%" y1="50%" y2="30%"></line>
+<line class="map-line" stroke="#d4af37" stroke-opacity="0.2" stroke-width="1" x1="30%" x2="20%" y1="35%" y2="60%"></line>
+<line class="map-line" stroke="#d4af37" stroke-opacity="0.2" stroke-width="1" x1="70%" x2="80%" y1="65%" y2="40%"></line>
+</svg>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="relative flex items-center justify-center">
+<div class="w-5 h-5 bg-primary rounded-full scent-node relative z-10 cursor-pointer group-hover:scale-125 transition-transform duration-300 ring-4 ring-white shadow-lg"></div>
+<div class="absolute w-12 h-12 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+</div>
+<div class="absolute top-7 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-100 transition-opacity">
+<span class="text-text-main text-xs font-serif font-bold tracking-widest uppercase bg-white/80 px-2 py-0.5 rounded-full shadow-sm backdrop-blur-sm border border-border-light">Santal Noir</span>
+</div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 bg-white border border-border-light rounded-lg shadow-2xl p-0 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto overflow-hidden">
+<div class="relative h-32 bg-[#f4f4f4]">
+<img alt="Luxury amber perfume bottle on light background" class="w-full h-full object-cover mix-blend-multiply opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOQr_pKNkjlOoe7OJLe1-UUcPHUtGfkMH6AM5fuUXCKxpitCEh__jUKtnG3npIr9NeULNs1Ljy09X25rfpQzeU2D55DMhi7wKjI5v7n6pN7lgWv7RK9GiwE2YLVwGbp0o11mC1WUmCCyxxftKqFdYKz_ODbZ-FTXyttRA5z0d1PpSnyfpvICtYyiEdlck0hYXk8dOz5-X8OnDXpy9gMtatSwVINYUrzbhjBNTfB_zBhlUHF_hKN3U47-ARIPW-9KbldLgMCBYS2z8"/>
+<div class="absolute top-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-primary border border-primary/20 font-bold uppercase tracking-wide">Woody</div>
+</div>
+<div class="p-4">
+<h3 class="text-lg font-bold text-text-main font-display">Santal Noir</h3>
+<p class="text-text-muted text-xs mt-1 font-sans">Sandalwood, Cardamom, Leather</p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-primary font-bold text-sm">$280</span>
+<button class="bg-text-main text-white hover:bg-primary transition-colors text-xs px-3 py-1.5 rounded font-medium shadow-md">Details</button>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-[35%] left-[30%] -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="w-3 h-3 bg-white border-2 border-primary rounded-full relative z-10 cursor-pointer group-hover:scale-125 group-hover:bg-primary transition-all duration-300 shadow-md"></div>
+<div class="absolute top-5 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-text-main text-[10px] font-serif tracking-widest uppercase font-bold group-hover:bg-white/80 group-hover:px-1.5 group-hover:py-0.5 group-hover:rounded-full group-hover:shadow-sm">Oud Impérial</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-white border border-border-light rounded shadow-lg text-xs text-text-main opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 font-medium">
+                        Oud • Incense • Patchouli
+                     </div>
+</div>
+<div class="absolute top-[65%] left-[70%] -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="w-3 h-3 bg-white border-2 border-primary rounded-full relative z-10 cursor-pointer group-hover:scale-125 group-hover:bg-primary transition-all duration-300 shadow-md"></div>
+<div class="absolute top-5 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="text-text-main text-[10px] font-serif tracking-widest uppercase font-bold group-hover:bg-white/80 group-hover:px-1.5 group-hover:py-0.5 group-hover:rounded-full group-hover:shadow-sm">Rose Velours</span>
+</div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 bg-white border border-border-light rounded-lg shadow-xl p-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 pointer-events-none z-20 flex gap-3 items-center">
+<div class="w-12 h-12 shrink-0 bg-[#f4f4f4] rounded overflow-hidden border border-border-light">
+<img alt="Pink perfume bottle detail" class="w-full h-full object-cover mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkAshjEPIZ0B5BAWzfzENUw5lGbAvHWWkZ8YXqXNhIt11PcRg_TyM_kWWvfWenAk3YfVvAt2xm_CTyigGnkTGUzbICg4N7IyDt1PpoFox58FitGdtGzSQghVCTD3efiKUfCH8UzKszQRYVMIfd2A0aHnxAlQIPFP2eQX27SqYtCGNIU89N8WDHLQnvJypq6O0aSOgmoYSDH0w2JSPupeZIVCQ1WI30grs78-SvbbBgIUi78QzIOuC207LzWqoYR12B3xZZCm8UakI"/>
+</div>
+<div>
+<div class="text-text-main font-bold text-sm font-display">Rose Velours</div>
+<div class="text-primary font-bold text-xs mt-0.5">$210</div>
+</div>
+</div>
+</div>
+<div class="absolute top-[30%] left-[65%] -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="w-2 h-2 bg-text-muted/40 rounded-full relative z-10 cursor-pointer hover:bg-primary transition-colors duration-300 ring-2 ring-transparent hover:ring-white hover:shadow-md"></div>
+<div class="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-text-muted text-[9px] font-serif tracking-widest uppercase group-hover:text-text-main group-hover:font-bold">Jasmin d'Eté</span>
+</div>
+</div>
+<div class="absolute top-[60%] left-[20%] -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="w-2 h-2 bg-text-muted/40 rounded-full relative z-10 cursor-pointer hover:bg-primary transition-colors duration-300 ring-2 ring-transparent hover:ring-white hover:shadow-md"></div>
+<div class="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-text-muted text-[9px] font-serif tracking-widest uppercase group-hover:text-text-main group-hover:font-bold">Cuir de Russie</span>
+</div>
+</div>
+<div class="absolute top-[40%] left-[80%] -translate-x-1/2 -translate-y-1/2 group z-10">
+<div class="w-2.5 h-2.5 bg-white border border-text-muted rounded-full relative z-10 cursor-pointer hover:bg-primary hover:border-primary transition-colors duration-300 shadow-sm"></div>
+<div class="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-text-muted text-[9px] font-serif tracking-widest uppercase group-hover:text-text-main group-hover:font-bold">Ambre Sultan</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-8 right-8 flex flex-col gap-2 z-20">
+<button class="bg-white border border-border-light text-text-main p-2 rounded hover:bg-surface-light hover:text-primary transition-colors shadow-lg">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+<button class="bg-white border border-border-light text-text-main p-2 rounded hover:bg-surface-light hover:text-primary transition-colors shadow-lg">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<button class="bg-white border border-border-light text-text-main p-2 rounded hover:bg-surface-light hover:text-primary transition-colors shadow-lg mt-2">
+<span class="material-symbols-outlined text-xl">my_location</span>
+</button>
+</div>
+<div class="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md border border-border-light rounded-lg p-3 z-20 flex gap-4 text-xs shadow-lg">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-primary shadow-sm ring-2 ring-white"></div>
+<span class="text-text-main font-medium">Selected Match</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-white border-2 border-primary shadow-sm"></div>
+<span class="text-text-main">Direct Relation</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-text-muted/40"></div>
+<span class="text-text-muted">Others</span>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
