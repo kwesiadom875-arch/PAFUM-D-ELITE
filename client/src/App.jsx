@@ -49,7 +49,7 @@ function App() {
     <CartProvider>
       <CompareProvider>
         <ScrollToTop />
-        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && <Navbar />}
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && !location.pathname.startsWith('/olfactory-map') && <Navbar />}
         <CompareTray />
         <ToastContainer
           position="top-center"
@@ -154,7 +154,7 @@ function App() {
             </Routes>
           </Suspense>
         </AnimatePresence>
-        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && <Footer />}
+        {!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/cart') && !location.pathname.startsWith('/checkout') && !location.pathname.startsWith('/olfactory-map') && <Footer />}
       </CompareProvider>
     </CartProvider>
   );

@@ -1,14 +1,17 @@
-
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { FaShoppingBag, FaBars, FaTimes, FaTrash, FaUser } from 'react-icons/fa';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import API_URL from '../config';
+import { FaShoppingBag, FaBars, FaTimes, FaTrash, FaUser, FaCamera } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
   const { cart, removeFromCart, getCartTotal, user, logout } = useContext(CartContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -23,6 +26,54 @@ const Navbar = () => {
     logout();
     navigate('/auth?mode=signin');
     if (isMenuOpen) toggleMenu();
+  };
+
+  const handleVisualSearch = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size too large (Max 5MB)");
+      return;
+    }
+
+    setIsSearching(true);
+    const toastId = toast.loading("Analyzing image...", { autoClose: false });
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await axios.post(`${API_URL}/api/search/visual`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const { brand, name, description } = res.data.analysis;
+
+      toast.update(toastId, {
+        render: `Found: ${brand} - ${name}`,
+        type: "success",
+        isLoading: false,
+        autoClose: 5000
+      });
+
+      // Navigate to shop with search query
+      navigate(`/shop?search=${encodeURIComponent(name)}`);
+
+    } catch (error) {
+      console.error("Visual Search Error", error);
+      toast.update(toastId, {
+        render: "Could not identify perfume. Try another image.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000
+      });
+    } finally {
+      setIsSearching(false);
+      event.target.value = ''; // Reset input
+    }
   };
 
   return (
@@ -50,6 +101,21 @@ const Navbar = () => {
           {/* Right Group */}
           <div className="nav-right">
             <Link to="/find-your-scent" className="desktop-only" style={{ color: '#C5A059', marginRight: '1.5rem' }}>Ask Josie</Link>
+
+            {/* Visual Search Icon */}
+            <div className="nav-icon" style={{ cursor: 'pointer', marginRight: '1rem' }} title="Search by Image">
+              <label htmlFor="visual-search-input" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <FaCamera />
+              </label>
+              <input
+                id="visual-search-input"
+                type="file"
+                accept="image/*"
+                onChange={handleVisualSearch}
+                style={{ display: 'none' }}
+                disabled={isSearching}
+              />
+            </div>
 
             {/* Profile Icon & Tier */}
             <div

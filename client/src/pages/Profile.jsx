@@ -50,7 +50,7 @@ const Profile = () => {
   const recentOrders = user?.orders || displayUser.recentOrders;
 
   return (
-    <div className="bg-background-light dark:bg-background-dark min-h-screen text-[#181611] dark:text-gray-100 flex flex-col font-sans">
+    <div className="bg-background-light dark:bg-background-dark min-h-screen text-text-light dark:text-text-dark flex flex-col font-sans">
       {/* Main Layout */}
       <div className="flex flex-1 max-w-[1440px] mx-auto w-full px-6 lg:px-10 py-10 gap-10">
         {/* Sidebar Navigation */}

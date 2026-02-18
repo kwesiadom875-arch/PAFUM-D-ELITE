@@ -60,6 +60,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// Security Middleware
+const aiSecurity = require('./middleware/aiSecurity');
+
+// Apply AI Firewall to sensitive POST/PUT routes
+// We want to protect user input areas like Reviews, Contact Requests, and Chat
+app.use(['/api/reviews', '/api/requests', '/api/josie', '/api/negotiate'], aiSecurity);
+
 // --- ROUTES ---
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);

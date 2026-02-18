@@ -8,22 +8,38 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Brand golds
                 "primary": "#CCA43B",
                 "primary-dark": "#B08D33",
                 "primary-metallic": "#D4AF37",
-                "background-light": "#FAFAFA",
-                "background-dark": "#121212",
+                "accent-gold": "#C5A028",
+                "gold": "#c5a059",
+                "gold-hover": "#d4af68",
+                "gold-light": "#F3E5AB",
+
+                // Backgrounds
+                "background-light": "#f8f8f6",
+                "background-light-alt": "#F9F9F7",
+                "background-dark": "#221d10",
+                "background-dark-alt": "#1a1a1a",
                 "surface-light": "#FFFFFF",
                 "surface-dark": "#1E1E1E",
+
+                // Text
                 "text-light": "#333333",
-                "text-dark": "#E0E0E0",
-                "gold-light": "#F3E5AB",
-                "accent-gold": "#C5A028",
+                "text-dark": "#E5E5E5",
+                "text-main": "#181611",
+                "text-muted": "#6b7280",
+
+                // Borders
+                "border-light": "#e6e3db",
+                "border-dark": "#3a3528",
             },
             fontFamily: {
-                "display": ["Playfair Display", "serif"],
+                // Noto stack from stitched designs, with Lato fallback
+                "display": ["Noto Serif", "Playfair Display", "serif"],
+                "sans": ["Noto Sans", "Lato", "sans-serif"],
                 "body": ["Lato", "sans-serif"],
-                "sans": ["Lato", "sans-serif"],
             },
             borderRadius: {
                 DEFAULT: "4px",

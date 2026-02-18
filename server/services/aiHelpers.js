@@ -1,8 +1,28 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Groq = require('groq-sdk');
+const OpenAI = require('openai');
+const { getCachedResponse, cacheResponse } = require('./semanticCache');
 
 // Initialize AI Clients
 // Support both GOOGLE_API_KEY and GEMINI_API_KEY
+
+// Lazy initialization for NVIDIA NIM (via OpenAI SDK)
+let nvidia = null;
+function getNvidiaClient() {
+  if (!nvidia) {
+    const nvidiaKey = process.env.NVIDIA_API_KEY;
+    if (!nvidiaKey) {
+      console.warn("⚠️ NVIDIA_API_KEY is missing. NVIDIA NIM will be skipped.");
+      return null;
+    }
+    console.log("✅ NVIDIA_API_KEY detected. Initializing NVIDIA NIM...");
+    nvidia = new OpenAI({
+      apiKey: nvidiaKey,
+      baseURL: 'https://integrate.api.nvidia.com/v1',
+    });
+  }
+  return nvidia;
+}
 
 // Lazy initialization for Google AI
 let genAI = null;
@@ -12,8 +32,8 @@ function getGoogleClient() {
   if (!genAI) {
     const googleKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
     if (!googleKey) {
-      console.error("❌ GOOGLE_API_KEY is missing. Gemini will fail.");
-      throw new Error("GOOGLE_API_KEY is missing");
+      console.warn("❌ GOOGLE_API_KEY is missing. Gemini will fail.");
+      return null;
     }
     console.log("✅ GOOGLE_API_KEY / GEMINI_API_KEY detected. Gemini is ready.");
     genAI = new GoogleGenerativeAI(googleKey);
@@ -29,7 +49,7 @@ function getGroqClient() {
   if (!groq) {
     if (!process.env.GROQ_API_KEY) {
       console.warn("⚠️ GROQ_API_KEY is missing. Fallback will not work.");
-      throw new Error("GROQ_API_KEY is missing");
+      return null;
     }
     console.log("✅ GROQ_API_KEY detected. Initializing Groq fallback...");
     groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -38,7 +58,7 @@ function getGroqClient() {
 }
 
 /**
- * Centralized AI API wrapper (Google Gemini with Groq Fallback)
+ * Centralized AI API wrapper (NVIDIA NIM -> Google Gemini -> Groq Fallback)
  * @param {string} systemPrompt - System instruction for the AI
  * @param {string} userMessage - User's message/query
  * @param {number} temperature - Creativity level (0.0-1.0)
@@ -47,38 +67,28 @@ function getGroqClient() {
  * @returns {Promise<string>} - AI response content
  */
 async function callAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 500, jsonMode = false) {
-  // 1. Try Google Gemini
-  try {
-    console.log("🤖 Attempting to generate response with Google Gemini...");
-    const generationConfig = {
-      temperature,
-      maxOutputTokens: maxTokens,
-    };
-    
-    if (jsonMode) {
-      generationConfig.responseMimeType = "application/json";
+
+  // 0. Check Semantic Cache
+  // We combine system prompt and user message for the cache key to ensure context matches
+  const uniqueQuery = `${systemPrompt} ::: ${userMessage}`;
+
+  if (!jsonMode) {
+    const cached = await getCachedResponse(uniqueQuery);
+    if (cached) {
+      return cached;
     }
+  }
 
-    const model = getGoogleClient();
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt + "\n\n" + userMessage }] }
-      ],
-      generationConfig,
-    });
+  let responseText = "";
 
-    console.log("✅ Google Gemini success");
-    let text = result.response.text();
-    return cleanAIResponse(text);
-  } catch (googleError) {
-    console.warn('⚠️ Google AI failed, switching to Groq fallback:', googleError.message);
-    
-    // 2. Fallback to Groq
-    try {
-      console.log("🤖 Attempting fallback with Groq...");
-      const groqClient = getGroqClient();
-      const completion = await groqClient.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+  // 1. Try NVIDIA NIM (Llama 3)
+  try {
+    const nvidiaClient = getNvidiaClient();
+    if (nvidiaClient) {
+      console.log("🤖 Attempting to generate response with NVIDIA NIM (Llama 3)...");
+
+      const completion = await nvidiaClient.chat.completions.create({
+        model: "meta/llama-3.3-70b-instruct",
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage }
@@ -88,13 +98,88 @@ async function callAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 
         response_format: jsonMode ? { type: "json_object" } : undefined
       });
 
-      console.log("✅ Groq fallback success");
-      let text = completion.choices[0]?.message?.content || '';
-      return cleanAIResponse(text);
-    } catch (groqError) {
-      console.error('❌ Groq AI Fallback Error:', groqError.message);
-      throw new Error('AI service temporarily unavailable (Both providers failed)');
+      console.log("✅ NVIDIA NIM success");
+      responseText = completion.choices[0]?.message?.content || '';
+      responseText = cleanAIResponse(responseText);
+
+      // Cache the successful response
+      if (!jsonMode && responseText) {
+        cacheResponse(uniqueQuery, responseText);
+      }
+
+      return responseText;
     }
+  } catch (nvidiaError) {
+    console.warn('⚠️ NVIDIA NIM failed, switching to backup providers:', nvidiaError.message);
+  }
+
+  // 2. Try Google Gemini
+  try {
+    console.log("🤖 Attempting to generate response with Google Gemini...");
+    const model = getGoogleClient();
+
+    if (model) {
+      const generationConfig = {
+        temperature,
+        maxOutputTokens: maxTokens,
+      };
+
+      if (jsonMode) {
+        generationConfig.responseMimeType = "application/json";
+      }
+
+      const result = await model.generateContent({
+        contents: [
+          { role: 'user', parts: [{ text: systemPrompt + "\n\n" + userMessage }] }
+        ],
+        generationConfig,
+      });
+
+      console.log("✅ Google Gemini success");
+      responseText = result.response.text();
+      responseText = cleanAIResponse(responseText);
+
+      // Cache the successful response
+      if (!jsonMode && responseText) {
+        cacheResponse(uniqueQuery, responseText);
+      }
+
+      return responseText;
+    }
+  } catch (googleError) {
+    console.warn('⚠️ Google AI failed, switching to Groq fallback:', googleError.message);
+  }
+
+  // 3. Fallback to Groq
+  try {
+    console.log("🤖 Attempting fallback with Groq...");
+    const groqClient = getGroqClient();
+    if (!groqClient) throw new Error("Groq client not available");
+
+    const completion = await groqClient.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage }
+      ],
+      temperature,
+      max_tokens: maxTokens,
+      response_format: jsonMode ? { type: "json_object" } : undefined
+    });
+
+    console.log("✅ Groq fallback success");
+    responseText = completion.choices[0]?.message?.content || '';
+    responseText = cleanAIResponse(responseText);
+
+    // Cache the successful response
+    if (!jsonMode && responseText) {
+      cacheResponse(uniqueQuery, responseText);
+    }
+
+    return responseText;
+  } catch (groqError) {
+    console.error('❌ Groq AI Fallback Error:', groqError.message);
+    throw new Error('AI service temporarily unavailable (All providers failed)');
   }
 }
 
@@ -126,7 +211,7 @@ async function extractFragranceNotes(description) {
   const userMessage = `Extract the fragrance notes that would best represent: "${description}"`;
 
   const response = await callAI(systemPrompt, userMessage, 0.3, 100);
-  
+
   // Parse the response into an array
   return response.split(',').map(note => note.trim()).filter(note => note.length > 0);
 }
@@ -192,7 +277,7 @@ async function analyzeReviewSentiment(reviewText) {
   Flag reviews that contain profanity, spam, or inappropriate content.`;
 
   const response = await callAI(systemPrompt, reviewText, 0.3, 200, true);
-  
+
   try {
     // Try to parse JSON response
     const parsed = JSON.parse(response);
@@ -211,10 +296,59 @@ async function analyzeReviewSentiment(reviewText) {
   }
 }
 
+/**
+ * Analyze an image to identify perfumes
+ * @param {string} imageBase64 - Base64 encoded image string (without prefix)
+ * @returns {Promise<Object>} 
+ */
+async function analyzeImage(imageBase64) {
+  const nvidiaClient = getNvidiaClient();
+  if (!nvidiaClient) return null;
+
+  try {
+    console.log("👁️ Analyzing image with NVIDIA VILA / Phi-3 Vision...");
+
+    // Construct the payload for Vision model
+    const response = await nvidiaClient.chat.completions.create({
+      model: "microsoft/phi-3-vision-128k-instruct",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Identify the perfume in this image. Return a JSON object with keys: brand, name, and a short visual description." },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`
+              }
+            }
+          ]
+        }
+      ],
+      max_tokens: 300,
+      stream: false
+    });
+
+    const content = response.choices[0].message.content;
+
+    const cleaned = cleanAIResponse(content);
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      return { description: cleaned };
+    }
+
+  } catch (error) {
+    console.error("Visual Search Error:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   callAI,
   callGroqAI,
   extractFragranceNotes,
   generatePersonalizedMessage,
-  analyzeReviewSentiment
+  analyzeReviewSentiment,
+  analyzeImage
 };
